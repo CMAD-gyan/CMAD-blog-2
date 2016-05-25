@@ -1,0 +1,19 @@
+PROJ_DIR=/home/gyaranja/proj/
+AJAY_REPO=$PROJ_DIR/WORKSPACE/CMAD-blog-2
+AJAY_REPO=/home/gyaranja/proj/Workspace/CMAD-blog-2
+TOMCAT_DIR=/home/gyaranja/proj/Programs/apache-tomcat-8.0.33
+source $PROJ_DIR/env.sh
+
+cd $AJAY_REPO
+mvn clean
+mvn package
+rm -rf /home/gyaranja/proj/tomcat-8.0/apache-tomcat-8.0.33/webapps/CMAD-blog
+rm -rf /home/gyaranja/proj/tomcat-8.0/apache-tomcat-8.0.33/logs/*
+cp $AJAY_REPO/./target/CMAD-blog-2.war   /home/gyaranja/proj/Programs/apache-tomcat-8.0.33/webapps
+
+cd $TOMCAT_DIR/bin/
+./startup.sh
+./shutdown.sh  
+cd $AJAY_REPO
+
+
