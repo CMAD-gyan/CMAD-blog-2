@@ -38,9 +38,14 @@ public class Question {
 @Embedded
 	private List<Answer>  answers;
 
+
+	public void QuestionCleanEmbeds(){
+		this.votes       = null;
+		this.comments    = null;
+		this.answers     = null;
+	}
+
 	public Question() {
-	//	this.createTime  = new Timestamp(System.currentTimeMillis());
-	//	this.updateTime  = new Timestamp(System.currentTimeMillis());
 		this.votes       = null;
 		this.comments    = null;
 		this.answers     = null;
@@ -66,11 +71,6 @@ public class Question {
 	public String getId(){
 		return this.id.toHexString();
 	}
-	
-//	public void setId(String id){
-//		this.id = ObjectId.  id;
-//	}
-	
 	
 	public String getTitle(){
 		return this.title;
@@ -112,8 +112,6 @@ public class Question {
 	public void setUpdateTime(){
 		this.updateTime = new Timestamp(System.currentTimeMillis());
 	}
-	
-	
 	
 	public String getUserName(){
 		return this.userName;

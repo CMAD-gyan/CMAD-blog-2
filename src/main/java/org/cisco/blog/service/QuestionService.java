@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -29,11 +30,31 @@ public class QuestionService {
 		return question;
 	}
 	
+	@DELETE
+	@Path("/{param}")
+	public void deleteQuestionById(@PathParam("param") String id) {
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		ObjectId  oid =  new ObjectId(id);
+		Question question =  dataStore.get(Question.class, oid);
+		
+		//if question matchs username then allow delete
+		dataStore.delete(Question.class, oid);
+		
+		return;
+	}
+	
+	//FIXME add start and end
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	public List<Question> getAllQuestion() {
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		List<Question> ques = dataStore.createQuery(Question.class).asList();
+		List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").offset(0).limit(2).asList();
+		
+		//    .offset(1)
+	    //.limit(10)
+	    //.asList()
+		//
+		
 		return ques;
 	}
 	
