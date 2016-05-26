@@ -36,6 +36,18 @@ public class Answer {
 		
 	}
 	
+	public Answer(String text, String userName, User user) {
+		this.text  = text;
+	   //@toDo	
+		//this.user  = user;
+		this.userName  = userName;		
+		this.createTime  = new Timestamp(System.currentTimeMillis());
+		this.updateTime  = new Timestamp(System.currentTimeMillis());
+		this.votes       = null;
+		this.comments    = null;
+	}
+	
+	
 	public String getText(){
 		return this.text;
 	}
