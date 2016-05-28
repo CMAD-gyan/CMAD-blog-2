@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
@@ -42,18 +43,19 @@ public class QuestionService {
 		return;
 	}
 	
-	
-    
-	
 	@GET
-	@Secured
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
-	public Question getQuestionById(@PathParam("param") String id,  
-			                       @Context SecurityContext securityContext) {
+	public Question getQuestionById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid =  new ObjectId(id);
 		Question question =  dataStore.get(Question.class, oid);
+		
+		// if question is found increment view count 
+		if (question != null) {
+			question.setViewCount(question.getViewCount() + 1);
+			dataStore.save(question);
+		}
 		return question;
 	}
 	
@@ -62,28 +64,78 @@ public class QuestionService {
 	@Path("/{param}")
 	public void deleteQuestionById(@PathParam("param") String id,
 			                       @Context SecurityContext securityContext) {
+		
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid =  new ObjectId(id);
 		Question question =  dataStore.get(Question.class, oid);
-		//if question matchs username then allow delete
-		dataStore.delete(Question.class, oid);
+		//if question matches username then allow delete
 		
+		
+		if( securityContext.getUserPrincipal().getName().equals("admin") || 
+				securityContext.getUserPrincipal().getName().equals(
+						             question.getUser().getUsername()))	{
+			dataStore.delete(Question.class, oid);
+		}else {
+			throw  new NotAuthorizedException("You Don't Have Permission");
+		}
 		return;
 	}
 	
 	//FIXME add start and end
 	@GET
-	@Secured
 	@Produces({MediaType.APPLICATION_JSON})
-	public List<Question> getAllQuestion(@Context SecurityContext securityContext) {
+	@Path("/{offset}/{length}")
+	public List<Question> getAllQuestion(@PathParam("offset") String offset, 
+			                             @PathParam("length") String length) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
-		//offset(0).limit(2).
+		List<Question> ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
+		
+		for (int i = 0; i < ques.size(); i++) {
+			//we should not send password
+			ques.get(i).setAnswers(null);
+			ques.get(i).setComments(null);
+			ques.get(i).setVotes(null);
+			ques.get(i).setUser(null);
+		}
 		return ques;
 	}
+
 	
-	
-	
+	//FIXME add start and end
+		@GET
+		@Produces({MediaType.APPLICATION_JSON})
+		@Path("/{offset}-{length}")
+		public List<Question> getallQuestion(@PathParam("offset") String offset, 
+				                             @PathParam("length") String length) {
+			Datastore dataStore = ServiceFactory.getMongoDB();
+			List<Question> ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
+			
+			for (int i = 0; i < ques.size(); i++) {
+				//we should not send password
+				ques.get(i).setAnswers(null);
+				ques.get(i).setComments(null);
+				ques.get(i).setVotes(null);
+				ques.get(i).setUser(null);
+			}
+			return ques;
+		}
+		
+		//FIXME add start and end
+		@GET
+		@Produces({MediaType.APPLICATION_JSON})
+		public List<Question> getQuestions( ) {
+			Datastore dataStore = ServiceFactory.getMongoDB();
+			List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
+			
+			for (int i = 0; i < ques.size(); i++) {
+				//we should not send password
+				ques.get(i).setAnswers(null);
+				ques.get(i).setComments(null);
+				ques.get(i).setVotes(null);
+				ques.get(i).setUser(null);
+			}
+			return ques;
+		}		
 	//Should be able to edit only if admin or the owner
 	//fixme
 	@PUT
@@ -98,12 +150,10 @@ public class QuestionService {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		Question question =  dataStore.get(Question.class, oid);
 		question.setUpdateTime();
-		question.setUpdateTime();
 		question.setText(ques.getText());
 		question.setTitle(ques.getTitle());
 		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
 		dataStore.save(ques);
 		return ques;
 	}
-	
 }

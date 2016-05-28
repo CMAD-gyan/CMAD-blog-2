@@ -131,6 +131,17 @@ public class Question {
 		this.user = user;
 	}
 	
+	
+	public int getViewCount(){
+		return this.viewCount;
+	}
+	
+	public void setViewCount(int viewCount){
+		this.viewCount = viewCount;
+	}
+	
+	
+	
 	public List< Vote > getVotes() { return votes; }
 	public void setVotes( List< Vote > votes ) { this.votes = votes; }
 	
