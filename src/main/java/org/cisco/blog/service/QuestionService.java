@@ -2,9 +2,12 @@ package org.cisco.blog.service;
 import java.util.List;
 import org.bson.types.ObjectId;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
@@ -32,14 +35,19 @@ public class QuestionService {
 		ques.setCreateTime();
 		ques.setUpdateTime();
 		String username = securityContext.getUserPrincipal().getName();
-		ques.setUserName(username);
-		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
+		ques.setUsername(username);
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		User user =  dataStore.find(User.class).field("username").equal(username).get();
 		
 		//no need to validate the user for null 
 		ques.setUser(user);
-		dataStore.save(ques);
+		try {
+			dataStore.save(ques);
+		} catch (com.mongodb.DuplicateKeyException e) {
+			throw new NotAcceptableException("Already Present");
+		} catch (Exception e) {
+			throw new BadRequestException("Unknow Problem");
+		}
 		return;
 	}
 	
@@ -70,6 +78,9 @@ public class QuestionService {
 		Question question =  dataStore.get(Question.class, oid);
 		//if question matches username then allow delete
 		
+		if (question == null){
+			throw  new NotFoundException("Not found");
+		}
 		
 		if( securityContext.getUserPrincipal().getName().equals("admin") || 
 				securityContext.getUserPrincipal().getName().equals(
@@ -89,6 +100,10 @@ public class QuestionService {
 			                             @PathParam("length") String length) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<Question> ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
+		
+		if (ques == null){
+			throw  new NotFoundException("Not found");
+		}
 		
 		for (int i = 0; i < ques.size(); i++) {
 			//we should not send password
@@ -110,6 +125,10 @@ public class QuestionService {
 			Datastore dataStore = ServiceFactory.getMongoDB();
 			List<Question> ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
 			
+			if (ques == null){
+				throw  new NotFoundException("Not found");
+			}	
+			
 			for (int i = 0; i < ques.size(); i++) {
 				//we should not send password
 				ques.get(i).setAnswers(null);
@@ -127,6 +146,10 @@ public class QuestionService {
 			Datastore dataStore = ServiceFactory.getMongoDB();
 			List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
 			
+			if (ques == null){
+				throw  new NotFoundException("Not found");
+			}
+			
 			for (int i = 0; i < ques.size(); i++) {
 				//we should not send password
 				ques.get(i).setAnswers(null);
@@ -136,24 +159,24 @@ public class QuestionService {
 			}
 			return ques;
 		}		
-	//Should be able to edit only if admin or the owner
-	//fixme
-	@PUT
-	@Secured
-	@Path("/{ObjectId}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces({MediaType.APPLICATION_JSON})
-	public Question updateQuestion(@PathParam("ObjectId") String ObjectId, 
-			                       Question ques,
-			                       @Context SecurityContext securityContext){
-		ObjectId  oid =  new ObjectId(ObjectId);
-		Datastore dataStore = ServiceFactory.getMongoDB();
-		Question question =  dataStore.get(Question.class, oid);
-		question.setUpdateTime();
-		question.setText(ques.getText());
-		question.setTitle(ques.getTitle());
-		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
-		dataStore.save(ques);
-		return ques;
-	}
+//	//Should be able to edit only if admin or the owner
+//	//fixme
+//	@PUT
+//	@Secured
+//	@Path("/{ObjectId}")
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces({MediaType.APPLICATION_JSON})
+//	public Question updateQuestion(@PathParam("ObjectId") String ObjectId, 
+//			                       Question ques,
+//			                       @Context SecurityContext securityContext){
+//		ObjectId  oid =  new ObjectId(ObjectId);
+//		Datastore dataStore = ServiceFactory.getMongoDB();
+//		Question question =  dataStore.get(Question.class, oid);
+//		question.setUpdateTime();
+//		question.setText(ques.getText());
+//		question.setTitle(ques.getTitle());
+//		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
+//		dataStore.save(ques);
+//		return ques;
+//	}
 }

@@ -28,7 +28,7 @@ public class Question {
 
 @Reference	
 	private User   user;
-	private String userName;
+	private String username;
 	private int    avgVotes;
 	private int    viewCount;
 @Embedded
@@ -60,7 +60,7 @@ public class Question {
 		this.text  = text;
 	   //@toDo	
 		this.user  = user;
-		this.userName  = userName;		
+		this.username  = username;		
 		this.createTime  = new Timestamp(System.currentTimeMillis());
 		this.updateTime  = new Timestamp(System.currentTimeMillis());
 		this.votes       = null;
@@ -115,12 +115,12 @@ public class Question {
 		this.updateTime = new Timestamp(System.currentTimeMillis());
 	}
 	
-	public String getUserName(){
-		return this.userName;
+	public String getUsername(){
+		return this.username;
 	}
 	
-	public void setUserName (String userName){
-		this.userName = userName;
+	public void setUsername (String username){
+		this.username = username;
 	}
 	
 	public User getUser(){
@@ -140,6 +140,14 @@ public class Question {
 		this.viewCount = viewCount;
 	}
 	
+	
+	public int getAvgVotes(){
+		return this.avgVotes;
+	}
+	
+	public void setAvgVotes(int avgVotes){
+		this.avgVotes = avgVotes;
+	}
 	
 	
 	public List< Vote > getVotes() { return votes; }

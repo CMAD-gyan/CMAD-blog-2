@@ -10,6 +10,8 @@ import org.mongodb.morphia.annotations.Indexed;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.utils.IndexDirection;
+import org.cisco.blog.model.VoteType;
+
 
 @Embedded
 public class Answer {
@@ -24,7 +26,7 @@ public class Answer {
 
 @Embedded
 	private List<Vote> votes;
-
+	private int avgVotes;
 @Embedded
 	private List<Comment>  comments;
 
@@ -42,6 +44,7 @@ public class Answer {
 		this.updateTime  = new Timestamp(System.currentTimeMillis());
 		this.votes       = null;
 		this.comments    = null;
+		this.avgVotes    =  VoteType.GOOD;;
 	}
 	
 	
@@ -66,6 +69,11 @@ public class Answer {
 		return this.updateTime;
 	}
 	
+	
+	public void setUpdateTime(){
+		this.updateTime = new Timestamp(System.currentTimeMillis());
+	}
+	
 	public void setUpdateTime(Timestamp updateTime){
 		this.updateTime = updateTime;
 	}
@@ -84,6 +92,15 @@ public class Answer {
 	
 	public void setUser(User user){
 		this.user = user;
+	}
+	
+	
+	public int getAvgVotes(){
+		return this.avgVotes;
+	}
+	
+	public void setAvgVotes(int avgVotes){
+		this.avgVotes = avgVotes;
 	}
 	
 	public List< Vote > getVotes() { return votes; }
