@@ -1,13 +1,7 @@
 package org.cisco.blog.model;
 import java.sql.Timestamp;
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
-import org.mongodb.morphia.annotations.Indexed;
-//import org.mongodb.morphia.annotations.Entity; 
-//import org.mongodb.morphia.annotations.Embedded; 
 import org.mongodb.morphia.annotations.Reference; 
-//import org.mongodb.morphia.annotations.Id; 
-import org.mongodb.morphia.utils.IndexDirection;
 
 final class VoteType {
     public static final int POOR =  0;
@@ -19,7 +13,6 @@ final class VoteType {
 
 @Embedded
 public class Vote {
-//    private ObjectId id;
     
 //   @Indexed(value=IndexDirection.ASC, name="userName", unique=true, dropDups=true)
     private String userName;

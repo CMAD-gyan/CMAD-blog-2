@@ -1,17 +1,15 @@
 package org.cisco.blog.model;
 
 import java.sql.Timestamp;
-//import org.mongodb.morphia.annotations.Entity; 
 import org.mongodb.morphia.annotations.Embedded; 
 import org.mongodb.morphia.annotations.Reference; 
-import org.mongodb.morphia.annotations.Id; 
 
 @Embedded
 public class Comment {
 	private String text;
 	private Timestamp createTime;
 	private Timestamp updateTime;
-	private String userName;
+	private String username;
     @Reference
     private User user;
 
@@ -44,22 +42,19 @@ public class Comment {
 		this.updateTime = updateTime;
 	}
 	
-	public String getUserName(){
-		return this.userName;
+	public String getUsername(){
+		return this.username;
 	}
 	
-	public void setUserName (String userName){
-		this.userName = userName;
+	public void setUsername (String username){
+		this.username = username;
 	}
 
-//	public User getUser(){
-//		return this.user;
-//	}
-//	
-//	public void setUser(User user){
-//		this.user = user;
-//	}
+	public User getUser(){
+		return this.user;
+	}
 	
-	
-    
+	public void setUser(User user){
+		this.user = user;
+	}
 }

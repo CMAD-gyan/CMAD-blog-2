@@ -2,14 +2,8 @@ package org.cisco.blog.model;
 
 import java.sql.Timestamp;
 import java.util.List;
-
-import org.mongodb.morphia.annotations.Entity;
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
-import org.mongodb.morphia.annotations.Indexed;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-import org.mongodb.morphia.utils.IndexDirection;
 import org.cisco.blog.model.VoteType;
 
 

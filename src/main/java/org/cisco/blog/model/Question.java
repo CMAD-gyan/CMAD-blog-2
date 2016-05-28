@@ -55,10 +55,10 @@ public class Question {
 		this.viewCount   = 0;		
 	}
 	
-	public Question(String title, String text, String userName, User user) {
+	public Question(String title, String text, String username, User user) {
 		this.title = title;
 		this.text  = text;
-	   //@toDo	
+
 		this.user  = user;
 		this.username  = username;		
 		this.createTime  = new Timestamp(System.currentTimeMillis());
