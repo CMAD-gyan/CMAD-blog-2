@@ -23,8 +23,26 @@ import org.cisco.blog.model.Question;
 @Path("/question")
 public class QuestionService {
 	
-   // @Context
-   // SecurityContext securityContext;
+	@POST
+	@Secured
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void createQuestion(Question ques, 
+								@Context SecurityContext securityContext){
+		ques.setCreateTime();
+		ques.setUpdateTime();
+		String username = securityContext.getUserPrincipal().getName();
+		ques.setUserName(username);
+		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		User user =  dataStore.find(User.class).field("username").equal(username).get();
+		
+		//no need to validate the user for null 
+		ques.setUser(user);
+		dataStore.save(ques);
+		return;
+	}
+	
+	
     
 	
 	@GET
@@ -61,26 +79,13 @@ public class QuestionService {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
 		//offset(0).limit(2).
-		
-		System.out.println("-----------------" + securityContext.getUserPrincipal().getName()  );
 		return ques;
 	}
 	
 	
-	@POST
-	@Secured
-	@Consumes(MediaType.APPLICATION_JSON)
-	public void createQuestion(Question ques, 
-								@Context SecurityContext securityContext){
-		ques.setCreateTime();
-		ques.setUpdateTime();
-		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
-		Datastore dataStore = ServiceFactory.getMongoDB();
-		dataStore.save(ques);
-		return;
-	}
 	
-	
+	//Should be able to edit only if admin or the owner
+	//fixme
 	@PUT
 	@Secured
 	@Path("/{ObjectId}")

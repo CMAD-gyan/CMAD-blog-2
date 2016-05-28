@@ -13,17 +13,14 @@ import org.mongodb.morphia.utils.IndexDirection;
 
 @Embedded
 public class Answer {
-	//@Id
-    //private ObjectId id;
-	
 	private String text;
 
 	private Timestamp createTime;
 	private Timestamp updateTime;
 
 	private String userName;
-//@Reference
-//    private User user;
+@Reference
+    private User user;
 
 @Embedded
 	private List<Vote> votes;
@@ -39,7 +36,7 @@ public class Answer {
 	public Answer(String text, String userName, User user) {
 		this.text  = text;
 	   //@toDo	
-		//this.user  = user;
+		this.user  = user;
 		this.userName  = userName;		
 		this.createTime  = new Timestamp(System.currentTimeMillis());
 		this.updateTime  = new Timestamp(System.currentTimeMillis());
@@ -81,13 +78,13 @@ public class Answer {
 		this.userName = userName;
 	}
 	
-//	public User getUser(){
-//		return this.user;
-//	}
-//	
-//	public void setUser(User user){
-//		this.user = user;
-//	}
+	public User getUser(){
+		return this.user;
+	}
+	
+	public void setUser(User user){
+		this.user = user;
+	}
 	
 	public List< Vote > getVotes() { return votes; }
 	public void setVotes( List< Vote > votes ) { this.votes = votes; }

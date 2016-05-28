@@ -26,6 +26,8 @@ public class Question {
 	private Timestamp createTime;
 	private Timestamp updateTime;
 
+@Reference	
+	private User   user;
 	private String userName;
 	private int    avgVotes;
 	private int    viewCount;
@@ -57,7 +59,7 @@ public class Question {
 		this.title = title;
 		this.text  = text;
 	   //@toDo	
-		//this.user  = user;
+		this.user  = user;
 		this.userName  = userName;		
 		this.createTime  = new Timestamp(System.currentTimeMillis());
 		this.updateTime  = new Timestamp(System.currentTimeMillis());
@@ -121,13 +123,13 @@ public class Question {
 		this.userName = userName;
 	}
 	
-//	public User getUser(){
-//		return this.user;
-//	}
-//	
-//	public void setUser(User user){
-//		this.user = user;
-//	}
+	public User getUser(){
+		return this.user;
+	}
+	
+	public void setUser(User user){
+		this.user = user;
+	}
 	
 	public List< Vote > getVotes() { return votes; }
 	public void setVotes( List< Vote > votes ) { this.votes = votes; }

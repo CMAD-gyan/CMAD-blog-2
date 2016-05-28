@@ -17,14 +17,26 @@ import org.cisco.blog.model.User;
 public class UserService {
 	
 	@GET
-	//@Secured
+	@Secured
 	@Produces({MediaType.APPLICATION_JSON})
-	public List<User> getAllUser(/* @Context SecurityContext securityContext*/) {
+	public List<User> getAllUser( @Context SecurityContext securityContext) {
+		
+		if (!securityContext.getUserPrincipal().getName().equals("admin"))
+			throw  new NotAuthorizedException("You Don't Have Permission");
+			
+		
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<User> user = dataStore.createQuery(User.class).order("-score").asList();
+		
+		
+		for (int i = 0; i < user.size(); i++) {
+			//we should not send password
+			user.get(i).setPassword(null);
+		}
 		return user;
 	}
 
+	
     //get user by Id
 	@GET
 	@Secured
@@ -42,7 +54,7 @@ public class UserService {
 		}
 
 		//allow to return only if admin or self
-		if ( securityContext.getUserPrincipal().getName().equals(user.getUserId()) ||
+		if ( securityContext.getUserPrincipal().getName().equals(user.getUsername()) ||
 				securityContext.getUserPrincipal().getName().equals("admin")) {
 
 			//clear the password
@@ -54,32 +66,20 @@ public class UserService {
 	}
 	
 	
-//POST /CMAD-blog-2/rest/user HTTP/1.1
-//Host: localhost:8080
-//Content-Type: application/json
-//Cache-Control: no-cache
-//Postman-Token: d5878963-6fdc-b5fa-ea2d-4a9862b1592c
-//
-//{
-//  "userId": "gyanranjan",
-//  "password": "password",
-//  "userName": "Gyan Ranjan",
-//  "email": "gyanranjan@alpha.com"
-//}	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void createUser(User user){
 		user.setCreateTime();
 		user.setUpdateTime();
 		user.setScore(0);
-		user.setUserId(user.getUserId().toLowerCase());
+		user.setUsername(user.getUsername().toLowerCase());
 		
 		//verify email id
 		if (!user.isValidEmailAddress(user.getEmail())) {
 			throw  new BadRequestException("Unknown Error");
 		}
 
-		System.out.println("User=" + user.getUserName() + user.getPassword() + user.getEmail());
+		//System.out.println("User=" + user.getUserName() + user.getPassword() + user.getEmail());
 		try {
 			Datastore dataStore = ServiceFactory.getMongoDB();
 			dataStore.save(user);
@@ -106,8 +106,9 @@ public class UserService {
 		} catch ( Exception e) {
 			throw  new ForbiddenException("Not found Error");
 		}
+
 		//allow to return only if admin or self
-		if ( securityContext.getUserPrincipal().getName().equals(user.getUserId()) ||
+		if ( securityContext.getUserPrincipal().getName().equals(user.getUsername()) ||
 				securityContext.getUserPrincipal().getName().equals("admin")) {
 			dataStore.delete(User.class, oid);
 		} else {

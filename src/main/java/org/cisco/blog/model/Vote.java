@@ -24,8 +24,8 @@ public class Vote {
 //   @Indexed(value=IndexDirection.ASC, name="userName", unique=true, dropDups=true)
     private String userName;
     
-//    @Reference
-//    private User user;
+    @Reference
+    private User user;
     
     private VoteType vote;
     
@@ -35,13 +35,7 @@ public class Vote {
 	public Vote () {		
 	}
 	
-//	public ObjectId getId(){
-//		return this.id;
-//	}
-//	
-//	public void setId (ObjectId id){
-//		this.id = id;
-//	}
+
 	
 	public String getUserName(){
 		return this.userName;
@@ -51,13 +45,13 @@ public class Vote {
 		this.userName = userName;
 	}
 
-//	public User getUser(){
-//		return this.user;
-//	}
-//	
-//	public void setUser(User user){
-//		this.user = user;
-//	}
+	public User getUser(){
+		return this.user;
+	}
+	
+	public void setUser(User user){
+		this.user = user;
+	}
 	
 	public VoteType getVote(){
 		return this.vote;

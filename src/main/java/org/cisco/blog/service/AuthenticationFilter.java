@@ -23,6 +23,7 @@ import java.security.Principal;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 	String username = null;
+	//String id = null;
 	
 	void validateToken ( String token) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -31,7 +32,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		if (sess == null) {
 			throw new NotAuthorizedException("Not valid session");
 		}
-		username = sess.getUserId();
+		username = sess.getUsername();
 	}
 	
     public void filter(ContainerRequestContext requestContext) throws IOException {

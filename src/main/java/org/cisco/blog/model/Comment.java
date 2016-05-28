@@ -12,8 +12,8 @@ public class Comment {
 	private Timestamp createTime;
 	private Timestamp updateTime;
 	private String userName;
- //   @Reference
-//    private User user;
+    @Reference
+    private User user;
 
     public Comment(){
     	

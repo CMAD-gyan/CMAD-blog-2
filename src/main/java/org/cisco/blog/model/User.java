@@ -13,10 +13,10 @@ public class User {
 	@Id
     private ObjectId id;
 	
-	@Indexed(value=IndexDirection.ASC, name="userid", unique=true)
-	private String userId;
+	@Indexed(value=IndexDirection.ASC, name="username", unique=true)
+	private String username;
 	private String password;
-	private String userName;
+	private String name;
 	
 	@Indexed(value=IndexDirection.ASC, name="email", unique=true)
 	private String email;
@@ -31,12 +31,12 @@ public class User {
 		return this.id.toHexString();
 	}
 	
-	public String getUserId(){
-		return this.userId;
+	public String getUsername(){
+		return this.username;
 	}
 	
-	public void setUserId( String userId){
-		this.userId = userId;
+	public void setUsername( String username){
+		this.username = username;
 	}
 	
 	public String getPassword(){
@@ -47,12 +47,12 @@ public class User {
 		this.password = password;
 	}
 	
-	public String getUserName(){
-		return this.userName;
+	public String getName(){
+		return this.name;
 	}
 	
-	public void setUserName( String userName){
-		this.userName = userName;
+	public void setName( String name){
+		this.name = name;
 	}
 	
 	public String getEmail(){
