@@ -24,13 +24,10 @@ public class UserService {
 		if (!securityContext.getUserPrincipal().getName().equals("admin"))
 			throw  new NotAuthorizedException("You Don't Have Permission");
 			
-		
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<User> user = dataStore.createQuery(User.class).order("-score").asList();
 		
-		
 		for (int i = 0; i < user.size(); i++) {
-			//we should not send password
 			user.get(i).setPassword(null);
 		}
 		return user;
@@ -45,20 +42,23 @@ public class UserService {
 	public User getUserById(@PathParam("param") String id,  
 			                @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		ObjectId  oid =  new ObjectId(id);
 		User user = null;
+
 		try {
+			ObjectId  oid =  new ObjectId(id);
 			user =  dataStore.get(User.class, oid);
 		} catch ( Exception e) {
 			throw  new ForbiddenException("Not found Error");
 		}
+		
+		if (user == null) {
+			throw  new NotAuthorizedException("Invalid user");
+		}
 
-		//allow to return only if admin or self
 		if ( securityContext.getUserPrincipal().getName().equals(user.getUsername()) ||
 				securityContext.getUserPrincipal().getName().equals("admin")) {
-
 			//clear the password
-			user.setPassword(null);
+			user.setPassword("xxxxxxxx");
 			return user;
 		} else {
 			throw  new NotAuthorizedException("You Don't Have Permission");
@@ -68,42 +68,79 @@ public class UserService {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void createUser(User user){
-		user.setCreateTime();
-		user.setUpdateTime();
-		user.setScore(0);
-		user.setUsername(user.getUsername().toLowerCase());
+    @Produces("application/text")
+	public String createUser(User user){
+		//check if create of update
+		//boolean update = false;
+		Datastore dataStore = ServiceFactory.getMongoDB();
 		
-		//verify email id
-		if (!user.isValidEmailAddress(user.getEmail())) {
-			throw  new BadRequestException("Unknown Error");
+		if(user.getUsername() == null)
+			throw  new BadRequestException("Invalid Email Error");
+		
+		user.setUsername(user.getUsername().toLowerCase());
+	
+		
+		User userdb = dataStore.find(User.class).field("username").equal(
+				                user.getUsername()).get();
+		
+		if (userdb == null) {
+			//New user Create
+			if ( user.getPassword() == null ||
+					user.getEmail() ==null     || 
+					!user.isValidEmailAddress(user.getEmail()) ) {
+				throw  new BadRequestException("Invalid Email Error");
+			}
+			
+			user.setCreateTime();
+			user.setUpdateTime();
+			user.setScore(0);
+			try {
+				dataStore.save(user);
+			} catch ( Exception e) {
+				throw  new BadRequestException("Unknown Error");
+			}
+		} else {
+			//Old user either password change or email change
+			if ( (user.getPassword() == null) && (user.getEmail() == null) )
+				throw  new BadRequestException("Unknown Error");
+				
+			
+			if (user.getPassword() != null) 
+				userdb.setPassword(user.getPassword());
+			
+			if (user.getEmail() != null && user.isValidEmailAddress(user.getEmail()))
+				userdb.setEmail(user.getEmail());	
+			
+			userdb.setUpdateTime();
+			try {
+				dataStore.save(userdb);
+			} catch ( Exception e) {
+				throw  new BadRequestException("Unknown Error");
+			}
 		}
-
-		//System.out.println("User=" + user.getUserName() + user.getPassword() + user.getEmail());
-		try {
-			Datastore dataStore = ServiceFactory.getMongoDB();
-			dataStore.save(user);
-		} catch (com.mongodb.DuplicateKeyException e) {
-			throw  new NotAcceptableException("Alreads exist");
-		} catch ( Exception e) {
-			throw  new ForbiddenException("Unknown Error");
-		}
-		return;
+		return "Ok";
 	}
+
 	
 	//delete user
 	@DELETE
 	@Secured
 	@Path("/{param}")
-	@Produces({MediaType.APPLICATION_JSON})
-	public void deleteUserById(@PathParam("param") String id,  
+	@Produces("application/text")
+	public String deleteUserById(@PathParam("param") String id,  
 			                @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		ObjectId  oid =  new ObjectId(id);
+		ObjectId  oid = null;
 		User user = null;
+		
 		try {
+			oid = new ObjectId(id);
 			user =  dataStore.get(User.class, oid);
 		} catch ( Exception e) {
+			throw  new ForbiddenException("Not found Error");
+		}
+		
+		if (user == null) {
 			throw  new ForbiddenException("Not found Error");
 		}
 
@@ -114,7 +151,10 @@ public class UserService {
 		} else {
 			throw  new NotAuthorizedException("You Don't Have Permission");
 		}
+		return "Ok";
 	}
+	
+	
 	
 	//edit user TBD
 	//not now

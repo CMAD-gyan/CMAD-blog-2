@@ -17,6 +17,15 @@ public class Comment {
     	
     }
 
+    public Comment(String text, String username, User user){
+    	this.text     = text;
+    	createTime    = new Timestamp(System.currentTimeMillis());;
+    	updateTime    = new Timestamp(System.currentTimeMillis());;
+    	this.username = username;
+    	this.user     = user;
+    	
+    }
+  
     public String getText(){
 		return this.text;
 	}
@@ -41,6 +50,11 @@ public class Comment {
 	public void setUpdateTime(Timestamp updateTime){
 		this.updateTime = updateTime;
 	}
+	
+	public void setUpdateTime(){
+		this.updateTime = new Timestamp(System.currentTimeMillis());
+	}
+	
 	
 	public String getUsername(){
 		return this.username;

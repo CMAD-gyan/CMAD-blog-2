@@ -15,12 +15,12 @@ final class VoteType {
 public class Vote {
     
 //   @Indexed(value=IndexDirection.ASC, name="userName", unique=true, dropDups=true)
-    private String userName;
+    private String username;
     
     @Reference
     private User user;
     
-    private VoteType vote;
+    private int vote;
     
 	private Timestamp createTime;
 	private Timestamp updateTime;
@@ -28,14 +28,20 @@ public class Vote {
 	public Vote () {		
 	}
 	
-
+    public Vote(int vote, String username, User user){
+    	this.vote     	= vote;
+    	this.createTime = new Timestamp(System.currentTimeMillis());;
+    	this.updateTime = new Timestamp(System.currentTimeMillis());;
+    	this.username   = username;
+    	this.user       = user;
+    }
 	
-	public String getUserName(){
-		return this.userName;
+	public String getUsername(){
+		return this.username;
 	}
 	
-	public void setUserName (String userName){
-		this.userName = userName;
+	public void setUsername (String username){
+		this.username = username;
 	}
 
 	public User getUser(){
@@ -46,11 +52,11 @@ public class Vote {
 		this.user = user;
 	}
 	
-	public VoteType getVote(){
+	public int getVote(){
 		return this.vote;
 	}
 	
-	public void setVote(VoteType vote){
+	public void setVote(int vote){
 		this.vote = vote;
 	}
 

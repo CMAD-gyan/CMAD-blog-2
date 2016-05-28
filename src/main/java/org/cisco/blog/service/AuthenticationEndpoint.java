@@ -20,7 +20,7 @@ import org.mongodb.morphia.Datastore;
 public class AuthenticationEndpoint {
 
     @POST
-    @Produces("application/json")
+    @Produces("application/text")
     @Consumes("application/json")
     public Response authenticateUser( User user) {
 
