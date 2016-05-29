@@ -113,7 +113,166 @@ public class AnswerService {
 		return  "Ok";
 	}
 	
-	//comment 
+	
+//comments 
+//post & edit
+	@POST
+	@Secured
+	@Path("/{param}/comment")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String postComment(Comment com, 
+			                @PathParam("param") String id,
+	        				@Context SecurityContext securityContext ) {
+		int i,j=0;
+		boolean update = false;
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		String username = securityContext.getUserPrincipal().getName();
+		ObjectId  oid = null;
+		try {
+			oid =  new ObjectId(id);
+		} catch (Exception e) {
+			throw new BadRequestException ("OID passed is not okay");
+		}
+		
+		Answer ans =  dataStore.get(Answer.class, oid);
+		
+		if (ans == null){
+			throw  new NotFoundException("Not found");
+		}
+	
+		List <Comment> comment = ans.getComments();
+		
+		for (i = 0; i < comment.size(); i++) {
+			if (comment.get(i).getUsername().equals(username)) {
+				update = true;
+				j = i;
+				break;
+			}
+		}
+		
+		if (update) {
+			comment.get(j).setText(com.getText());
+			comment.get(j).setUpdateTime();
+			ans.setComments(comment);
+		} else {
+			User user =  dataStore.find(User.class).field("username").equal(username).get();
+			Comment newComment = new Comment(com.getText(), username,user);
+			comment.add(newComment);
+		}
+		dataStore.save(ans);
+		return "Ok";
+	}
+
+
+	@DELETE
+	@Secured
+	@Path("/{param}/comment")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String deleteComment(@PathParam("param") String id,
+	        					@Context SecurityContext securityContext ) {
+		String username = securityContext.getUserPrincipal().getName();
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		ObjectId  oid = null;
+		int i;
+		boolean found = false;
+		
+		try {
+			oid =  new ObjectId(id);
+		} catch (Exception e) {
+			throw new BadRequestException ("OID passed is not okay");
+		}
+		Answer anwser =  dataStore.get(Answer.class, oid);
+		
+		if (anwser != null) {
+			List <Comment> comment = anwser.getComments();
+			
+			if (comment != null) { 
+				for (i = 0; i < comment.size(); i++) {
+					if (comment.get(i).getUsername().equals(username)) {
+						found = true;
+						break;
+					}
+				}
+				
+				if (found == true) {
+					comment.remove(i);
+					anwser.setComments(comment);
+					dataStore.save(anwser);
+				}
+			}
+		}
+		return "Ok";
+	}
+
+
+	///Not tested ..........	
+	@POST
+	@Secured
+	@Path("/{param}/vote")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String postVote(Vote votein, @PathParam("param") String id,
+	        			 @Context SecurityContext securityContext ) {
+		String username = securityContext.getUserPrincipal().getName();
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		ObjectId  oid = null;
+		
+		int i;
+		int j = 0;
+		int totalVote =0;
+		boolean found = false;
+		
+		try {
+			oid =  new ObjectId(id);
+		} catch (Exception e) {
+			throw new BadRequestException ("OID passed is not okay");
+		}
+		
+		if (votein.getVote() > 4 || votein.getVote() < 0 ){
+			throw new BadRequestException ("Invalid vote");
+		}
+		
+		Answer answer =  dataStore.get(Answer.class, oid);
+		
+		if (answer == null){
+			throw  new NotFoundException("Not found");
+		}
+	
+		List <Vote> votes = answer.getVotes();
+		
+		if (votes == null) 
+			votes = new ArrayList <Vote>();
+		
+		for (i = 0; i < votes.size(); i++) {
+			
+			if (votes.get(i).getUsername().equals(username)) {
+				found = true;
+				j=i;
+			}
+			totalVote +=  votes.get(i).getVote();
+		}
+		
+		totalVote += votein.getVote();
+		totalVote /= (votes.size() + 1);
+		
+		
+		answer.setAvgVotes(totalVote);
+		
+		if (found == true) {
+			votes.get(j).setVote( votein.getVote());
+			answer.setVotes(votes);
+		} else {
+			User user =  dataStore.find(User.class).field("username").equal(username).get();
+			Vote vote = new Vote(votein.getVote(), username,user); 
+			votes.add(vote);
+			answer.setVotes(votes);
+		}
+		
+		dataStore.save(answer);
+		return "Ok";
+	}
+	
 	
 	
 }
