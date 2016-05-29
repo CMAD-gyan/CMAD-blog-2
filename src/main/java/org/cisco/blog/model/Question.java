@@ -40,7 +40,6 @@ public class Question {
 @Embedded
 	private List<Answer>  answers;
 
-
 	public void QuestionCleanEmbeds(){
 		this.votes       = null;
 		this.comments    = null;
@@ -90,7 +89,6 @@ public class Question {
 		this.text = text;
 	}
 	
-	
 	public Timestamp getCreateTime(){
 		return this.createTime;
 	}
@@ -131,7 +129,6 @@ public class Question {
 		this.user = user;
 	}
 	
-	
 	public int getViewCount(){
 		return this.viewCount;
 	}
@@ -140,7 +137,6 @@ public class Question {
 		this.viewCount = viewCount;
 	}
 	
-	
 	public int getAvgVotes(){
 		return this.avgVotes;
 	}
@@ -148,7 +144,6 @@ public class Question {
 	public void setAvgVotes(int avgVotes){
 		this.avgVotes = avgVotes;
 	}
-	
 	
 	public List< Vote > getVotes() { return votes; }
 	public void setVotes( List< Vote > votes ) { this.votes = votes; }
@@ -160,4 +155,3 @@ public class Question {
 	public void setAnswers( List< Answer > answers ) { this.answers = answers; }
 
 }
-

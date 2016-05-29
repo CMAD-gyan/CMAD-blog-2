@@ -23,25 +23,21 @@ import org.cisco.blog.model.*;
 
 @Path("/question")
 public class QuestionService {
-	
 	@POST
 	@Secured
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public String createQuestion(Question ques, 
 								@Context SecurityContext securityContext){
-		//boolean update = false;
 		Question question = null;
+		User user;
+		String username = securityContext.getUserPrincipal().getName();
+		Datastore dataStore = ServiceFactory.getMongoDB();
 		
 		ques.setCreateTime();
 		ques.setUpdateTime();
-		
-		String username = securityContext.getUserPrincipal().getName();
-		User user;
-		
-		
 		ques.setUsername(username);
-		Datastore dataStore = ServiceFactory.getMongoDB();
+		
 		question =  dataStore.find(Question.class).field("title").equal(ques.getTitle()).get();
 		
 		try {
@@ -80,42 +76,76 @@ public class QuestionService {
 	@Produces({MediaType.APPLICATION_JSON})
 	public Question getQuestionById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		ObjectId  oid =  new ObjectId(id);
-		Question question =  dataStore.get(Question.class, oid);
+		ObjectId  oid;
+		Question question = null;
+		
+		try {
+			oid =  new ObjectId(id);
+		} catch(Exception e) {
+			throw new BadRequestException("Bad param passed");
+		}
+		
+		question =  dataStore.get(Question.class, oid);
 		
 		// if question is found increment view count 
 		if (question != null) {
 			question.setViewCount(question.getViewCount() + 1);
 			dataStore.save(question);
+			question.getUser().setPassword("xxxxxxxxx");
+			
+			//@TBD get some better way to fix
+			
+			if (question.getComments() != null) {
+				for ( int i=0; i < question.getComments().size(); i++) {
+					question.getComments().get(i).getUser().setPassword("XXXXX");
+				}
+			}
+			
+			
+			if (question.getAnswers() != null) {
+				for ( int i=0; i < question.getAnswers().size(); i++) {
+					question.getAnswers().get(i).getUser().setPassword("XXXXX");
+				}
+			}
+			question.setVotes(null);
 		}
 		return question;
 	}
+	
 	
 	@DELETE
 	@Secured
 	@Path("/{param}")
 	public void deleteQuestionById(@PathParam("param") String id,
 			                       @Context SecurityContext securityContext) {
-		
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		ObjectId  oid =  new ObjectId(id);
-		Question question =  dataStore.get(Question.class, oid);
-		//if question matches username then allow delete
+		ObjectId  oid;
+		Question question = null;
 		
-		if (question == null){
-			throw  new NotFoundException("Not found");
+		try {
+			oid =  new ObjectId(id);
+		} catch(Exception e) {
+			throw new BadRequestException("Bad param passed");
 		}
 		
-		if( securityContext.getUserPrincipal().getName().equals("admin") || 
-				securityContext.getUserPrincipal().getName().equals(
-						             question.getUser().getUsername()))	{
-			dataStore.delete(Question.class, oid);
-		}else {
-			throw  new NotAuthorizedException("You Don't Have Permission");
+		question =  dataStore.get(Question.class, oid);
+
+		//if question matches username then allow delete
+		question =  dataStore.get(Question.class, oid);
+		if (question != null){
+			if( securityContext.getUserPrincipal().getName().equals("admin") || 
+					securityContext.getUserPrincipal().getName().equals(
+							             question.getUser().getUsername()))	{
+				dataStore.delete(Question.class, oid);
+			}else {
+				throw  new NotAuthorizedException("You Don't Have Permission");
+			}	
 		}
 		return;
 	}
 		
+	
+	
 	//FIXME add start and end
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
@@ -125,16 +155,14 @@ public class QuestionService {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<Question> ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
 		
-		if (ques == null){
-			throw  new NotFoundException("Not found");
-		}	
-		
-		for (int i = 0; i < ques.size(); i++) {
-			//we should not send password
-			ques.get(i).setAnswers(null);
-			ques.get(i).setComments(null);
-			ques.get(i).setVotes(null);
-			ques.get(i).setUser(null);
+		if (ques != null){
+			for (int i = 0; i < ques.size(); i++) {
+				//we should not send password
+				ques.get(i).setAnswers(null);
+				ques.get(i).setComments(null);
+				ques.get(i).setVotes(null);
+				ques.get(i).setUser(null);
+			}
 		}
 		return ques;
 	}
@@ -146,16 +174,14 @@ public class QuestionService {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
 		
-		if (ques == null){
-			throw  new NotFoundException("Not found");
-		}
-		
-		for (int i = 0; i < ques.size(); i++) {
-			//we should not send password
-			ques.get(i).setAnswers(null);
-			ques.get(i).setComments(null);
-			ques.get(i).setVotes(null);
-			ques.get(i).setUser(null);
+		if (ques != null) {
+			for (int i = 0; i < ques.size(); i++) {
+				//we should not send password
+				ques.get(i).setAnswers(null);
+				ques.get(i).setComments(null);
+				ques.get(i).setVotes(null);
+				ques.get(i).setUser(null);
+			}
 		}
 		return ques;
 	}		
@@ -167,7 +193,8 @@ public class QuestionService {
 	@Secured
 	@Path("/{param}/comment")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void postComment(Comment com, 
+	@Produces(MediaType.TEXT_PLAIN)
+	public String postComment(Comment com, 
 			                @PathParam("param") String id,
             				@Context SecurityContext securityContext ) {
 		int i;
@@ -189,8 +216,10 @@ public class QuestionService {
 
 		List <Comment> comment = question.getComments();
 		
-		if (comment == null) 
+		if (comment == null) {
 			comment = new ArrayList <Comment>();
+			question.setComments(comment);
+		}
 		
 		for (i = 0; i < comment.size(); i++) {
 			
@@ -209,47 +238,54 @@ public class QuestionService {
 			comment.add(newComment);
 		}
 		dataStore.save(question);
+		return "Ok";
 	}
 	
 	
 	@DELETE
 	@Secured
-	@Path("/{param}/comment")	
-	public void deleteComment(@PathParam("param") String id,
+	@Path("/{param}/comment")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String deleteComment(@PathParam("param") String id,
             					@Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
+		String test = "start";
 		int i;
 		boolean found = false;
+		
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
 			throw new BadRequestException ("OID passed is not okay");
 		}
 		Question question =  dataStore.get(Question.class, oid);
-		//check if the user exist then delete 
 		
-		if (question == null){
-			throw  new NotFoundException("Not found");
-		}
-
-		List <Comment> comment = question.getComments();
-		
-		if (comment == null) 
-			return;
-		for (i = 0; i < comment.size(); i++) {
+		if (question != null) {
+			List <Comment> comment = question.getComments();
+			test = "not here ";
 			
-			if (comment.get(i).getUsername() == username) {
-				found = true;
-				break;
+			if (comment != null) { 
+				for (i = 0; i < comment.size(); i++) {
+					if (comment.get(i).getUsername().equals(username)) {
+						found = true;
+						test = "found comments ";
+						break;
+					}
+				}
+				
+				if (found == true) {
+					
+					test = "in foind block  " + i ;
+					comment.remove(i);
+					question.setComments(comment);
+					dataStore.save(question);
+					test = "iSuppose delet" ;
+				}
 			}
 		}
-		
-		if (found) {
-			comment.remove(i);
-			dataStore.save(question);
-		}
+		return test;
 	}
 	
 	
