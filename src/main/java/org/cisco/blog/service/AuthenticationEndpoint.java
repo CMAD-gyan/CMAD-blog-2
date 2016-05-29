@@ -3,16 +3,17 @@ package org.cisco.blog.service;
 import java.sql.Timestamp;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.POST;
-//import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-//import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.cisco.blog.model.Session;
-//import org.bson.types.ObjectId;
 import org.cisco.blog.model.User;
 import org.mongodb.morphia.Datastore;
 
@@ -70,5 +71,22 @@ public class AuthenticationEndpoint {
     	Session sess = dataStore.createQuery(Session.class).filter("username =", username ).get(); 
     	
     	return sess.getId();
+    }
+    
+    @DELETE
+    @Produces("application/text")
+    @Secured
+    public Response deAuthenticate(@PathParam("param") String id, 
+    		@Context SecurityContext securityContext) {
+    	try{	
+    		Datastore dataStore = ServiceFactory.getMongoDB();
+    		String caller_name = securityContext.getUserPrincipal().getName();
+    		//drop the username in session table 
+    		Session session = dataStore.find(Session.class).field("username").equal(caller_name).get();
+    		dataStore.delete(Session.class, session.getId());
+    		return Response.ok("Ok").build();
+    	} catch (Exception e) {
+    		return Response.status(Response.Status.UNAUTHORIZED).build();
+    	}  
     }
 }

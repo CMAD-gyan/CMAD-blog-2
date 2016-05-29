@@ -27,25 +27,52 @@ public class QuestionService {
 	@POST
 	@Secured
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void createQuestion(Question ques, 
+	@Produces(MediaType.TEXT_PLAIN)
+	public String createQuestion(Question ques, 
 								@Context SecurityContext securityContext){
+		//boolean update = false;
+		Question question = null;
+		
 		ques.setCreateTime();
 		ques.setUpdateTime();
+		
 		String username = securityContext.getUserPrincipal().getName();
+		User user;
+		
+		
 		ques.setUsername(username);
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		User user =  dataStore.find(User.class).field("username").equal(username).get();
+		question =  dataStore.find(Question.class).field("title").equal(ques.getTitle()).get();
 		
-		//no need to validate the user for null 
-		ques.setUser(user);
 		try {
-			dataStore.save(ques);
-		} catch (com.mongodb.DuplicateKeyException e) {
-			throw new NotAcceptableException("Already Present");
-		} catch (Exception e) {
+			
+			//no need to validate the user for null
+			if (question == null) {
+				try {
+					user =  dataStore.find(User.class).field("username").equal(username).get();
+				} catch (Exception e) {
+					throw  new NotAcceptableException("Unknown Error");
+				}
+				
+				if (user == null) {
+					throw  new NotAcceptableException("Unknown Error");
+				}
+				
+				ques.setUser(user);
+				dataStore.save(ques);
+			} else {
+				if (question.getUsername().equals(username)) {
+					question.setText(ques.getText());
+					question.setUpdateTime();
+					dataStore.save(question);
+				} else {
+					 throw new NotAcceptableException("Already Present");
+				}
+			}
+		}catch (Exception e) {
 			throw new BadRequestException("Unknow Problem");
 		}
-		return;
+		return "Ok";
 	}
 	
 	@GET
@@ -238,7 +265,7 @@ public class QuestionService {
 		ObjectId  oid = null;
 		
 		int i;
-		int j;
+		int j = 0;
 		int totalVote =0;
 		boolean found = false;
 		try {
@@ -269,8 +296,8 @@ public class QuestionService {
 		totalVote /= votes.size();
 		question.setAvgVotes(totalVote);
 		
-		if (found) {
-			votes.get(i).setVote( votein.getVote());
+		if (found == true) {
+			votes.get(j).setVote( votein.getVote());
 		} else {
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
 			Vote vote = new Vote(votein.getVote(), username,user  ); 
@@ -278,36 +305,5 @@ public class QuestionService {
 		}
 		dataStore.save(question);
 	}
-	
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-//	//Should be able to edit only if admin or the owner
-//	//fixme
-//	@PUT
-//	@Secured
-//	@Path("/{ObjectId}")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces({MediaType.APPLICATION_JSON})
-//	public Question updateQuestion(@PathParam("ObjectId") String ObjectId, 
-//			                       Question ques,
-//			                       @Context SecurityContext securityContext){
-//		ObjectId  oid =  new ObjectId(ObjectId);
-//		Datastore dataStore = ServiceFactory.getMongoDB();
-//		Question question =  dataStore.get(Question.class, oid);
-//		question.setUpdateTime();
-//		question.setText(ques.getText());
-//		question.setTitle(ques.getTitle());
-//		System.out.println("Questions=" + ques.getTitle() + ques.getText()  );
-//		dataStore.save(ques);
-//		return ques;
-//	}
+
 }

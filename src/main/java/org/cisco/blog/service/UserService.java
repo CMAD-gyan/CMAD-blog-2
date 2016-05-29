@@ -153,10 +153,4 @@ public class UserService {
 		}
 		return "Ok";
 	}
-	
-	
-	
-	//edit user TBD
-	//not now
-	
 }
