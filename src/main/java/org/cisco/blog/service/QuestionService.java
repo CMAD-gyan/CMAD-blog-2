@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
+//import org.cisco.blog.model.VoteType;
 
 import org.mongodb.morphia.Datastore;
 import org.cisco.blog.model.*;
@@ -197,7 +198,7 @@ public class QuestionService {
 	public String postComment(Comment com, 
 			                @PathParam("param") String id,
             				@Context SecurityContext securityContext ) {
-		int i;
+		int i,j=0;
 		boolean update = false;
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		String username = securityContext.getUserPrincipal().getName();
@@ -221,17 +222,21 @@ public class QuestionService {
 			question.setComments(comment);
 		}
 		
+		
+		
 		for (i = 0; i < comment.size(); i++) {
 			
-			if (comment.get(i).getUsername() == username) {
+			if (comment.get(i).getUsername().equals(username)) {
 				update = true;
+				j = i;
 				break;
 			}
 		}
 		
 		if (update) {
-			comment.get(i).setText(com.getText());
-			comment.get(i).setUpdateTime();
+			comment.get(j).setText(com.getText());
+			comment.get(j).setUpdateTime();
+			question.setComments(comment);
 		} else {
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
 			Comment newComment = new Comment(com.getText(), username,user);
@@ -251,7 +256,6 @@ public class QuestionService {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
-		String test = "start";
 		int i;
 		boolean found = false;
 		
@@ -264,37 +268,33 @@ public class QuestionService {
 		
 		if (question != null) {
 			List <Comment> comment = question.getComments();
-			test = "not here ";
 			
 			if (comment != null) { 
 				for (i = 0; i < comment.size(); i++) {
 					if (comment.get(i).getUsername().equals(username)) {
 						found = true;
-						test = "found comments ";
 						break;
 					}
 				}
 				
 				if (found == true) {
-					
-					test = "in foind block  " + i ;
 					comment.remove(i);
 					question.setComments(comment);
 					dataStore.save(question);
-					test = "iSuppose delet" ;
 				}
 			}
 		}
-		return test;
+		return "Ok";
 	}
 	
 	
-	
+///Not tested ..........	
 	@POST
 	@Secured
 	@Path("/{param}/vote")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void postVote(Vote votein, @PathParam("param") String id,
+	@Produces(MediaType.TEXT_PLAIN)
+	public String postVote(Vote votein, @PathParam("param") String id,
             			 @Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -304,11 +304,17 @@ public class QuestionService {
 		int j = 0;
 		int totalVote =0;
 		boolean found = false;
+		
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
 			throw new BadRequestException ("OID passed is not okay");
 		}
+		
+		if (votein.getVote() > 4 || votein.getVote() < 0 ){
+			throw new BadRequestException ("Invalid vote");
+		}
+		
 		Question question =  dataStore.get(Question.class, oid);
 		
 		if (question == null){
@@ -322,24 +328,30 @@ public class QuestionService {
 		
 		for (i = 0; i < votes.size(); i++) {
 			
-			if (votes.get(i).getUsername() == username) {
+			if (votes.get(i).getUsername().equals(username)) {
 				found = true;
 				j=i;
 			}
 			totalVote +=  votes.get(i).getVote();
 		}
 		
-		totalVote /= votes.size();
+		totalVote += votein.getVote();
+		totalVote /= (votes.size() + 1);
+		
+		
 		question.setAvgVotes(totalVote);
 		
 		if (found == true) {
 			votes.get(j).setVote( votein.getVote());
+			question.setVotes(votes);
 		} else {
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
-			Vote vote = new Vote(votein.getVote(), username,user  ); 
+			Vote vote = new Vote(votein.getVote(), username,user); 
 			votes.add(vote);
+			question.setVotes(votes);
 		}
+		
 		dataStore.save(question);
+		return "Ok";
 	}
-
 }
