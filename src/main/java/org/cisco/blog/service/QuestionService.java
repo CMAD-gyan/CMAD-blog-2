@@ -131,6 +131,8 @@ public class QuestionService {
 		
 		question =  dataStore.get(Question.class, oid);
 
+		//TBD Delete all the answers as well
+		
 		//if question matches username then allow delete
 		question =  dataStore.get(Question.class, oid);
 		if (question != null){

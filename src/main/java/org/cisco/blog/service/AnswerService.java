@@ -11,6 +11,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
@@ -24,13 +25,14 @@ public class AnswerService {
 	@Path("/{param}")
 	@Secured
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void setAnswerByQuestionId( Answer ans,
+	@Produces(MediaType.TEXT_PLAIN)
+	public String setAnswerByQuestionId( Answer ans,
 			                           @PathParam("param") String id,
 			                           @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
 		boolean update = false;
-		int i;
+		int index;
 		
 		try {
 			oid =  new ObjectId(id);
@@ -47,21 +49,22 @@ public class AnswerService {
 		User user =  dataStore.find(User.class).field("username").equal(username).get();
 		
 		List< Answer > answers = question.getAnswers();
+		
 		if ( answers == null ) 
 			answers = new ArrayList <Answer>();
 		
 		//iterate to see of user had already answered something  here 
 
-		for (i = 0; i < answers.size(); i++) {
-			if (answers.get(i).getUserName().equals(username)) {
+		for (index = 0; index < answers.size(); index++) {
+			if (answers.get(index).getUserName().equals(username)) {
 				update = true;
 				break;
 			}
 		}
 
 		if (update) {
-			answers.get(i).setText(ans.getText());
-			answers.get(i).setUpdateTime();
+			answers.get(index).setText(ans.getText());
+			answers.get(index).setUpdateTime();
 			
 		} else {
 			Answer answer = new Answer(ans.getText(), username, user);
@@ -69,16 +72,19 @@ public class AnswerService {
 			question.setAnswers(answers);
 		}
 		
+		dataStore.save(answers);
 		dataStore.save(question);
-		return;
+		return "Ok";
 	}
 	
 	@DELETE
 	@Secured
 	@Path("/{questionId}")
-	public void setAnswerByQuestionId(@PathParam("questionId") String id, @Context SecurityContext securityContext) {
+	@Produces(MediaType.TEXT_PLAIN)
+	public String setAnswerByQuestionId(@PathParam("questionId") String id, @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
+		ObjectId  answerOid = null;
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
@@ -88,19 +94,26 @@ public class AnswerService {
 		Question question =  dataStore.get(Question.class, oid);
 		String username = securityContext.getUserPrincipal().getName();
 		
-		if (question.getAnswers() == null) {
-			return;
-		}
-		
-		List<Answer> list = question.getAnswers();
-		
-		for (Iterator<Answer> iterator = list.iterator(); iterator.hasNext();) {
-			Answer answer = iterator.next();
-		    if (answer.getUserName().equals(username)) {
-		    	iterator.remove();
-		    }
+		if (question.getAnswers() != null) {
+			List<Answer> list = question.getAnswers();
+			
+			for (Iterator<Answer> iterator = list.iterator(); iterator.hasNext();) {
+				Answer answer = iterator.next();
+			    if (answer.getUserName().equals(username)) {
+			    	answerOid = new ObjectId(answer.getId());
+			    	iterator.remove();
+			    	
+			    }
+			}
 		}
 		dataStore.save(question);
-		return;
+		if (answerOid != null) {
+			dataStore.delete(Answer.class, answerOid);
+		}
+		return  "Ok";
 	}
+	
+	//comment 
+	
+	
 }
