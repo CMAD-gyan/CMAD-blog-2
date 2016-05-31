@@ -2,6 +2,7 @@ package org.cisco.blog.model;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -37,19 +38,13 @@ public class Question {
 @Embedded
 	private List<Comment>  comments;
 
-@Embedded
+@Reference
 	private List<Answer>  answers;
 
-	public void QuestionCleanEmbeds(){
-		this.votes       = null;
-		this.comments    = null;
-		this.answers     = null;
-	}
-
 	public Question() {
-		this.votes       = null;
-		this.comments    = null;
-		this.answers     = null;
+		this.votes       = new ArrayList <Vote>();
+		this.comments    = new ArrayList <Comment>();
+		this.answers     = new ArrayList <Answer>();
 		this.avgVotes    = VoteType.GOOD;
 		this.viewCount   = 0;		
 	}
@@ -62,9 +57,9 @@ public class Question {
 		this.username  = username;		
 		this.createTime  = new Timestamp(System.currentTimeMillis());
 		this.updateTime  = new Timestamp(System.currentTimeMillis());
-		this.votes       = null;
-		this.comments    = null;
-		this.answers     = null;
+		this.votes       = new ArrayList <Vote>();
+		this.comments    = new ArrayList <Comment>();
+		this.answers     = new ArrayList <Answer>();
 		this.avgVotes    = VoteType.GOOD;
 		this.viewCount   = 0;
 	}

@@ -74,49 +74,73 @@ public class UserService {
 		//boolean update = false;
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		
-		if(user.getUsername() == null)
-			throw  new BadRequestException("Invalid Email Error");
+		if ( user.getUsername() == null||
+				user.getName() == null ||
+				user.getPassword() == null ||
+				user.getEmail() ==null     || 
+				!user.isValidEmailAddress(user.getEmail()) ) {
+			throw  new  NotAllowedException("Invalid form ");
+		}
 		
 		user.setUsername(user.getUsername().toLowerCase());
-	
 		
 		User userdb = dataStore.find(User.class).field("username").equal(
 				                user.getUsername()).get();
 		
 		if (userdb == null) {
-			//New user Create
-			if ( user.getPassword() == null ||
-					user.getEmail() ==null     || 
-					!user.isValidEmailAddress(user.getEmail()) ) {
-				throw  new BadRequestException("Invalid Email Error");
-			}
-			
 			user.setCreateTime();
 			user.setUpdateTime();
 			user.setScore(0);
 			try {
 				dataStore.save(user);
 			} catch ( Exception e) {
-				throw  new BadRequestException("Unknown Error");
+				throw  new  BadRequestException("Unknown Error");
 			}
 		} else {
-			//Old user either password change or email change
-			if ( (user.getPassword() == null) && (user.getEmail() == null) )
-				throw  new BadRequestException("Unknown Error");
-				
+			throw  new  NotAllowedException("User Already Present");
+		}
+		return "Ok";
+	}
+	
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/text")
+	@Secured
+	public String editUser(User user, @Context SecurityContext securityContext){
+		String username = securityContext.getUserPrincipal().getName();
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		
+		
+		if(user.getUsername() == null) {
+			user.setUsername(username.toLowerCase());
+		} else {
+			//verify if both the user and supplied usernames are matching
+			if (!user.getUsername().equals(username))
+				throw new  NotAuthorizedException("Passed username and actual are not matching");
+		}
+		
+		User userdb = dataStore.find(User.class).field("username").equal(
+				                user.getUsername()).get();
+		
+		if (userdb == null) 
+			throw  new BadRequestException("Unknown Error");
+		
+		//Old user either password change or email change
+		if ( (user.getPassword() == null) && (user.getEmail() == null) )
+			throw  new BadRequestException("Unknown Error");
 			
-			if (user.getPassword() != null) 
-				userdb.setPassword(user.getPassword());
-			
-			if (user.getEmail() != null && user.isValidEmailAddress(user.getEmail()))
-				userdb.setEmail(user.getEmail());	
-			
-			userdb.setUpdateTime();
-			try {
-				dataStore.save(userdb);
-			} catch ( Exception e) {
-				throw  new BadRequestException("Unknown Error");
-			}
+		
+		if (user.getPassword() != null) 
+			userdb.setPassword(user.getPassword());
+		
+		if (user.getEmail() != null && user.isValidEmailAddress(user.getEmail()))
+			userdb.setEmail(user.getEmail());	
+		
+		userdb.setUpdateTime();
+		try {
+			dataStore.save(userdb);
+		} catch ( Exception e) {
+			throw  new BadRequestException("Unknown Error");
 		}
 		return "Ok";
 	}

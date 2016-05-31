@@ -1,5 +1,5 @@
 package org.cisco.blog.service;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 import org.bson.types.ObjectId;
 
@@ -17,7 +17,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
-//import org.cisco.blog.model.VoteType;
 
 import org.mongodb.morphia.Datastore;
 import org.cisco.blog.model.*;
@@ -95,18 +94,12 @@ public class QuestionService {
 			question.getUser().setPassword("xxxxxxxxx");
 			
 			//@TBD get some better way to fix
-			
-			if (question.getComments() != null) {
-				for ( int i=0; i < question.getComments().size(); i++) {
-					question.getComments().get(i).getUser().setPassword("XXXXX");
-				}
+			for ( int i=0; i < question.getComments().size(); i++) {
+				question.getComments().get(i).getUser().setPassword("XXXXX");
 			}
 			
-			
-			if (question.getAnswers() != null) {
-				for ( int i=0; i < question.getAnswers().size(); i++) {
-					question.getAnswers().get(i).getUser().setPassword("XXXXX");
-				}
+			for ( int i=0; i < question.getAnswers().size(); i++) {
+				question.getAnswers().get(i).getUser().setPassword("XXXXX");
 			}
 			question.setVotes(null);
 		}
@@ -117,7 +110,8 @@ public class QuestionService {
 	@DELETE
 	@Secured
 	@Path("/{param}")
-	public void deleteQuestionById(@PathParam("param") String id,
+	@Produces(MediaType.TEXT_PLAIN)
+	public String deleteQuestionById(@PathParam("param") String id,
 			                       @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
@@ -131,18 +125,23 @@ public class QuestionService {
 		
 		question =  dataStore.get(Question.class, oid);
 
-		//if question matches username then allow delete
 		question =  dataStore.get(Question.class, oid);
 		if (question != null){
 			if( securityContext.getUserPrincipal().getName().equals("admin") || 
 					securityContext.getUserPrincipal().getName().equals(
 							             question.getUser().getUsername()))	{
+				
+				for ( int i=0; i < question.getAnswers().size(); i++) {
+					ObjectId idAns =  new ObjectId(question.getAnswers().get(i).getId());
+					dataStore.delete(Answer.class, idAns);
+				}	
 				dataStore.delete(Question.class, oid);
+				
 			}else {
 				throw  new NotAuthorizedException("You Don't Have Permission");
 			}	
 		}
-		return;
+		return "Ok";
 	}
 		
 	
@@ -217,13 +216,6 @@ public class QuestionService {
 
 		List <Comment> comment = question.getComments();
 		
-		if (comment == null) {
-			comment = new ArrayList <Comment>();
-			question.setComments(comment);
-		}
-		
-		
-		
 		for (i = 0; i < comment.size(); i++) {
 			
 			if (comment.get(i).getUsername().equals(username)) {
@@ -246,7 +238,6 @@ public class QuestionService {
 		return "Ok";
 	}
 	
-	
 	@DELETE
 	@Secured
 	@Path("/{param}/comment")
@@ -268,21 +259,20 @@ public class QuestionService {
 		
 		if (question != null) {
 			List <Comment> comment = question.getComments();
-			
-			if (comment != null) { 
-				for (i = 0; i < comment.size(); i++) {
-					if (comment.get(i).getUsername().equals(username)) {
-						found = true;
-						break;
-					}
-				}
 				
-				if (found == true) {
-					comment.remove(i);
-					question.setComments(comment);
-					dataStore.save(question);
+			for (i = 0; i < comment.size(); i++) {
+				if (comment.get(i).getUsername().equals(username)) {
+					found = true;
+					break;
 				}
 			}
+			
+			if (found == true) {
+				comment.remove(i);
+				question.setComments(comment);
+				dataStore.save(question);
+			}
+
 		}
 		return "Ok";
 	}
@@ -323,11 +313,7 @@ public class QuestionService {
 
 		List <Vote> votes = question.getVotes();
 		
-		if (votes == null) 
-			votes = new ArrayList <Vote>();
-		
 		for (i = 0; i < votes.size(); i++) {
-			
 			if (votes.get(i).getUsername().equals(username)) {
 				found = true;
 				j=i;
@@ -337,8 +323,7 @@ public class QuestionService {
 		
 		totalVote += votein.getVote();
 		totalVote /= (votes.size() + 1);
-		
-		
+
 		question.setAvgVotes(totalVote);
 		
 		if (found == true) {

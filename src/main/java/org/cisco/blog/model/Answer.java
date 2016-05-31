@@ -3,12 +3,18 @@ package org.cisco.blog.model;
 import java.sql.Timestamp;
 import java.util.List;
 import org.mongodb.morphia.annotations.Embedded;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
+import org.bson.types.ObjectId;
 import org.cisco.blog.model.VoteType;
 
 
-@Embedded
+@Entity
 public class Answer {
+	@Id
+    private ObjectId id;
+
 	private String text;
 
 	private Timestamp createTime;
@@ -41,6 +47,10 @@ public class Answer {
 		this.avgVotes    =  VoteType.GOOD;;
 	}
 	
+	public String getId(){
+		return this.id.toHexString();
+	}
+
 	
 	public String getText(){
 		return this.text;
