@@ -1,0 +1,30 @@
+<div  ng-controller="UserController as userController"  class="form">
+  <div class="form-toggle"></div>
+  <div class="form-panel one">
+    <div class="form-header">
+      <h1>Account Login</h1>
+    </div>
+    <div class="form-content">
+      <form>
+        <div class="form-group">
+          <label for="EMAIl">Username</label>
+          <input type="email" id="email" ng-model="user.email" required="required"/>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" ng-model="user.password" required="required"/>
+        </div>
+        <div class="form-group">
+          <label class="form-remember">
+            <input type="checkbox"/>Remember Me
+          </label><a href="#" class="form-recovery">Forgot Password?</a>
+        </div>
+        <div >
+        <input type="button" id="loginB" value="Login" ng-click="getUser(user)"></input> 
+         </div>
+        <div class="form-group" id=addResultDiv>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

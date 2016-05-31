@@ -1,0 +1,143 @@
+@CHARSET "UTF-8";
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background: -webkit-linear-gradient(45deg, rgba(248, 248, 255, 0.8) 0%, rgba(66, 245, 189, 0.4) 100%);
+  background: linear-gradient(45deg, rgba(255,255,255, 0.8) 0%, rgba(255,255,255, 0.4) 100%);
+  color: rgba(0, 0, 0, 0.6);
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  line-height: 1.6em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    background-color:  black;
+      height: 5%;
+      color: white;
+}
+
+
+#header > div {
+    width: 330%;
+    height: 5%;
+
+}
+
+
+#title{
+  margin: 4px auto;
+  font-size: 14px;
+  color: white;
+  float right;
+}
+#login{
+  margin: 3px auto;
+  font-size: 12px;
+  color: white;
+  margin-right: 10px
+}
+#signup{
+  margin: 3px auto;
+  font-size: 12px;
+  color: white;
+  margin-right: 10px
+}
+#search{
+  margin: 3px auto;
+  width: inherit;;
+  margin-right: 10px
+}
+#cmadLogo{
+    display: flex;
+    justify-content: space-between;
+    background-color:  white;
+      height: 10%;
+      color: Red;
+      top: 10%
+}
+#cmadLogo > div {
+    width: 330%;
+    height: 5%;
+
+}
+#logoleft{
+  margin-left: 40px;
+    justify-content: space-between;
+      color: Red;
+
+}
+#leftB{
+  margin: 15px auto;
+  width: 80px ;
+  height: 30px;
+  font-size: 12px;
+  color: white;
+  margin-right: 10px;
+  font-weight: bold;
+  background-color: #FFA07A;
+}
+#centerB{
+  margin: 5px auto;
+  font-size: 12px;
+  font-weight: bold;
+  width: 70px ;
+  height: 30px;
+  color: white;
+  margin-right: 10px;
+  background-color: #A9A9A9;
+}
+#rightB{
+  margin: 7px auto;
+  width: 100px ;
+  height: 30px;
+  margin-right: 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #A9A9A9;
+}
+
+
+#blogSection {
+  top: 20%;
+
+  	background: #FFFFFF;
+  	width: 800px;
+ 	 border-radius: 4px;
+  	box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+ 	 box-sizing: border-box;
+    margin: 0, 0, 30;
+}
+
+.blogtitle {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin: 0 0 20px;
+  color: #191970;
+  font-size: 16px;
+}
+#blogSection:last-child {
+  margin: 0;
+}
+.body_date {
+	text-align: right;
+  margin-right: 25px;
+	font-sixe :10px;
+	color:#DC143C;
+}

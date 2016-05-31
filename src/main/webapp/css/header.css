@@ -1,0 +1,168 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+}
+
+header {
+  padding: 20px 0;
+}
+
+header .row{
+  display: flex;
+  align-items: center;
+}
+
+
+nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+header p {
+  padding: 0 20px;
+  margin: 0;
+}
+
+.header {
+	margin:0;
+	padding:0;
+	background:#3085ca url(../images/header_bg.jpg) top center repeat-x;
+}
+
+h1 {
+	margin:0;
+	padding:0px 0;
+	color:#fff;
+	font:normal 40px/1.2em Georgia, "Times New Roman", Times, serif;
+	text-transform:uppercase;
+	letter-spacing:-2px;
+}
+h1 a,h1 small , h1 a:hover {
+	color:#fff;
+	text-decoration:none;
+}
+
+#left h1 .span {
+	font-size:12px;
+	letter-spacing:-1px;
+}
+h1 span {
+	font-size:12px;
+	letter-spacing:-1px;
+}
+#h1 .small {
+	display:block;
+	margin:-4px 0;
+	padding:0 0 0 176px;
+	font:normal 13px/1.2em Georgia, "Times New Roman", Times, serif;
+	text-transform:none;
+	letter-spacing:normal;
+}
+
+/* .jumbotron {
+  display: flex;
+  align-items: center;
+  background-image: url('https://s3.amazonaws.com/codecademy-content/projects/make-a-website/lesson-4/jumbotron.jpg');
+  background-size: cover;
+  color: #ffffff;
+  height: 500px;
+  text-shadow: 0.25px 0.25px 0.25px #000000;
+}
+
+.jumbotron h2 {
+  font-size: 60px;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.jumbotron h3 {
+  margin: 0 0 20px;
+  color: #fff;
+}
+
+section .row img {
+  margin: 0 0 30px;
+  width: 100%;
+}
+
+.col-md-6 {
+  margin: 0 0 30px;
+}
+
+.btn.btn-primary {
+  border-radius: 2px;
+  border: 0px;
+  color: #fbd1d5;
+  text-shadow: none;
+  background-color: #ffffff;
+}
+
+.btn.btn-primary:hover {
+  color: #ffffff;
+  background-color: #fbd1d5;
+}
+
+.btn-secondary {
+  background-color: #E8DFE0;
+  color: #ffffff;
+  margin: 0 0 30px;
+}
+
+footer {
+  font-size: 12px;
+  padding: 20px 0;
+}
+
+footer .col-sm-8 {
+  display: flex;
+  justify-content: flex-end;
+}
+
+footer ul {
+  list-style: none;
+}
+
+footer li img {
+  width: 32px;
+  height: 32px;
+} */
+
+.navbar {
+	border-radius: 0;
+	border: none;
+	margin-bottom: 0;
+	min-height: 80px;
+}
+
+.nav li {
+	display: inline;
+	color: white;
+}
+
+.navbar-nav > li > a {
+	color: #ffffff;
+	font-family: Lato;
+	font-size: 1.5em;
+	font-weight: 300;
+	padding: 50px 5px 33px 25px;
+	background-color: transparent;
+}
+
+.navbar-nav li a:hover {
+	background-color: #3085ca;
+	transition: 0.7s all linear;
+	
+}
+
+.navbar-default {
+    background-color: transparent;
+    border-color: #337ab7;
+    padding: 40px 5px 1px 5px;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #ffffff;
+}
+
+

@@ -1,0 +1,26 @@
+<div ng-controller="UserController as userController">
+		<div ng-show="loading"><img src="images/loading.gif"></img></div>
+		<table style="width: 400px" border="1">
+				<td>user Name</td>
+				<td>Age</td>
+				<td>Option</td>
+			<tr ng-repeat="user in users">
+				<td>{{user.userName}}</td>
+				<td>{{user.email}}</td>
+				<td><a href='#' ng-click="editUser(user)">Edit</a></td>
+			</tr>
+		</table>
+		{{error}}
+		Showing {{users.length}} users </br>
+		<input type="button" value="Add User" ng-click="showAddForm=true"></input>
+		<div ng-show="showAddForm || showEditForm">
+			<form novalidate>
+				<input type="text" ng-model="user.name"></input>
+				<input type="number" ng-model="user.age"></input>
+				<input type="button" value="Cancel" ng-click="showAddForm=false; showEditForm=false"></input>
+				<input type="button" value="Update" ng-show="showEditForm" ng-click="updateUser(user); "></input>
+				<input type="button" value="Save" ng-show="showAddForm" ng-click="addUser(user)"></input> 
+				</br>
+			</form>
+</div>
+	</div>

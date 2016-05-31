@@ -1,0 +1,13 @@
+ <div ng-repeat="blog in blogs" ng-controller="BlogController as blogController" >
+    <h2> <a href="#">{{blog.title}}</a>
+    </br>
+    <span>{{blog.title}}</span> </h2>
+         <p>{{blog.content}} </p>
+         <p><a href="#">Read more | Comments (5)</a></p>
+ </div>
+ <div ng-show="shownext ">
+ 	<a href ng-click="setPage()">Next</a>
+	<span> count: {{mypage}} </span>		
+</div>
+		
+        
