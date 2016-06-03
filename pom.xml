@@ -70,5 +70,13 @@
 	</dependencies>
 	<build>
 		<finalName>CMAD-blog-2</finalName>
+		
+		  <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-file</artifactId>
+         <version>1.0-beta-3</version>
+      </extension>
+    </extensions>
 	</build>
 </project>
