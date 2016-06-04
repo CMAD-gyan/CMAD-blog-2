@@ -16,7 +16,7 @@ public class ServiceFactory {
 	 */
 	public static Datastore getMongoDB(){
 		if(mongoTL.get()==null){
-			MongoClientURI connectionString = new MongoClientURI("mongodb://localhost:27017");
+			MongoClientURI connectionString = new MongoClientURI("mongodb://162.222.181.52:27017");
 //			MongoClientURI connectionString = new MongoClientURI("mongodb://vm-ajchande-001.cisco.com:27017");
 			MongoClient mongoClient = new MongoClient(connectionString);	
 			Morphia morphia = new Morphia();
