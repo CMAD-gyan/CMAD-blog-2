@@ -1,5 +1,5 @@
 (function(){
-	var app = angular.module('myApp',['ngRoute']);
+	var app = angular.module('myApp',['ngRoute','ngCookies']);
 	
 	
 	app.config(function($routeProvider) {
@@ -48,13 +48,13 @@
     });
 	
 	
-	app.controller('UserController',function($http, $log, $scope, $rootScope){
+	app.controller('UserController',function($http, $log, $scope, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
 		var controller = this;
 		$scope.users=[];
 		$scope.loading = true;
 		$log.debug("Getting users...");
-		$http.get('cmad/user').
+		$http.get('rest/user').
 		  success(function(data, status, headers, config) {
 			  $scope.users = data;
 			  $scope.loading = false;
@@ -64,31 +64,36 @@
 			  $scope.error = status;
 		  });
 		
-		$scope.getUserOnLogin = function (user) {
+		$scope.getUserOnLogin = function(user) {
 			$log.debug(user);
 			$scope.showEditForm=false;
 			$scope.showAddForm=true;
-			 var postlogin =  $http.post('cmad/user/login', user);
-	         postlogin.success(function (data) {
+			 var postlogin =  $http.post('rest/authentication', user);
+	         postlogin.success(function(data) {
 	        	 console.log("Success");
-	        	 console.log(data)
 	        	 $log.debug(data);
-	        	 
+	        	 $cookies['token'] = data;
+	        	 console.log("printing token=========");
+	        	 $log.debug($cookies['token']);
+	        	 $location.path("viewallblogs");
 	         })
 	         .error(function (data) {
+	        	 $log.debug("Login failed");
 	        	 $log.debug(data);
 	         });
 	    };
 		$scope.addUser = function (user) {
+			$log.debug("Inside user creation");
 			$log.debug(user);
 			$scope.showEditForm=false;
 			$scope.showAddForm=true;
-	         var postData =  $http.post('cmad/user', user);
-	         postData.success(function (data) {
+	         $http.post('rest/user', user).success(function (data) {
 	        	 $log.debug(data);
 	        	 $scope.users.push(user);
-	         })
-	         .error(function (data) {
+	        	 $location.path("login");
+//	        	 $window.location.href= "#login";
+	         }).error(function (data) {
+	        	 $log.debug("Failed to create user");
 	        	 $log.debug(data);
 	         });
 	    };
@@ -197,7 +202,7 @@
     	    	    };
 
 	});
-	app.controller('BlogController',function($http, $log, $scope, $location,$rootScope){
+	app.controller('BlogController',function($http, $log, $scope, $location,$rootScope,$cookies){
 		var controller = this;
 		$scope.blogs=[];
 		$scope.allblogs=[];
@@ -234,8 +239,10 @@
 		$log.debug(blog);
 		$scope.showEditForm=false;
 		$scope.showAddForm=true;
+		$log.debug("=====" + $cookies['token']);
 		$log.debug("Add Blogs...");
-         var postData =  $http.post('rest/question', blog);
+		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+        var postData =  $http.post('rest/question', blog);
          postData.success(function (data) {
         	 $log.debug(data);
         	 $scope.blogs.push(blog);

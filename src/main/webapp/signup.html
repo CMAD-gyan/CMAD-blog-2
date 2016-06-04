@@ -7,9 +7,13 @@
     </div>
     <div class="form-content" id="validateform">
       <form>
-       <div class="form-group">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" ng-model="user.name" minlength="4" required="required"/>
+        </div>
+        <div class="form-group">
           <label for="username">User Name</label>
-          <input type="text" id="username" ng-model="user.userName" minlength="8" required="required"/>
+          <input type="text" id="username" ng-model="user.username" minlength="8" required="required"/>
         </div>
         <div class="form-group">
           <label for="email">Email Address</label>
