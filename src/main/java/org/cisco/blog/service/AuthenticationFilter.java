@@ -16,6 +16,7 @@ import org.cisco.blog.model.Session;
 import org.mongodb.morphia.Datastore;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 
 
 @Secured
@@ -33,6 +34,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			throw new NotAuthorizedException("Not valid session");
 		}
 		username = sess.getUsername();
+		sess.setLastLoginTime(new Timestamp(System.currentTimeMillis()));
+		//update the last active time 
+		dataStore.save(sess);
+		
 	}
 	
     public void filter(ContainerRequestContext requestContext) throws IOException {
