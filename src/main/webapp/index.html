@@ -1,35 +1,150 @@
 <!DOCTYPE>
-<html ng-app="Airlines">
+<html >
 <head>
-<link rel="stylesheet" href="styles/bootstrap.css" />
+  	<link rel="stylesheet" href="styles/bootstrap.css" />
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="stylesheet" href="css/header.css">
+	<link rel="stylesheet" href="css/body.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/style1.css">
+    <link rel="stylesheet" href="css/style2.css">
+    <link rel="stylesheet" href="css/style3.css">
+    <script type="text/javascript" src="scripts/jquery-2.2.3.js"></script>
+   	<script type="text/javascript" src="scripts/angular.js"></script>
+   	<script type="text/javascript" src="scripts/angular-cookies.js"></script>
+   	<script type="text/javascript" src="scripts/angular-route.js"></script>
+   	<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+ 	<script type="text/javascript" src="scripts/cmadmain.js"></script>
+ 	
 
-<script type="text/javascript" src="scripts/jquery-2.2.3.js"></script>
-<script type="text/javascript" src="scripts/angular.js"></script>
-<script type="text/javascript" src="scripts/app3.js"></script>
-</head>
-<body>
-	<h2>Users</h2>
-	<div ng-controller="UserController as userController">
-		<div ng-show="loading"><img src="images/loading.gif"></img></div>
-		<table style="width: 400px">
-			<tr ng-repeat="user in users">
-				<td>{{user.userName}}</td>
-				<td>{{user.email}}</td>
-				<td><a href='#' ng-click="editUser(user)">Edit</a></td>
-			</tr>
-		</table>
-		{{error}}
-		Showing {{users.length}} users
-		<input type="button" value="Add User" ng-click="showAddForm=true"></input>
-		<div ng-show="showAddForm || showEditForm">
-			<form novalidate>
-				<input type="text" ng-model="user.userName"></input>
-				<input type="text" ng-model="user.email"></input>
-				<input type="button" value="Cancel" ng-click="showAddForm=false; showEditForm=false"></input>
-				<input type="button" value="Update" ng-show="showEditForm" ng-click="updateUser(user); "></input>
-				<input type="button" value="Save" ng-show="showAddForm" ng-click="addUser(user)"></input>
-			</form>
-		</div>
+  </head>
+
+<body ng-app="myApp">
+  <!-- START PAGE SOURCE -->
+  <div class="main">
+    <div class="header">
+      <!-- <div class="header_resize"> -->
+	  <header class="container">
+	  <div class="row">
+        <div class="col-sm-10">
+          <h1><a href="MainIndex2.html"><small>SMARTBlogger</small>CMAD<span>com</span></a></h1>
+        </div>
+        <div class="search col-sm-2">
+          <form id="form1" name="form1" method="post" action="#">
+            <span>
+            <input name="q" type="text" class="keywords" id="textfield" maxlength="50" value="Search..." />
+            </span>
+            <!-- <input name="b" type="image" src="images/search.gif" class="button" /> -->
+          </form>
+        </div>
+      </div>
+    <nav class="navbar navbar-static-top" role="navigation">
+	<div class="container">
+	  <div class="navbar-header navbar-default">
+		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<ul class="nav navbar-nav">
+		  <li><a href="#/viewallblogs">Home</a></li>
+		  <li><a href="#/login">Login</a></li>
+          <li><a href="#/signup">SignUp</a></li>
+          <li><a href="#/addblog">Ask Questions</a></li>
+          <li><a href="#">Contact</a></li>
+		</ul>
+	  </div>
 	</div>
-</body>
-</html>
+	</nav>
+	</header>
+      <!-- </div> -->
+      
+    </div>
+    <div class="clr"></div>
+    <div class="body">
+      <div class="body_resize">
+        <div class="left" id="left" ng-view>
+        </div>
+        <div class="right">
+          <h2> Sidebar Menu</h2>
+         <ul>
+            <li><a href="#/viewallblogs">Home</a></li>
+            <li><a href="#/login">Login</a></li>
+            <li><a href="#/signup">Signup</a></li>
+            <li><a href="#/addblog">Ask Questions</a></li>
+            <li><a href="#">Archives</a></li>
+          </ul>
+          <h2>Careers</h2>
+          <ul class="sponsors">
+            <li class="sponsors"><a href="#">For Companies</a><br />
+              Source, attract and recruit technical talent on the platform 40 million developers trust to solve their coding problrms</li>
+            <li class="sponsors"><a href="#">FOR DEVELOPERS</a><br />
+              Want to sit back and receive personalized job matches> Pro-actively find the best Java jobs in your city?
+            Join us and find your dream job on your terms.</li>
+            <li class="sponsors"><a href="#">Career Ads</a><br />
+            What if you could source top talent by exposing your job ads to the right seekers where they live online?
+
+            Monsters exclusive Career Ad Network takes an existing Job Posting, dynamically transforms it into an online ad and strategically places it on Monsters vast network of thousands of sites to attract the most qualified seekers that match your sourcing criteria.
+  Simple and easy to use, Career Ad Network targets seekers wherever they are online</li>
+            <li class="sponsors"><a href="#">US Advertising Executive - Nature jobs</a><br />
+
+            Springer Science+Business
+            New York ,NY
+  Springer Nature is a major new force in scientific, scholarly, professional and educational publishing. By using its combined expertise,
+  scale and the reach of our brands, the company aims to grow and in</li>
+          </ul>
+          <p>&nbsp;</p>
+          <div class="clr"></div>
+        </div>
+        <div class="clr"></div>
+      </div>
+    </div>
+    <div class="FBG">
+      <div class="FBG_resize">
+        <div class="blok2">
+          <h2>CMAD Team</h2>
+          <img src="images/sami.jpg" alt="" width="68" height="68" /> <img src="images/sami1.jpg" alt="" width="68" height="68" /> <img src="images/gallery_3.gif" alt="" width="68" height="68" /> <img src="images/gallery_4.gif" alt="" width="68" height="68" /> <img src="images/gallery_5.gif" alt="" width="68" height="68" /> <img src="images/gallery_6.gif" alt="" width="68" height="68" /> <img src="images/gallery_7.gif" alt="" width="68" height="68" /> <img src="images/gallery_8.gif" alt="" width="68" height="68" />
+          <div class="clr"></div>
+          <h2>Engineering </h2>
+          <p>Building and shipping products that millions of developers use every day. </br>
+            Recruiting the best (and nicest!) team of people to work with and constantly improving our employee experience. </p>
+        </div>
+        <div class="blok">
+          <h2>About</h2>
+          <img src="images/gallery_9.gif" alt="" width="68" height="68" />
+          <p>Developers trust CMAD Blog to help solve coding problems and use CMAD Blog Careers to find job opportunities. We are committed to making the internet a better place, and our products aim to enrich the lives of developers as they grow and mature in their careers.
+
+            Founded in 2015, CMAD Blog sees 40 million visitors each month and is the flagship site of the Stack Exchange network, home to 150+ Q&A sites dedicated to niche topics.
+          </p>
+        </div>
+        <div class="blog">
+          <h2>Contact</h2>
+          <p>To buy ads or inquire about tag sponsorships, please contact us at ads@smartblogger.com, call +91 80-44260000 and select option "2" at the auto-attendant to reach our ad sales team. Our business hours are Monday through Friday, 9am to 5pm IST .</p>
+          <img src="images/gallery_10.gif" alt="" width="68" height="68" /><img src="images/gallery_11.gif" alt="" width="68" height="68" /><img src="images/gallery_12.gif" alt="" width="68" height="68" />
+          <div class="clr"></div>
+          <p>Email	<a href="#">support@smartblogger.com</a><br />
+          Phone	India: +91 80-44260000 (9am–5pm IST) </br>
+          Fax	US: +1 (212)785-4578 </br>
+          Office: Cisco Systems,
+          Bangalore </p>
+        </div>
+        <div class="clr"></div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer_resize">
+        <p class="lf">Copyright &copy; 2016 <a href="#">SMartBlogger</a> - All Rights Reserved</p>
+        <p class="rf"><a href="index.jsp">Blog Website</a> by <a href="login.jsp">Ajay , Gyan and Samiksha </a></p>
+        <div class="clr"></div>
+      </div>
+      <div class="clr"></div>
+    </div>
+  </div>
+  <!-- END PAGE SOURCE -->
+  <div align=center>This Website Is under Development By <a href='index.jsp'>Samiksha, Ajay & Gyan</a></div></body>
+  </html>
