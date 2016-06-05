@@ -4,13 +4,20 @@ import java.sql.Timestamp;
 import java.util.List;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.utils.IndexType;
 import org.bson.types.ObjectId;
 import org.cisco.blog.model.VoteType;
 
 
 @Entity
+@Indexes({
+@Index(fields = @Field(value = "$**", type = IndexType.TEXT))
+})
 public class Answer {
 	@Id
     private ObjectId id;

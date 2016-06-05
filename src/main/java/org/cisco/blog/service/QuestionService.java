@@ -19,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 import org.cisco.blog.model.*;
 
 @Path("/question")
@@ -110,6 +111,32 @@ public class QuestionService {
 		}
 		return question;
 	}
+	
+	@POST
+	@Path("/search")
+	@Produces({MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.TEXT_PLAIN})
+	public List<Question> getQuestionBySerch(String search_string) {
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		ObjectId  oid;
+		Question question = null;
+		
+		
+		Query<Question> q = dataStore.createQuery(Question.class).search(search_string);
+		List<Question> ques = q.asList();
+		
+		if (ques != null){
+			for (int i = 0; i < ques.size(); i++) {
+				//we should not send password
+				ques.get(i).setAnswers(null);
+				ques.get(i).setComments(null);
+				ques.get(i).setVotes(null);
+				ques.get(i).setUser(null);
+			}
+		}
+		return ques;
+	}	
+
 	
 	
 	@DELETE
