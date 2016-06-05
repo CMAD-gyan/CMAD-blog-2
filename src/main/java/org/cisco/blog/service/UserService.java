@@ -68,7 +68,7 @@ public class UserService {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/text")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String createUser(User user){
 		//check if create of update
 		//boolean update = false;
@@ -104,7 +104,7 @@ public class UserService {
 	
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/text")
+	@Produces(MediaType.TEXT_PLAIN)
 	@Secured
 	public String editUser(User user, @Context SecurityContext securityContext){
 		String username = securityContext.getUserPrincipal().getName();
@@ -150,7 +150,7 @@ public class UserService {
 	@DELETE
 	@Secured
 	@Path("/{param}")
-	@Produces("application/text")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String deleteUserById(@PathParam("param") String id,  
 			                @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
