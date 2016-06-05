@@ -33,6 +33,7 @@ public class QuestionService {
 		User user;
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
+		String id=null;
 		
 		ques.setCreateTime();
 		ques.setUpdateTime();
@@ -56,11 +57,13 @@ public class QuestionService {
 				
 				ques.setUser(user);
 				dataStore.save(ques);
+				id = ques.getId();
 			} else {
 				if (question.getUsername().equals(username)) {
 					question.setText(ques.getText());
 					question.setUpdateTime();
 					dataStore.save(question);
+					id = ques.getId();
 				} else {
 					 throw new NotAcceptableException("Already Present");
 				}
@@ -68,7 +71,9 @@ public class QuestionService {
 		}catch (Exception e) {
 			throw new BadRequestException("Unknow Problem");
 		}
-		return "Ok";
+		
+		
+		return id;
 	}
 	
 	@GET
