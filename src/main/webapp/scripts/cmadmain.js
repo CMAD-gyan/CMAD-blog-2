@@ -14,6 +14,14 @@
             templateUrl : 'viewallblogs.html',
             controller  : 'BlogController'
         })
+        .when('/viewallblogs/:id', {
+            templateUrl : 'viewallblogs.html',
+            controller  : 'BlogController'
+        })
+         .when('/viewdetailblog/:id', {
+            templateUrl : 'viewdetailblog.html',
+            controller  : 'detailBlogController'
+        })
         .when('/viewnextblogs', {
             templateUrl : 'viewnextblogs.html',
             controller  : 'BlogController'
@@ -118,54 +126,34 @@
 
 		}
 	});
-	app.controller('detailBlogController',function($http, $log, $scope, $location,$rootScope,  $routeParams){
+	app.controller('detailBlogController',function($http, $log, $scope, $route, $location,$rootScope, $cookies, $routeParams){
 		var controller = this;
-		$scope.blogs=[];
-		$scope.allblogs=[];
-		$scope.count= 0;
-		$scope.loading = true;
-		$scope.shownext = true;
-		$scope.showprev = true;
-		$scope.prevpage = 0;
-		$scope.nextpage = 0;
-		$scope.lastDataPoint = 3;
-		$scope.pagesize= 3;
-		$scope.currentPage = this.n;
+		$scope.question=[];
+		$scope.currentquestion=[];
+		$scope.showanswers = false;
+		 $scope.questionid = $routeParams.id;
+		
+		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
 	
-		 $scope.startpage = parseInt( $routeParams.id);
-		 $scope.nextpage = parseInt( $routeParams.id) + $scope.pagesize;
-		$log.debug($routeParams.id  + "Getting Blogs..." +  $scope.nextpage);
-		$log.debug($scope.showprev  + "Getting Prev ..." +  $scope.prevpage);
-		$http.get('rest/question').
+		$http.get('rest/question/' + $scope.questionid).
 		  success(function(data, status, headers, config) {
-			  $scope.count= data.length;
-			  $scope.allblogs = data;
-			  if($routeParams.id != undefined && $routeParams.id <=  3) {
-				  $scope.prevpage = 0;
-				  $scope.showprev = true;
+			  
+			  $scope.currentquestion = data;
+			  $log.debug("Successful data retrieved:" +   $scope.currentquestion.answers.length);
+			  if($scope.currentquestion.answers.length > 0) {
+				  $scope.showanswers = true;
 			  } else {
-				  $scope.showprev = true;
-				  $scope.prevpage = $routeParams.id - $scope.pagesize;
+				  $scope.showanswers = false;
 			  }
-			 if($scope.nextpage >=  $scope.count) {
-				 $scope.shownext = false;
-				  $scope.lastDataPoint = $scope.count;
-			  } else {
-				  $scope.lastDataPoint = $scope.nextpage;
-			  }
-			  $log.debug($rootScope.mypage + "Getting Blogs..." + $scope.startpage + "last=" + $scope.lastDataPoint);
-			  for (var i =  $scope.startpage, j= 0; i < $scope.lastDataPoint; i++, j++) {
-				  $scope.blogs[j] = $scope.allblogs[i];
-			  }
-			 // $scope.blogs[0] = data[$routeParams.id];
-			  //$scope.blogs = data;
-			  $scope.loading = false;
+			
+			
 		  }).
 		  error(function(data, status, headers, config) {
-			  $scope.loading = false;
+			
 			  $scope.error = status;
 		  });
 	
+		
 	$scope.addBlog = function (blog) {
 		$log.debug(blog);
 		$scope.showEditForm=false;
@@ -180,13 +168,27 @@
         	 $log.debug(data);
          });
     };
+    
+    $scope.addAnswer = function (answer) {
+		$log.debug(answer);
+		$log.debug("=====" + $cookies['token']);
+		$log.debug("Add Answers...");
+		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+        var postData =  $http.post('rest/answer/'+$scope.questionid, answer);
+         postData.success(function (data) {
+        	 $log.debug(data);
+        	 $log.debug("Add Answers Success change the path...");
+        	 $route.reload();
+        	 $location.path('/viewdetailblog/' + $scope.questionid);
+         })
+         .error(function (data) {
+        	 $log.debug(data);
+         });
+    };
     $scope.setPage = function () {
     	
     	$log.debug("setPagecunt" +  $scope.nextpage);
-    
-    	$scope.currentPage++;
-    	$scope.startpage =  $scope.lastDataPoint  ;
-    	$location.path('/viewnextblogs/'+ $scope.nextpage);
+    	$location.path('/viewallblogs/'+ $scope.prevpage);
     	    };
     $scope.setPrevPage = function () {
     	    	
@@ -196,13 +198,14 @@
     	    		$location.path('/viewallblogs');
     	    	} else {
     	    		$log.debug("not matched" );
-    	    		$location.path('/viewnextblogs/'+ $scope.prevpage);
+    	    		$location.path('/viewallblogs/'+ $scope.prevpage);
     	    	}
     	    	
     	    	    };
 
 	});
-	app.controller('BlogController',function($http, $log, $scope, $location,$rootScope,$cookies){
+	
+	app.controller('BlogController',function($http, $log, $scope, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
 		$scope.blogs=[];
 		$scope.allblogs=[];
@@ -210,30 +213,70 @@
 		$scope.loading = true;
 		$scope.shownext = true;
 		$scope.showprev = false;
-		$scope.lastDataPoint = 3;
+		 $scope.nextpage = 2;
+		$scope.lastDataPoint = $scope.pagesize;
 		$scope.pagesize= 3;
-		$scope.currentPage = this.n;
-		$scope.nextpage = 0 + $scope.pagesize;
+		$scope.offset = 0;
+		$scope.prevpage = 1;
+		
 		 $scope.startpage = 0;
-		$log.debug("Getting Blogs...");
-		$http.get('rest/question').
+		$log.debug("Getting Blogs..." + $routeParams.id);
+		if($routeParams.id == undefined) {
+			$scope.showprev = false;
+			$scope.nextpage = 2;
+			$scope.foundnext = false;
+			$scope.offset = 0;
+			$scope.prevpage = 0;
+			$log.debug("MainPage/" + "$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
+		} else {
+			$scope.showprev = true;
+			$scope.nextpage = (parseInt( $routeParams.id) + 1);
+			$scope.offset = (parseInt( $routeParams.id) -1) * 3;
+			$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
+			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
+		}
+		
+		$http.get('rest/question/'+$scope.offset +"-"+3 ).
 		  success(function(data, status, headers, config) {
 			  $scope.count= data.length;
 			  $scope.allblogs = data;
-			  if($scope.lastDataPoint >  $scope.count) {
-				  $scope.lastDataPoint = $scope.count;
-			  }
-			  $log.debug($scope.nextpage + "Getting Blogs..." + $scope.startpage + "last=" + $scope.lastDataPoint);
-			  for (var i = $scope.startpage, j= 0; i < $scope.lastDataPoint; i++, j++) {
-				  $scope.blogs[j] = $scope.allblogs[i];
-			  }
-			  //$scope.blogs = data;
-			  $scope.loading = false;
+			  $scope.shownext= true;
+			  if($scope.pagesize >  $scope.count) {
+				  $scope.shownext= false;
+			  } 
+			  $log.debug($scope.nextpage + "Getting Blogs..." +  $scope.count + "last=" +$scope.pagesize);
+			 
+			 $scope.blogs = data;
+			 $scope.getnextquestion();
 		  }).
 		  error(function(data, status, headers, config) {
 			  $scope.loading = false;
 			  $scope.error = status;
 		  });
+		$scope.getnextquestion = function() {
+			$http.get('rest/question/'+($scope.offset+$scope.pagesize) +"-"+1 ).
+			  success(function(data, status, headers, config) {
+				  if(data.length != 0) {
+					  $log.debug("Next Data:" + data.length);
+					  $scope.foundnext = true;
+					  $scope.shownext= true;
+				  } else {
+					  $log.debug("No Next Data:" + data.length);
+					  $scope.foundnext = true;
+					  $scope.shownext= false;
+				  }
+				 
+				 
+				  $log.debug("Next Data:" + data.length);
+				
+				
+				
+			  }).
+			  error(function(data, status, headers, config) {
+				
+				  $scope.error = status;
+			  });
+		}
 	
 	$scope.addBlog = function (blog) {
 		$log.debug(blog);
@@ -245,17 +288,35 @@
         var postData =  $http.post('rest/question', blog);
          postData.success(function (data) {
         	 $log.debug(data);
-        	 $scope.blogs.push(blog);
+        	 $scope.question = data;
+        	 $location.path('/viewallblogs');
          })
          .error(function (data) {
         	 $log.debug(data);
          });
     };
-    $scope.setPage = function () {
+$scope.setPage = function () {
     	
     	$log.debug("Change Path" +  $scope.nextpage);
-    	$location.path('/viewnextblogs/'+ $scope.nextpage);
+    	$location.path('/viewallblogs/'+ $scope.nextpage);
+    	
     	    };
+   
+    	    $scope.setPrevPage = function () {
+    	    	$log.debug("setPrev" +  $scope.prevpage);
+    	    	if(($scope.prevpage) === 1) {
+    	    		$log.debug("1 matched" );
+    	    		$location.path('/viewallblogs');
+    	    	} else {
+    	    		$log.debug("not matched" );
+    	    		$location.path('/viewallblogs/'+ $scope.prevpage);
+    	    	}
+    	    	    };
+   $scope.showBlogDetails = function (id) {
+    	    	
+    	    	$log.debug("id" +  id);
+    	    	$location.path('/viewdetailblog/'+ id);
+    	    	    };
 
 	});
 })();
