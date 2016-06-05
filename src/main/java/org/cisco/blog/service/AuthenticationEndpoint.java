@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.bson.types.ObjectId;
 import org.cisco.blog.model.Session;
 import org.cisco.blog.model.User;
 import org.mongodb.morphia.Datastore;
@@ -84,7 +85,7 @@ public class AuthenticationEndpoint {
     		String caller_name = securityContext.getUserPrincipal().getName();
     		//drop the username in session table 
     		Session session = dataStore.find(Session.class).field("username").equal(caller_name).get();
-    		dataStore.delete(Session.class, session.getId());
+    		dataStore.delete(Session.class, new ObjectId(session.getId()));
     		return Response.ok("Ok").build();
     	} catch (Exception e) {
     		return Response.status(Response.Status.UNAUTHORIZED).build();
