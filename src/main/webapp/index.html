@@ -30,11 +30,12 @@
           <h1><a href="MainIndex2.html"><small>SMARTBlogger</small>CMAD<span>com</span></a></h1>
         </div>
         <div class="search col-sm-2">
-          <form id="form1" name="form1" method="post" action="#">
+          <form id="form1" name="form1" method="post"  ng-submit="showsearchresult(searchkey)" ng-controller="searchCtrl as searchCtrl" >
             <span>
-            <input name="q" type="text" class="keywords" id="textfield" maxlength="50" value="Search..." />
+            <input name="q" type="text" class="keywords" ng-model="searchkey" id="textfield" maxlength="50" value="Search..." />
+             <input name="b" type="image" src="images/search.gif" class="button" />
             </span>
-            <!-- <input name="b" type="image" src="images/search.gif" class="button" /> -->
+           
           </form>
         </div>
       </div>
