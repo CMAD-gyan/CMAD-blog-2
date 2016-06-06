@@ -113,17 +113,18 @@ public class QuestionService {
 	}
 	
 	@POST
-	@Path("/search")
+	@Path("/search/{offset}-{length}")
 	@Produces({MediaType.APPLICATION_JSON})
 	@Consumes({MediaType.TEXT_PLAIN})
-	public List<Question> getQuestionBySerch(String search_string) {
+	public List<Question> getQuestionBySerch(String search_string, @PathParam("offset") String offset, 
+            @PathParam("length") String length) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
 		Question question = null;
 		
 		
 		Query<Question> q = dataStore.createQuery(Question.class).search(search_string);
-		List<Question> ques = q.asList();
+		List<Question> ques = q.offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();;
 		
 		if (ques != null){
 			for (int i = 0; i < ques.size(); i++) {
