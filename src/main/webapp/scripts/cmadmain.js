@@ -22,6 +22,10 @@
             templateUrl : 'viewsearchquestions.html',
             controller  : 'searchCtrl'
         })
+        .when('/viewallblogs/tagged/:searchkey/:id', {
+            templateUrl : 'viewsearchquestions.html',
+            controller  : 'searchCtrl'
+        })
          .when('/viewdetailblog/:id', {
             templateUrl : 'viewdetailblog.html',
             controller  : 'detailBlogController'
@@ -215,7 +219,7 @@
 		$scope.allblogs=[];
 		$scope.count= 0;
 		$scope.loading = true;
-		$scope.shownext = true;
+		$scope.shownext = false;
 		$scope.showprev = false;
 		 $scope.nextpage = 2;
 		$scope.lastDataPoint = $scope.pagesize;
@@ -226,14 +230,13 @@
 		 $scope.startpage = 0;
 		$log.debug("Getting Blogs..." + $routeParams.id);
 		if($routeParams.id == undefined) {
-			$scope.showprev = false;
+			//$scope.showprev = false;
 			$scope.nextpage = 2;
-			$scope.foundnext = false;
 			$scope.offset = 0;
 			$scope.prevpage = 0;
 			$log.debug("MainPage/" + "$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
 		} else {
-			$scope.showprev = true;
+			//$scope.showprev = true;
 			$scope.nextpage = (parseInt( $routeParams.id) + 1);
 			$scope.offset = (parseInt( $routeParams.id) -1) * 3;
 			$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
@@ -243,8 +246,8 @@
 		$http.get('rest/question/'+$scope.offset +"-"+3 ).
 		  success(function(data, status, headers, config) {
 			  $scope.count= data.length;
-			  $scope.allblogs = data;
-			  $scope.shownext= true;
+			  //$scope.allblogs = data;
+			  //$scope.shownext= true;
 			  if($scope.pagesize >  $scope.count) {
 				  $scope.shownext= false;
 			  } 
@@ -252,6 +255,11 @@
 			 
 			 $scope.blogs = data;
 			 $scope.getnextquestion();
+			 if($routeParams.id == undefined) {
+					$scope.showprev = false;
+			 } else {
+				 $scope.showprev = true;
+			 }
 		  }).
 		  error(function(data, status, headers, config) {
 			  $scope.loading = false;
@@ -277,7 +285,7 @@
 				
 			  }).
 			  error(function(data, status, headers, config) {
-				
+				  $scope.shownext= false;
 				  $scope.error = status;
 			  });
 		}
@@ -329,16 +337,17 @@ $scope.setPage = function () {
 	
 		$scope.count= 0;
 		$scope.loading = true;
-		$scope.shownext = true;
+		$scope.shownext = false;
 		$scope.showprev = false;
 		 $scope.searchkey = "";
 		$scope.lastDataPoint = $scope.pagesize;
-		$scope.pagesize= 3;
+		$scope.pagesize= 1;
 		$scope.offset = 0;
 		$scope.prevpage = 1;
 		
 		 $scope.startpage = 0;
 		$log.debug("Getting Search Blogs..." + $routeParams.searchkey);
+		
 		if($routeParams.searchkey == undefined || $routeParams.searchkey == "") {
 			$location.path('/viewallblogs/');
 		} else {
@@ -347,11 +356,27 @@ $scope.setPage = function () {
 			$scope.offset = (parseInt( $routeParams.id) -1) * 3;
 			$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
 			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;*/
+			if($routeParams.id == undefined) {
+				$scope.showprev = false;
+				$scope.nextpage = 2;
+				$scope.foundnext = false;
+				$scope.offset = 0;
+				$scope.prevpage = 0;
+				$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
+			} else {
+				//$scope.showprev = true;
+				$scope.nextpage = (parseInt( $routeParams.id) + 1);
+				$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
+				$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
+				$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
+			}
 			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
-			$log.debug("Getting Search questions ..." + $routeParams.searchkey);
+			
+			$scope.url = 'rest/question/search/'+$scope.offset +"-"+$scope.pagesize;
+			$log.debug("Getting Search results for..." + $routeParams.searchkey + "-" + $scope.url);
 			$http({
 		          method: 'POST', 
-		          url: 'rest/question/search',
+		          url: $scope.url,
 		          data:  $routeParams.searchkey,
 		          headers: {
 		        	  'Content-Type': 'text/plain'
@@ -362,9 +387,16 @@ $scope.setPage = function () {
 		          if (status == 200 || status == 201) {
 		        	  $scope.questions = data;
 		              $scope.searchcontact = {};
+		              $scope.getnextsearchresult();
+		          }
+		          if($routeParams.id == undefined) {
+		        	  $scope.showprev = false;
+		          } else {
+		        	  $scope.showprev = true;
 		          }
 		        }).
 		        error(function(data, status) {
+		        	$scope.shownext= false;
 		          if (status == 401) {
 		            notify('Forbidden', 'Authentication required to create new resource.');
 		          } else if (status == 403) {
@@ -375,7 +407,44 @@ $scope.setPage = function () {
 		        });
 		}
 		
-		
+		$scope.getnextsearchresult = function() {
+			$scope.offset = $scope.offset + 1;
+			$scope.url = 'rest/question/search/'+$scope.offset +"-"+$scope.pagesize;
+			$log.debug("Getting next Search results for..." + $routeParams.searchkey + "-" + $scope.url);
+			$http({
+		          method: 'POST', 
+		          url: $scope.url,
+		          data:  $routeParams.searchkey,
+		          headers: {
+		        	  'Content-Type': 'text/plain'
+		            
+		          },
+		        }).
+		        success(function(data, status, headers) {
+		        	if(data.length != 0) {
+						  $log.debug("Next Data:" + data.length);
+						
+						  $scope.shownext= true;
+					  } else {
+						  $log.debug("No Next Data:" + data.length);
+						  $scope.foundnext = true;
+						  $scope.shownext= false;
+					  }
+		        }).
+		        error(function(data, status) {
+		        	$scope.shownext= false;
+		          if (status == 401) {
+		        	  
+		            notify('Forbidden', 'Authentication required to create new resource.');
+		          } else if (status == 403) {
+		            notify('Forbidden', 'You are not allowed to create new resource.');
+		          } else {
+		            notify('Failed '+ status + data);
+		          }
+		        });
+			
+			
+		}
 		$scope.showsearchresult = function(searchkey) {
 			$location.path('/viewallblogs/tagged/'+ searchkey);
 		}
@@ -384,7 +453,7 @@ $scope.setPage = function () {
 $scope.setPage = function () {
     	
     	$log.debug("Change Path" +  $scope.nextpage);
-    	$location.path('/viewallblogs/'+ $scope.nextpage);
+    	$location.path('/viewallblogs/tagged/'+ $scope.searchkey+ "/" + $scope.nextpage );
     	
     	    };
    
@@ -392,17 +461,17 @@ $scope.setPage = function () {
     	    	$log.debug("setPrev" +  $scope.prevpage);
     	    	if(($scope.prevpage) === 1) {
     	    		$log.debug("1 matched" );
-    	    		$location.path('/viewallblogs');
+    	    		$location.path('/viewallblogs/tagged/'+ $scope.searchkey);
     	    	} else {
     	    		$log.debug("not matched" );
-    	    		$location.path('/viewallblogs/'+ $scope.prevpage);
+    	    		$location.path('/viewallblogs/tagged/'+ $scope.searchkey + "/" + $scope.prevpage);
     	    	}
     	    	    };
    $scope.showBlogDetails = function (id) {
     	    	
     	    	$log.debug("id" +  id);
     	    	$location.path('/viewdetailblog/'+ id);
-    	    	    };
+    	    	  };
 
 	})
 })();
