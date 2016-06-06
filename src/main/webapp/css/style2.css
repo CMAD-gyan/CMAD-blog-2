@@ -19,14 +19,14 @@ body {
     display: flex;
     justify-content: space-between;
     background-color:  black;
-      height: 5%;
+      height: 2%;
       color: white;
 }
 
 
 #header > div {
     width: 330%;
-    height: 5%;
+    height: 2%;
 
 }
 

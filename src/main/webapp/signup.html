@@ -6,18 +6,30 @@
       <h1>Register Account</h1>
     </div>
     <div class="form-content" id="validateform">
-      <form>
-        <div class="form-group">
-          <label for="name">Name</label>
+      <form name="myForm" ng-submit="addUser(user)" novalidate>
+       <!--  <div class="form-group">
+          <label for="name">Full Name</label>
           <input type="text" id="name" ng-model="user.name" minlength="4" required="required"/>
-        </div>
+        </div> -->
+         <div class="form-group">
+          <label>Full Name</label>
+        <input type="text" name="user" ng-model="user.name" required>
+  <span style="color:red" ng-show="myForm.user.$dirty && myForm.user.$invalid">
+  <span ng-show="myForm.user.$error.required">Username is required.</span>
+  </span>
+   </div>
+       
         <div class="form-group">
-          <label for="username">User Name</label>
+          <label for="username">UserName</label>
           <input type="text" id="username" ng-model="user.username" minlength="8" required="required"/>
         </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" ng-model="user.email" required="required"/>
+        <div class="form-group" ng-class="{'has-error' : myForm.name.$invalid && !myForm.name.$pristine }">
+                <label>Email(required, but never shown)</label>
+                <input type="email" name="email" class="form-control" ng-model="user.email" required placeholder="Email Address">
+                <p ng-show="myForm.email.$touched &&  myForm.email.$invalid && !myForm.email.$pristine" class="error">Your email is required.</p>
+            
+            
+        <!-- 
         </div>
         <div class="form-group">
           <label for="password">Password</label>
@@ -26,9 +38,20 @@
         <div class="form-group">
           <label for="cpassword">Confirm Password</label>
           <input type="password" id="cpassword" name="cpassword" required="required"/>
-        </div>
+        </div> -->
+        <div class="form-group">
+                <label >Password Check</label>
+                <input type="password" name="password" class="form-control" placeholder="Password" ng-model="user.password" ng-minlength="6" ng-maxlength="8" required>
+                 <p style="color:red" ng-show="myForm.password.$error.minlength" class="help-block">Password Is Very Short.</p>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" name="confirmPassword"  class="form-control"  placeholder="Confirm Password"  required>
+                <span class="error" ng-if="confirmPassword" ng-show="formValues.password!=formValues.confirmPassword">password should  match</span>
+            </div>
         <div >
-        <input type="button" id="resgisterB" value="Register" ng-click="addUser(user)"></input> 
+        <!-- <input type="button" id="resgisterB" value="Register" ng-click="addUser(user)"></input>  -->
+          <button type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid" ng-model="formValues.submit">Submit</button>
          
         </div>
         <div class="form-group"  id="errors">
