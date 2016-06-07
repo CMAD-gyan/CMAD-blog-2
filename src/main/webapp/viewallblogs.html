@@ -1,13 +1,19 @@
  <div ng-repeat="blog in blogs" ng-controller="BlogController as blogController" >
-    <h2> <a>{{blog.title}}</a>
+    <h2> <a a href="index.html#/viewdetailblog/{{blog.id}}">{{blog.title}}</a>
     <br>
    <span>Created On {{blog.createTime | date:'M/d/yyyy HH:mm:ss'}} | By {{blog.username}}</span> </h2>
          <p>{{ blog.text | limitTo: 100 }}{{blog.text.length > 100 ? '.....' : ''}}</p>
          
-              <p><a href="MainIndex2.html#/viewdetailblog/{{blog.id}}"  >Read more | Comments (5)</a></p>
  </div>
  <div >
- 	<a href ng-show="showprev" ng-click="setPrevPage()">Prev</a>
- <a  href ng-show="shownext" ng-click="setPage()">Next</a>	
+  <ul class="pager">
+                    <li class="next">
+                       <!--  <a href="#">Older Posts &rarr;</a> -->
+                       <a href ng-show="showprev" ng-click="setPrevPage()">New Posts</a>
+                        <a  href ng-show="shownext" ng-click="setPage()">Older Posts</a>
+                    </li>
+                </ul>
+ 	<!-- <a href ng-show="showprev" ng-click="setPrevPage()">Prev</a>
+ <a  href ng-show="shownext" ng-click="setPage()">Next</a>	 -->
 </div>
 		

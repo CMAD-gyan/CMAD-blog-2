@@ -138,6 +138,8 @@
 		var controller = this;
 		$scope.question=[];
 		$scope.currentquestion=[];
+		$scope.addanswers = false;
+		$scope.showansbtn = false;
 		$scope.showanswers = false;
 		 $scope.questionid = $routeParams.id;
 		
@@ -153,14 +155,17 @@
 			  } else {
 				  $scope.showanswers = false;
 			  }
-			
+			  $scope.showansbtn = true;
 			
 		  }).
 		  error(function(data, status, headers, config) {
 			
 			  $scope.error = status;
 		  });
-	
+		$scope.addanswer = function () {
+			$scope.showansbtn = false;
+			$scope.addanswers = true;
+		}
 		
 	$scope.addBlog = function (blog) {
 		$log.debug(blog);

@@ -1,4 +1,40 @@
-
+.search {
+	padding:13px 0 0 0;
+	margin:0 auto;
+	width:250px;
+	float:right;
+}
+.search form {
+	float:right;
+	padding:0;
+	margin:0;
+}
+.search span {
+	display:block;
+	float:left;
+	background:#fff;
+	width:165px;
+	padding:2px 5px;
+	height:21px;
+	border:1px solid #dedede;
+}
+.search form .keywords {
+	line-height:14px;
+	height:14px;
+	float:left;
+	background:none;
+	border:0;
+	padding:4px 2px;
+	margin:0;
+	font:bold 12px Arial, Helvetica, sans-serif;
+	color:#464646;
+}
+.search form .button {
+	float:left;
+	margin:0;
+	padding:0 0 0 5px;
+	height : 12px;
+}
 .overlay, .form-panel.one:before {
   position: absolute;
   top: 0;
