@@ -58,7 +58,9 @@
                 <ul class="nav navbar-nav navbar-right">
               
                     <li>
-                        <a href="#/viewallblogs">Home</a>
+                        <a href="#/login" ng-hide="loginstatus">Home</a>
+                        <a href="#/viewallblogs" ng-show="loginstatus">Home</a>
+                        
                     </li>
                     <li>
                         <a href="about.html">About</a>
@@ -70,24 +72,24 @@
                         <a href="contact.html">Contact</a>
                     </li>
                     <li>
-                        <a href="#/login">Login</a>
+                        <a href="#/login" ng-hide="loginstatus">Login</a>
                     </li>
                      <li>
-                        <a href="#/signup">Sign Up</a>
+                        <a href="#/signup" ng-hide="loginstatus">Sign Up</a>
                     </li>
                     <li>
-                        <a href="#/login">logout</a>
+                        <a ng-controller="UserController as userController" ng-href="#/login" ng-show="loginstatus" ng-click="getUserLogout()">Logout</a>
                     </li>
-                      <li>
-                 <div class="search">
-          <form id="form1" name="form1" method="post"  ng-submit="showsearchresult(searchkey)" ng-controller="searchCtrl as searchCtrl" >
-            <span>
-            <input name="q" type="text" class="keywords" ng-model="searchkey" id="textfield" maxlength="50" value="Search..." />
+                    <li>
+                 	  <div class="search">
+          			    <form id="form1" name="form1" method="post"  ng-submit="showsearchresult(searchkey)" ng-controller="searchCtrl as searchCtrl" >
+            			  <span>
+            				<input name="q" type="text" class="keywords" ng-model="searchkey" id="textfield" maxlength="50" value="Search..." />
               
-            </span>
-          </form>
-        </div> <!--  search class div end -->
-        </li>
+            			  </span>
+          				</form>
+        			  </div> <!--  search class div end -->
+        			</li>
         
                 </ul>
             </div>

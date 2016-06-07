@@ -9,58 +9,44 @@
         .when('/', {
             templateUrl : 'login.html',
             controller  : 'UserController'
-        })
-        .when('/viewallblogs', {
+        }).when('/viewallblogs', {
             templateUrl : 'viewallblogs.html',
             controller  : 'BlogController'
-        })
-        .when('/viewallblogs/:id', {
+        }).when('/viewallblogs/:id', {
             templateUrl : 'viewallblogs.html',
             controller  : 'BlogController'
-        })
-        .when('/viewallblogs/tagged/:searchkey', {
+        }).when('/viewallblogs/tagged/:searchkey', {
             templateUrl : 'viewsearchquestions.html',
             controller  : 'searchCtrl'
-        })
-        .when('/viewallblogs/tagged/:searchkey/:id', {
+        }).when('/viewallblogs/tagged/:searchkey/:id', {
             templateUrl : 'viewsearchquestions.html',
             controller  : 'searchCtrl'
-        })
-         .when('/viewdetailblog/:id', {
+        }).when('/viewdetailblog/:id', {
             templateUrl : 'viewdetailblog.html',
             controller  : 'detailBlogController'
-        })
-        .when('/viewnextblogs', {
+        }).when('/viewnextblogs', {
             templateUrl : 'viewnextblogs.html',
             controller  : 'BlogController'
-        })
-          .when('/viewnextblogs/:id', {
+        }).when('/viewnextblogs/:id', {
         	  templateUrl : 'viewnextblogs.html',
               controller  : 'detailBlogController'
-    })
-    .when('/user', {
+        }).when('/user', {
             templateUrl : 'user.html',
             controller  : 'UserController'
-        })
-            // route for the signup page
-            .when('/signup', {
+        }).when('/signup', {
+        	// route for the signup page
                 templateUrl : 'signup.html',
                 controller  : 'UserController'
-            })
-
-            // route for the login page
-            .when('/login', {
+        }).when('/login', {
+            	// route for the login page
                 templateUrl : 'login.html',
                 controller  : 'UserController'
-            })
-
-             .when('/addblog', {
+        }).when('/addblog', {
                 templateUrl : 'addblog.html',
                 controller  : 'BlogController'
-            })
-            .otherwise({
+        }).otherwise({
             	redirectTo : '/',
-            })
+        })
     });
 	
 	
@@ -86,6 +72,7 @@
 			$scope.showAddForm=true;
 			 var postlogin =  $http.post('rest/authentication', user);
 	         postlogin.success(function(data) {
+	        	 $rootScope.loginstatus = true;
 	        	 console.log("Success");
 	        	 $log.debug(data);
 	        	 $cookies['token'] = data;
@@ -98,6 +85,27 @@
 	        	 $log.debug(data);
 	         });
 	    };
+	    $scope.getUserLogout = function() {
+	    	$log.debug("Inside logout function");
+			$scope.showEditForm=false;
+			$scope.showAddForm=true;
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+			var postlogin =  $http.delete('rest/authentication');
+	        postlogin.success(function(data) {
+	        	 $rootScope.loginstatus = false;
+	        	 console.log("Success");
+	        	 $log.debug(data);
+	        	 $cookies['token'] = "";
+	        	 console.log("printing token=========");
+	        	 $log.debug($cookies['token']);
+	        	 $location.path("login");
+	         })
+	         .error(function (data) {
+	        	 $log.debug("Logout failed");
+	        	 $log.debug(data);
+	         });
+	    };
+	    
 		$scope.addUser = function (user) {
 			$log.debug("Inside user creation");
 			$log.debug(user);
