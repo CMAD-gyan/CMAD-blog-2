@@ -49,10 +49,12 @@
                 <input type="password" name="confirmPassword"  class="form-control"  placeholder="Confirm Password"  required>
                 <span class="error" ng-if="confirmPassword" ng-show="formValues.password!=formValues.confirmPassword">password should  match</span>
             </div>
-        <div >
+        <div class="formButton">
         <!-- <input type="button" id="resgisterB" value="Register" ng-click="addUser(user)"></input>  -->
-          <button type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid" ng-model="formValues.submit">Submit</button>
+        <span>
          
+          <button type="submit" id="signupbtn" ng-disabled="myForm.$invalid" ng-model="formValues.submit">Sign Up</button>
+         </span>
         </div>
         <div class="form-group"  id="errors">
         </div>

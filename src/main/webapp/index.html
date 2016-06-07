@@ -56,9 +56,7 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-              <li>
-                        <a href="#/viewallblogs">Home</a>
-                    </li>
+              
                     <li>
                         <a href="#/viewallblogs">Home</a>
                     </li>
@@ -77,19 +75,20 @@
                      <li>
                         <a href="#/signup">Sign Up</a>
                     </li>
+                    <li>
+                        <a href="#/login">logout</a>
+                    </li>
                       <li>
-                 <div class="search col-sm-2">
+                 <div class="search">
           <form id="form1" name="form1" method="post"  ng-submit="showsearchresult(searchkey)" ng-controller="searchCtrl as searchCtrl" >
             <span>
             <input name="q" type="text" class="keywords" ng-model="searchkey" id="textfield" maxlength="50" value="Search..." />
-             
+              
             </span>
           </form>
         </div> <!--  search class div end -->
         </li>
-        <li>
-        <input name="b" type="image" src="images/search.gif" class="button" />
-         <\li>
+        
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
