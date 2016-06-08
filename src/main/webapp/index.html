@@ -63,13 +63,7 @@
                         
                     </li>
                     <li>
-                        <a href="about.html">About</a>
-                    </li>
-                    <li>
                         <a href="#/addblog">Ask Questions</a>
-                    </li>
-                    <li>
-                        <a href="contact.html">Contact</a>
                     </li>
                     <li>
                         <a href="#/login" ng-hide="loginstatus">Login</a>
@@ -80,16 +74,6 @@
                     <li>
                         <a ng-controller="UserController as userController" ng-href="#/login" ng-show="loginstatus" ng-click="getUserLogout()">Logout</a>
                     </li>
-                    <li>
-                 	  <div class="search">
-          			    <form id="form1" name="form1" method="post"  ng-submit="showsearchresult(searchkey)" ng-controller="searchCtrl as searchCtrl" >
-            			  <span>
-            				<input name="q" type="text" class="keywords" ng-model="searchkey" id="textfield" maxlength="50" value="Search..." />
-              
-            			  </span>
-          				</form>
-        			  </div> <!--  search class div end -->
-        			</li>
         
                 </ul>
             </div>
@@ -108,6 +92,16 @@
                         <h1>Smart Blog</h1>
                         <hr class="small">
                         <span class="subheading">A Smart Blog  by Ajay, Gyan & Samiksha</span>
+
+                 	  <div class="search" style="text-align: center; width:100%;" >
+          			    <form id="form1" name="form1" method="post"  ng-submit="showsearchresult(searchkey)" ng-controller="searchCtrl as searchCtrl" >
+            			  <span>
+            				<input name="q" type="text" style="font-size:18pt; width: 100%; height:40px; background-color: #331a00"  class="keywords" ng-model="searchkey" id="textfield" maxlength="150" placeholder="Search..."  />
+              
+            			  </span>
+          				</form>
+        			  </div> <!--  search class div end -->
+
                     </div>
                 </div>
             </div>
