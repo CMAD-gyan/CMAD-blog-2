@@ -1,30 +1,48 @@
  <div  ng-controller="detailBlogController as detailBlogController" class="detailques">
     <h2> {{currentquestion.title}} </h2>
-      <h3><span>Asked on {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}}</span> </h3>
+      <h3><span>Asked By {{currentquestion.username}} </span> </h3>
       <hr>
-      <h3> <span> By {{currentquestion.username}}</span> </h3>
+      <h3> <span> on {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}}</span> </h3>
     </br>
 
          <p>{{currentquestion.text}} </p>    
+         <div ng-hide="edittext" class="edit">
+          <a  href ng-click="editText()">Edit</a>
+          </div>
+           <div ng-show="edittext">
+           <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
+            <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
+           </div>
          <a> Add Comments</a>
           </div>
+          
+          <!--  <div ng-show="edittext">
+           <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
+            <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
+           </div> -->
+           
+           <div ng-hide="dataloading"  >
  <div ng-show="showanswers"  >
  <h4>{{currentquestion.answers.length}} Answer</h4>
  <hr style="border-top: solid 0.1px;" />
- <div ng-repeat="answer in currentquestion.answers" ng-controller="BlogController as blogController" class="answersection" >
+ 
+ <div ng-repeat="answer in currentquestion.answers" ng-controller="detailBlogController as detailBlogController" class="answersection" >
     <p> {{answer.text}}</p>
     </br>
-      <span>answered  {{answer.createTime | date:'MM/dd/yyyy'}} @  {{answer.createTime | date:' HH:mm:ss'}}</span> 
+      <span>answered  By {{answer.userName}} </span> 
       <br>
-      <span> By {{answer.userName}}</span> 
+      <span> {on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
       <br>
       <a> Add Comment</a>
        <hr style="border-top: dotted 0.1px;" />      
  </div>
-  <div >
+     </div>
+     <hr>
+  <div ng-hide="addanswers">
         <input type="button" id="answerB" value="Post Your Answer" ng-click="addanswer()"></input> 
    </div>
- </div ng-show="addanswers">
+   
+ <div ng-show="addanswers">
 	<h4>Your Answer</h4>
 	<form>
         <div class="form-group">
@@ -32,10 +50,10 @@
         </div>
        
         <div >
-        <input type="button" id="answerB" value="Post Your Answer" ng-click="addAnswer(answer)"></input> 
+        <input type="button" id="answerB" value="Post Your Answer" ng-click="addYourAnswer(answer)"></input> 
          </div>
         <div class="form-group" id=addResultDiv>
         </div>
       </form>
-  
+    </div>
   </div>

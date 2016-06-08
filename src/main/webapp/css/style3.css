@@ -1,15 +1,18 @@
 .detailques h2 {
-	font-size: 250%;
-	/*background : rgba(255,248,220, 0.8);
-	background : rgba(255,255,240, 0.8);*/
-	
-	border-bottom: 1px solid;
-  	
+	font-size: 200%;
 }
 
 .showblog h2 a{
 	
 	color: #8B814C;
+}
+.edit {
+	float: right;
+}
+#questionedit {
+	width: 80px;
+	height: 30px;
+	background-color: #B8860B;
 }
 .detailques a {
 	font:normal 12px Georgia, "Times New Roman", Times, serif;

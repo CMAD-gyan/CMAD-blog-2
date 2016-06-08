@@ -147,17 +147,23 @@
 		var controller = this;
 		$scope.question=[];
 		$scope.currentquestion=[];
+		$scope.updatedquestion = [];
+		$scope.changequestion = [];
 		$scope.addanswers = false;
 		$scope.showansbtn = false;
 		$scope.showanswers = false;
 		 $scope.questionid = $routeParams.id;
+		 $scope.dataloading = true;
+		 $scope.edittext = false;
 		
 		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
-	
+		$log.debug( $scope.edittext);
 		$http.get('rest/question/' + $scope.questionid).
 		  success(function(data, status, headers, config) {
-			  
+			  $log.debug("detail blog="+ data);
 			  $scope.currentquestion = data;
+			  
+			  $log.debug("detail blog="+ $scope.currentquestion.username + "-" + $scope.currentquestion.title);
 			  $log.debug("Successful data retrieved:" +   $scope.currentquestion.answers.length);
 			  if($scope.currentquestion.answers.length > 0) {
 				  $scope.showanswers = true;
@@ -165,7 +171,8 @@
 				  $scope.showanswers = false;
 			  }
 			  $scope.showansbtn = true;
-			
+			  $scope.dataloading = false;
+			  $scope.edittext =false;
 		  }).
 		  error(function(data, status, headers, config) {
 			
@@ -176,22 +183,42 @@
 			$scope.addanswers = true;
 		}
 		
-	$scope.addBlog = function (blog) {
-		$log.debug(blog);
-		$scope.showEditForm=false;
-		$scope.showAddForm=true;
-		$log.debug("Add Blogs...");
-         var postData =  $http.post('cmad/blog', blog);
+		$scope.questionupdate = function (updatedtext) {
+			$log.debug(updatedtext);
+			var changedques= {
+					"title":  $scope.currentquestion.title,
+					"text": updatedtext
+			};
+			$log.debug("edit text" + changedques);
+			//$scope.updatedquestion.username = $scope.currentquestion.username;
+			$scope.updatedquestion.text = updatedtext;
+			$scope.updatedquestion.title = $scope.currentquestion.title;
+			$scope.updateBlog(changedques);
+		}
+		
+	$scope.editText = function () {
+			$log.debug("edit text");
+			$scope.edittext= true;
+			
+			$log.debug("edit text=" + $scope.edittext);
+		}
+	$scope.updateBlog = function(blog) {
+		$log.debug("edit blog=" + blog + "===" + $cookies['token']);
+		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+         var postData =  $http.post('rest/question', blog);
          postData.success(function (data) {
         	 $log.debug(data);
-        	 $scope.blogs.push(blog);
+        	 $scope.edittext= false;
+        	 $location.path('/viewdetailblog/' + data);
+        	 
          })
          .error(function (data) {
+        	 $log.debug("ERROR..." + blog);
         	 $log.debug(data);
          });
     };
     
-    $scope.addAnswer = function (answer) {
+    $scope.addYourAnswer = function (answer) {
 		$log.debug(answer);
 		$log.debug("=====" + $cookies['token']);
 		$log.debug("Add Answers...");
