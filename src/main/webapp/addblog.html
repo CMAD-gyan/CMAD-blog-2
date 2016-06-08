@@ -1,0 +1,34 @@
+
+<div  ng-controller="BlogController as blogController"  class="blogform">
+  <div class="form-toggle"></div>
+  <div class="blog-form-panel">
+    <div class="form-header">
+      <h1>Ask Question</h1>
+    </div>
+    <div class="form-content">
+      <form>
+          <div class="form-group">
+          <label>Title</label>
+        </div>
+    <div class="form-group">
+          <input type="text" id="posttitle"  ng-model="question.title" required="required"/>
+        </div>
+        <div class="form-group">
+          <label>Details</label>
+        </div>
+        <div class="form-group">
+          <textarea cols=55 rows=15 id="postdesc"  ng-model="question.text" required="required"></textarea> <br />
+        </div>
+        <div class="form-group">
+          <label class="form-remember">
+            <input type="checkbox"/>Send me new responses to my posts via email</label>
+        </div>
+        <div >
+        <input type="button" id="loginB" value="Post Your Question" ng-click="addBlog(question)"></input> 
+         </div>
+        <div class="form-group" id=addResultDiv>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

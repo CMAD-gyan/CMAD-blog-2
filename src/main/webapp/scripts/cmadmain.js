@@ -52,6 +52,7 @@
 	
 	app.controller('UserController',function($http, $log, $scope, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
+		$rootScope.loginstatus = false;
 		var controller = this;
 		$scope.users=[];
 		$scope.loading = true;
@@ -228,6 +229,7 @@
 	
 	app.controller('BlogController',function($http, $log, $scope, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
+		
 		$scope.blogs=[];
 		$scope.allblogs=[];
 		$scope.count= 0;
