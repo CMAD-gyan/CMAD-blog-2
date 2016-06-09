@@ -50,13 +50,17 @@
     });
 	
 	
-	app.controller('UserController',function($http, $log, $scope, $window, $rootScope, $location, $cookies){
+	app.controller('UserController',function($http, $log, $window, $scope, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
-		$rootScope.loginstatus = false;
+		$scope.loginstatus = false;
+		 $scope.loggedin = false;
+		$scope.username = "";
 		var controller = this;
 		$scope.users=[];
 		$scope.loading = true;
-		$log.debug("Getting users..." + $window.localStorage.getItem("loggedin"));
+		$window.localStorage.setItem("loginstatus", false);
+		$scope.loginstatus = $window.localStorage.getItem("loginstatus");
+		$log.debug("Getting users...");
 		$http.get('rest/user').
 		  success(function(data, status, headers, config) {
 			  $scope.users = data;
@@ -73,19 +77,22 @@
 			$scope.showAddForm=true;
 			 var postlogin =  $http.post('rest/authentication', user);
 	         postlogin.success(function(data) {
-	        	 $rootScope.loginstatus = true;
+	        	 $window.localStorage.setItem("loginstatus", true);
+	        	 $scope.loggedin = $window.localStorage.getItem("loginstatus");
+	        	 $scope.loginstatus = $window.localStorage.getItem("loginstatus");
 	        	 console.log("Success");
 	        	 $log.debug(data);
 	        	 $cookies['token'] = data;
 	        	 $window.localStorage.setItem("currentUser", user.username);
-	        	 $window.localStorage.setItem("loggedin", true);
-	        	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
+	        	 console.log("printing token=========");
 	        	 $log.debug($cookies['token']);
 	        	 $location.path("viewallblogs");
+	        	 
 	         })
 	         .error(function (data) {
 	        	 $log.debug("Login failed");
 	        	 $log.debug(data);
+	        	 $scope.username = "";
 	         });
 	    };
 	    $scope.getUserLogout = function() {
@@ -95,14 +102,14 @@
 			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 			var postlogin =  $http.delete('rest/authentication');
 	        postlogin.success(function(data) {
-	        	 $rootScope.loginstatus = false;
 	        	 console.log("Success");
 	        	 $log.debug(data);
 	        	 $cookies['token'] = "";
+	        	 $window.localStorage.setItem("loginstatus", false);
 	        	 $window.localStorage.setItem("currentUser", "");
-	        	 $window.localStorage.setItem("loggedin", false);
-	        	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-	        	
+	        	 $scope.loginstatus = $window.localStorage.getItem("loginstatus");
+	        	 $scope.username = $window.localStorage.getItem("currentUser");
+	        	 $scope.loggedin = $window.localStorage.getItem("loginstatus");
 	        	 console.log("printing token=========");
 	        	 $log.debug($cookies['token']);
 	        	 $location.path("login");
@@ -110,6 +117,7 @@
 	         .error(function (data) {
 	        	 $log.debug("Logout failed");
 	        	 $log.debug(data);
+	        	 
 	         });
 	    };
 	    
@@ -149,7 +157,7 @@
 
 		}
 	});
-	app.controller('detailBlogController',function($http, $log, $scope, $window, $route, $location,$rootScope, $cookies, $routeParams){
+	app.controller('detailBlogController',function($http, $window, $log, $scope, $route, $location,$rootScope, $cookies, $routeParams){
 		var controller = this;
 		$scope.question=[];
 		$scope.currentquestion=[];
@@ -161,9 +169,11 @@
 		 $scope.questionid = $routeParams.id;
 		 $scope.dataloading = true;
 		 $scope.edittext = false;
-		
+		 $scope.username= $window.localStorage.getItem("currentUser");
+		 $scope.loginstatus = $window.localStorage.getItem("loginstatus");
+		 $scope.loggedin = $window.localStorage.getItem("loginstatus");
 		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
-		$log.debug( $scope.edittext);
+		$log.debug("username=" +  $scope.username + "loginstatus =" + $scope.loggedin );
 		$http.get('rest/question/' + $scope.questionid).
 		  success(function(data, status, headers, config) {
 			  $log.debug("detail blog="+ data);
@@ -203,8 +213,7 @@
 		}
 		
 	$scope.editText = function () {
-			$log.debug("edit text");
-			 $scope.username= $window.localStorage.getItem("currentUser");
+			$log.debug("logged in user" + $scope.username + "quesuserrname=" + $scope.currentquestion.username);
 			if($scope.username == $scope.currentquestion.username) {
 				$scope.edittext= true;
 			} else {
@@ -213,6 +222,7 @@
                 return;
 				
 			}
+			
 			
 			$log.debug("edit text=" + $scope.edittext);
 		}
@@ -268,9 +278,10 @@
 
 	});
 	
-	app.controller('BlogController',function($http, $log, $scope,$window, $location,$rootScope,$cookies, $routeParams){
+	app.controller('BlogController',function($http, $log, $window, $scope, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
-		
+		$scope.loggedin = $window.localStorage.getItem("loginstatus");
+    	
 		$scope.blogs=[];
 		$scope.allblogs=[];
 		$scope.count= 0;
@@ -284,10 +295,10 @@
 		$scope.prevpage = 1;
 		
 		 $scope.startpage = 0;
-		$log.debug("Getting Blogs..." + $window.localStorage.getItem("currentUser"));
-		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-    	
+		 $scope.username= $window.localStorage.getItem("currentUser");
+		 $scope.loginstatus = $window.localStorage.getItem("loginstatus");
+		$log.debug("Getting Blogs..." + $routeParams.id);
+		$log.debug("user=" +   $scope.username + "loggedin =" + $scope.loggedin );
 		if($routeParams.id == undefined) {
 			//$scope.showprev = false;
 			$scope.nextpage = 2;
@@ -355,6 +366,7 @@
 		$scope.showAddForm=true;
 		$log.debug("=====" + $cookies['token']);
 		$log.debug("Add Blogs...");
+		
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
         var postData =  $http.post('rest/question', blog);
          postData.success(function (data) {
@@ -390,10 +402,10 @@ $scope.setPage = function () {
     	    	    };
 
 	});
-	app.controller('searchCtrl',function($http, $log, $scope, $window, $location,$rootScope,$cookies, $routeParams){
+	app.controller('searchCtrl',function($http, $log, $scope, $location, $rootScope,$cookies, $window, $routeParams){
 		var controller = this;
 		$scope.questions=[];
-	
+		$scope.loggedin = true;
 		$scope.count= 0;
 		$scope.loading = true;
 		$scope.shownext = false;
@@ -405,14 +417,14 @@ $scope.setPage = function () {
 		$scope.prevpage = 1;
 		
 		 $scope.startpage = 0;
-		
-		$log.debug("Getting Search Blogs..." + $rootScope.loginstatus);
-		$log.debug("Getting Blogs..." + $window.localStorage.getItem("currentUser"));
-		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-    	
+		 
+		$scope.username= $window.localStorage.getItem("currentUser");
+		 $scope.loginstatus = $window.localStorage.getItem("loginstatus");
+		 $scope.loggedin = $window.localStorage.getItem("loginstatus");
+		$log.debug("Getting Search Blogs..." + $routeParams.searchkey);
+		$log.debug("username=" +  $scope.username + "loggedin =" + $scope.loggedin );
 		if($routeParams.searchkey == undefined || $routeParams.searchkey == "") {
-			//$location.path('/viewallblogs/');
+			$location.path('/viewallblogs/');
 		} else {
 			/*$scope.showprev = true;
 			$scope.nextpage = (parseInt( $routeParams.id) + 1);
