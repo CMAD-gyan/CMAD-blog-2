@@ -163,6 +163,7 @@ public class AnswerService {
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
 			Comment newComment = new Comment(com.getText(), username,user);
 			comment.add(newComment);
+			ans.setComments(comment);
 		}
 		dataStore.save(ans);
 		return "Ok";
