@@ -143,6 +143,10 @@ public class AnswerService {
 	
 		List <Comment> comment = ans.getComments();
 		
+		if (comment == null) {
+			comment = new ArrayList <Comment>();
+		}
+		
 		for (i = 0; i < comment.size(); i++) {
 			if (comment.get(i).getUsername().equals(username)) {
 				update = true;
@@ -241,6 +245,7 @@ public class AnswerService {
 	
 		List <Vote> votes = answer.getVotes();
 		
+
 		if (votes == null) 
 			votes = new ArrayList <Vote>();
 		
