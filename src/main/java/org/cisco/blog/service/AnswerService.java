@@ -143,6 +143,10 @@ public class AnswerService {
 	
 		List <Comment> comment = ans.getComments();
 		
+		if (comment == null) {
+			comment = new ArrayList <Comment>();
+		}
+		
 		for (i = 0; i < comment.size(); i++) {
 			if (comment.get(i).getUsername().equals(username)) {
 				update = true;
@@ -159,6 +163,7 @@ public class AnswerService {
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
 			Comment newComment = new Comment(com.getText(), username,user);
 			comment.add(newComment);
+			ans.setComments(comment);
 		}
 		dataStore.save(ans);
 		return "Ok";
@@ -241,6 +246,7 @@ public class AnswerService {
 	
 		List <Vote> votes = answer.getVotes();
 		
+
 		if (votes == null) 
 			votes = new ArrayList <Vote>();
 		
