@@ -1,5 +1,5 @@
 (function(){
-	var app = angular.module('myApp',['ngRoute','ngCookies']);
+	var app = angular.module('myApp',['ngRoute','ngCookies','ngDialog']);
 	
 	
 	app.config(function($routeProvider) {
@@ -149,7 +149,7 @@
 
 		}
 	});
-	app.controller('detailBlogController',function($http, $log, $scope, $window, $route, $location,$rootScope, $cookies, $routeParams){
+	app.controller('detailBlogController',function($http, $log, $scope, $window, $route, $location,$rootScope, $cookies, $routeParams, ngDialog){
 		var controller = this;
 		$scope.question=[];
 		$scope.currentquestion=[];
@@ -265,6 +265,83 @@
     	    	}
     	    	
     	    	    };
+    $scope.openQCommentsForm = function() {
+    	    			ngDialog.openConfirm({template: 'comments.html',
+    	    			  scope: $scope //Pass the scope object if you need to access in the template
+    	    			}).then(
+    	    				function(value) {
+    	    					//save the contact form
+    	    					$log.debug(value);
+    	    					var comment= {
+    	    							"text": value
+    	    					};
+    	    					//$scope.updatedquestion.username = $scope.currentquestion.username;
+//    	    					$scope.updatedquestion.text = updatedtext;
+//    	    					$scope.updatedquestion.comments = $scope.currentquestion.comments;
+    	    					$scope.postQComment(comment);
+    	    					
+    	    				},
+    	    				function(value) {
+    	    					//Cancel or do nothing
+    	    				}
+    	    			);
+    	    		};
+    	    	    $scope.postQComment = function(comment){
+    	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
+    	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+    	    	         var postData =  $http.post('rest/question/'+$scope.questionid +"/comment" , comment);
+    	    	         postData.success(function (data) {
+    	    	        	 $log.debug(data);
+//    	    	        	 $scope.edittext= false;
+//    	    	        	 $location.path('/viewdetailblog/' + data);
+    	    	        	 
+    	    	         })
+    	    	         .error(function (data) {
+    	    	        	 $log.debug("ERROR..." + comment);
+    	    	        	 $log.debug(data);
+    	    	         });
+    	    	    };
+    	    		
+    	    		$scope.openACommentsForm = function(ans) {
+    	    			ngDialog.openConfirm({template: 'comments.html',
+    	    			  scope: $scope //Pass the scope object if you need to access in the template
+    	    			}).then(
+    	    				function(value) {
+    	    					//save the contact form
+    	    					$log.debug("comment is:" + value);
+    	    					$log.debug("answer id: " + ans.id);
+    	    					var comment= {
+    	    							"text": value
+    	    					};
+    	    					//$scope.updatedquestion.username = $scope.currentquestion.username;
+//    	    					$scope.updatedquestion.text = updatedtext;
+//    	    					$scope.updatedquestion.comments = $scope.currentquestion.comments;
+    	    					$scope.postAComment(comment, ans.id);
+    	    					
+    	    				},
+    	    				function(value) {
+    	    					//Cancel or do nothing
+    	    				}
+    	    			);
+    	    		};
+    	    		
+    	    		$scope.postAComment = function(comment, ansid){
+    	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
+    	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+    	    	         var postData =  $http.post('rest/answer/'+ansid +"/comment" , comment);
+    	    	         postData.success(function (data) {
+    	    	        	 $log.debug(data);
+//    	    	        	 $scope.edittext= false;
+//    	    	        	 $location.path('/viewdetailblog/' + data);
+    	    	        	 
+    	    	         })
+    	    	         .error(function (data) {
+    	    	        	 $log.debug("ERROR..." + comment);
+    	    	        	 $log.debug(data);
+    	    	         });
+    	    	    };
+    	    		
+    	    		
 
 	});
 	
