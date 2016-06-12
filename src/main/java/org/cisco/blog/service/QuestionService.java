@@ -1,4 +1,5 @@
 package org.cisco.blog.service;
+import java.util.ArrayList;
 //import java.util.ArrayList;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -64,7 +65,7 @@ public class QuestionService {
 					question.setText(ques.getText());
 					question.setUpdateTime();
 					dataStore.save(question);
-					id = ques.getId();
+					id = question.getId();
 				} else {
 					 throw new NotAcceptableException("Already Present");
 				}
@@ -72,11 +73,10 @@ public class QuestionService {
 		}catch (Exception e) {
 			throw new BadRequestException("Unknow Problem");
 		}
-		
-		
 		return id;
 	}
 	
+		
 	@GET
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
@@ -226,8 +226,8 @@ public class QuestionService {
 	@Secured
 	@Path("/{param}/comment")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String postComment(Comment com, 
+	@Produces(MediaType.APPLICATION_JSON)
+	public Question postComment(Comment com, 
 			                @PathParam("param") String id,
             				@Context SecurityContext securityContext ) {
 		int i,j=0;
@@ -268,14 +268,14 @@ public class QuestionService {
 			comment.add(newComment);
 		}
 		dataStore.save(question);
-		return "Ok";
+		return question;
 	}
 	
 	@DELETE
 	@Secured
 	@Path("/{param}/comment")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String deleteComment(@PathParam("param") String id,
+	@Produces(MediaType.APPLICATION_JSON)
+	public Question deleteComment(@PathParam("param") String id,
             					@Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -304,10 +304,13 @@ public class QuestionService {
 				comment.remove(i);
 				question.setComments(comment);
 				dataStore.save(question);
+			}else {
+				throw new BadRequestException ("Invalid comment");
 			}
-
+		} else {
+			throw new BadRequestException ("Question not found");
 		}
-		return "Ok";
+		return question;
 	}
 	
 	
@@ -316,8 +319,8 @@ public class QuestionService {
 	@Secured
 	@Path("/{param}/vote")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String postVote(Vote votein, @PathParam("param") String id,
+	@Produces(MediaType.APPLICATION_JSON)
+	public Question postVote(Vote votein, @PathParam("param") String id,
             			 @Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -334,7 +337,7 @@ public class QuestionService {
 			throw new BadRequestException ("OID passed is not okay");
 		}
 		
-		if (votein.getVote() > 4 || votein.getVote() < 0 ){
+		if (votein.getVote() > 1 || votein.getVote() < -1 ){
 			throw new BadRequestException ("Invalid vote");
 		}
 		
@@ -346,6 +349,9 @@ public class QuestionService {
 
 		List <Vote> votes = question.getVotes();
 		
+		if (votes == null) 
+			votes = new ArrayList <Vote>();
+		
 		for (i = 0; i < votes.size(); i++) {
 			if (votes.get(i).getUsername().equals(username)) {
 				found = true;
@@ -355,9 +361,8 @@ public class QuestionService {
 		}
 		
 		totalVote += votein.getVote();
-		totalVote /= (votes.size() + 1);
-
-		question.setAvgVotes(totalVote);
+		
+		question.setTotalVotes(totalVote);
 		
 		if (found == true) {
 			votes.get(j).setVote( votein.getVote());
@@ -370,6 +375,6 @@ public class QuestionService {
 		}
 		
 		dataStore.save(question);
-		return "Ok";
+		return question;
 	}
 }

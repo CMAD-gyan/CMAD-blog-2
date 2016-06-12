@@ -234,7 +234,7 @@ public class AnswerService {
 			throw new BadRequestException ("OID passed is not okay");
 		}
 		
-		if (votein.getVote() > 4 || votein.getVote() < 0 ){
+		if (votein.getVote() > 1 || votein.getVote() < -1 ){
 			throw new BadRequestException ("Invalid vote");
 		}
 		
@@ -260,10 +260,8 @@ public class AnswerService {
 		}
 		
 		totalVote += votein.getVote();
-		totalVote /= (votes.size() + 1);
 		
-		
-		answer.setAvgVotes(totalVote);
+		answer.setTotalVotes(totalVote);
 		
 		if (found == true) {
 			votes.get(j).setVote( votein.getVote());

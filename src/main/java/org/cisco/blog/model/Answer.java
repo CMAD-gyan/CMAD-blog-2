@@ -33,7 +33,7 @@ public class Answer {
 
 @Embedded
 	private List<Vote> votes;
-	private int avgVotes;
+	private int totalVotes;
 @Embedded
 	private List<Comment>  comments;
 
@@ -51,7 +51,7 @@ public class Answer {
 		this.updateTime  = new Timestamp(System.currentTimeMillis());
 		this.votes       = null;
 		this.comments    = null;
-		this.avgVotes    =  VoteType.GOOD;;
+		this.totalVotes    =  0;
 	}
 	
 	public String getId(){
@@ -106,12 +106,12 @@ public class Answer {
 	}
 	
 	
-	public int getAvgVotes(){
-		return this.avgVotes;
+	public int getTotalVotes(){
+		return this.totalVotes;
 	}
 	
-	public void setAvgVotes(int avgVotes){
-		this.avgVotes = avgVotes;
+	public void setTotalVotes(int totalVotes){
+		this.totalVotes = totalVotes;
 	}
 	
 	public List< Vote > getVotes() { return votes; }

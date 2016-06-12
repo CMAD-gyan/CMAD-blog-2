@@ -4,11 +4,9 @@ import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Reference; 
 
 final class VoteType {
-    public static final int POOR =  0;
-    public static final int GOOD =  1;
-    public static final int VGOOD = 2;
-    public static final int SUPER = 3;
-    public static final int BEST  = 4;
+    public static final int DOWNVOTE =  -1;
+    public static final int NOVOTE   =  0;
+    public static final int UPVOTE =    1;
 }
 
 @Embedded

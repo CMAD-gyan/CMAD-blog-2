@@ -38,7 +38,7 @@ public class Question {
 @Reference	
 	private User   user;
 	private String username;
-	private int    avgVotes;
+	private int    totalVotes;
 	private int    viewCount;
 @Embedded
 	private List<Vote> votes;
@@ -53,7 +53,7 @@ public class Question {
 		this.votes       = new ArrayList <Vote>();
 		this.comments    = new ArrayList <Comment>();
 		this.answers     = new ArrayList <Answer>();
-		this.avgVotes    = VoteType.GOOD;
+		this.totalVotes       = 0;
 		this.viewCount   = 0;		
 	}
 	
@@ -68,7 +68,7 @@ public class Question {
 		this.votes       = new ArrayList <Vote>();
 		this.comments    = new ArrayList <Comment>();
 		this.answers     = new ArrayList <Answer>();
-		this.avgVotes    = VoteType.GOOD;
+		this.totalVotes    = 0;
 		this.viewCount   = 0;
 	}
 	
@@ -140,12 +140,12 @@ public class Question {
 		this.viewCount = viewCount;
 	}
 	
-	public int getAvgVotes(){
-		return this.avgVotes;
+	public int getTotalVotes(){
+		return this.totalVotes;
 	}
 	
-	public void setAvgVotes(int avgVotes){
-		this.avgVotes = avgVotes;
+	public void setTotalVotes(int totalVotes){
+		this.totalVotes = totalVotes;
 	}
 	
 	public List< Vote > getVotes() { return votes; }
