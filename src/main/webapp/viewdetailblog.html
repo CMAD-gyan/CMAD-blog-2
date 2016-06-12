@@ -13,7 +13,13 @@
            <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
             <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
            </div>
-         <a> Add Comments</a>
+         <a href ng-click="openQCommentsForm()"> Add Comments</a>
+         <div ng-repeat="comment in currentquestion.comments" id="qcomment" style="padding-left: 8em;" class="answersection">
+         	<p>{{comment.text}}</p></br>
+         	<span>By {{comment.username}}</span>
+         	</br>
+         	<span> on  {{comment.createTime | date:' HH:mm:ss'}}</span> 
+         </div>
           </div>
           
           <!--  <div ng-show="edittext">
@@ -31,9 +37,15 @@
     </br>
       <span>answered  By {{answer.userName}} </span> 
       <br>
-      <span> {on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
+      <span> on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
       <br>
-      <a> Add Comment</a>
+      <a href ng-click="openACommentsForm(answer)"> Add Comments</a>
+      <div ng-repeat="comment in answer.comments" id="acomment" style="padding-left: 8em;" class="answersection">
+         	<p>{{comment.text}}</p></br>
+         	<span>By {{comment.username}}</span>
+         	</br>
+         	<span> on  {{comment.createTime | date:' HH:mm:ss'}}</span> 
+       </div>
        <hr style="border-top: dotted 0.1px;" />      
  </div>
      </div>
