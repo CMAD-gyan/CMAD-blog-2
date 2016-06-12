@@ -7,8 +7,8 @@
         // route for the home page
         // route for the login page
         .when('/', {
-            templateUrl : 'login.html',
-            controller  : 'UserController'
+            templateUrl : 'viewallblogs.html',
+            controller  : 'BlogController'
         }).when('/viewallblogs', {
             templateUrl : 'viewallblogs.html',
             controller  : 'BlogController'
@@ -275,9 +275,6 @@
     	    					var comment= {
     	    							"text": value
     	    					};
-    	    					//$scope.updatedquestion.username = $scope.currentquestion.username;
-//    	    					$scope.updatedquestion.text = updatedtext;
-//    	    					$scope.updatedquestion.comments = $scope.currentquestion.comments;
     	    					$scope.postQComment(comment);
     	    					
     	    				},
@@ -292,8 +289,8 @@
     	    	         var postData =  $http.post('rest/question/'+$scope.questionid +"/comment" , comment);
     	    	         postData.success(function (data) {
     	    	        	 $log.debug(data);
-//    	    	        	 $scope.edittext= false;
-//    	    	        	 $location.path('/viewdetailblog/' + data);
+    	    	        	 $route.reload();
+    	    	        	 $location.path('/viewdetailblog/' + $scope.questionid);
     	    	        	 
     	    	         })
     	    	         .error(function (data) {
@@ -313,9 +310,6 @@
     	    					var comment= {
     	    							"text": value
     	    					};
-    	    					//$scope.updatedquestion.username = $scope.currentquestion.username;
-//    	    					$scope.updatedquestion.text = updatedtext;
-//    	    					$scope.updatedquestion.comments = $scope.currentquestion.comments;
     	    					$scope.postAComment(comment, ans.id);
     	    					
     	    				},
@@ -331,9 +325,8 @@
     	    	         var postData =  $http.post('rest/answer/'+ansid +"/comment" , comment);
     	    	         postData.success(function (data) {
     	    	        	 $log.debug(data);
-//    	    	        	 $scope.edittext= false;
-//    	    	        	 $location.path('/viewdetailblog/' + data);
-    	    	        	 
+    	    	        	 $route.reload();
+    	    	        	 $location.path('/viewdetailblog/' + $scope.questionid);    	    	        	 
     	    	         })
     	    	         .error(function (data) {
     	    	        	 $log.debug("ERROR..." + comment);
