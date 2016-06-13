@@ -64,9 +64,7 @@
   cursor: pointer;
 }
 .blog-form-panel postBlog {
-  /* position: relative;
-  top: 10%; */
-  left: 10px;
+   left: 10px;
   display: none;
   background: rgba(0, 0, 0, 0.8);
   width: 60%;

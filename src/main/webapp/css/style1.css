@@ -6,34 +6,7 @@
 	float:center;
 }
 
-/*
-.search form {
-	float:center;
-	right-margin: 10px;
-	padding:0;
-	margin:0;
-}
-.search span {
-	display:block;
-	float:center;
-	background:#fff;
-	width:30%;
-	padding:2px 5px;
-	height:21px;
-	border: 1px solid #dedede;
-}
-.search form1 .keywords {
-	right-margin: 10px;
-	line-height:14px;
-	height:10px;
-	background:none;
-	border:0;
-	padding-right: 10px;
-	font:bold 12px Arial, Helvetica, sans-serif;
-	color:#464646;
-}
 
-*/
 .formButton span  {
 	float: right;
 }

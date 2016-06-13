@@ -161,9 +161,11 @@
 		 $scope.questionid = $routeParams.id;
 		 $scope.dataloading = true;
 		 $scope.edittext = false;
+
+		 $scope.edittextarea = false;
 		
 		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
-		$log.debug( $scope.edittext);
+		
 		$http.get('rest/question/' + $scope.questionid).
 		  success(function(data, status, headers, config) {
 			  $log.debug("detail blog="+ data);
@@ -176,9 +178,15 @@
 			  } else {
 				  $scope.showanswers = false;
 			  }
+			  $scope.username= $window.localStorage.getItem("currentUser");
+			  if($scope.username == $scope.currentquestion.username) {
+			  $scope.edittext = true;
+			  } else {
+			  $scope.edittext = false;
+			  }
 			  $scope.showansbtn = true;
 			  $scope.dataloading = false;
-			  $scope.edittext =false;
+			  $scope.edittextarea =false;
 		  }).
 		  error(function(data, status, headers, config) {
 			
@@ -196,40 +204,78 @@
 					"text": updatedtext
 			};
 			$log.debug("edit text" + changedques);
-			//$scope.updatedquestion.username = $scope.currentquestion.username;
 			$scope.updatedquestion.text = updatedtext;
 			$scope.updatedquestion.title = $scope.currentquestion.title;
 			$scope.updateBlog(changedques);
 		}
 		
-	$scope.editText = function () {
-			$log.debug("edit text");
-			 $scope.username= $window.localStorage.getItem("currentUser");
+		$scope.editText = function () {
+
+
+			$scope.username= $window.localStorage.getItem("currentUser");
+
 			if($scope.username == $scope.currentquestion.username) {
-				$scope.edittext= true;
+
+			$scope.edittext= false;
+
+			$scope.edittextarea = true;
 			} else {
-				$log.debug("No Previledge");
-				$window.alert("No Previledge to edit the Post");
-                return;
-				
+			$window.alert("No Previledge to edit the Post");
+			$scope.edittextarea = false;
+			return;
 			}
-			
 			$log.debug("edit text=" + $scope.edittext);
+			}
+		
+		$scope.deletequestion = function () {
+			var retVal = $window.confirm("Do you want to delete ?");
+
+	        if (retVal == true) {
+
+	        $log.debug("dleete blog=" + $scope.currentquestion.id + "===" + $cookies['token']);
+	        $http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+	       
+	        $http({ url: 'rest/question/' +  $scope.currentquestion.id, 
+                method: 'DELETE'
+        }).then(function(res) {
+            console.log("del Successful" +res.data);
+        	$location.path('/viewallblogs');
+        }, function(error) {
+            console.log("del UnSuccessful" + error);
+        });
+	        /*
+	            $http.put('url', myData).
+
+	            success(function (data, status, headers, config) {
+
+	                alert('Saved');
+
+	            }).error(function (data, status, headers, config) {
+
+	                alert('Error while updating');
+
+	            });
+*/
+	            return true;
+
+	        } else {
+
+	        $log.debug("Dont delete blog=" + $scope.currentquestion.id);
+
+	            return false;
+		}
 		}
 	$scope.updateBlog = function(blog) {
-		$log.debug("edit blog=" + blog + "===" + $cookies['token']);
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-         var postData =  $http.post('rest/question', blog);
-         postData.success(function (data) {
-        	 $log.debug(data);
-        	 $scope.edittext= false;
-        	 $location.path('/viewdetailblog/' + data);
-        	 
-         })
-         .error(function (data) {
-        	 $log.debug("ERROR..." + blog);
-        	 $log.debug(data);
-         });
+
+        var postData =  $http.post('rest/question', blog);
+        postData.success(function (data) {
+       	$log.debug(data);
+       	$scope.edittext= true;
+       	$scope.edittextarea = false;
+       	$location.path('/viewdetailblog/' + data);
+        }).error(function (data) {
+	        	$log.debug("ERROR..." + data);        });
     };
     
     $scope.addYourAnswer = function (answer) {

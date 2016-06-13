@@ -1,18 +1,26 @@
- <div  ng-controller="detailBlogController as detailBlogController" class="detailques">
+ <div  ng-hide="dataloading" ng-controller="detailBlogController as detailBlogController" class="detailques">
     <h2> {{currentquestion.title}} </h2>
       <h3><span>Asked By {{currentquestion.username}} </span> </h3>
       <hr>
       <h3> <span> on {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}}</span> </h3>
     </br>
 
-         <p>{{currentquestion.text}} </p>    
-         <div ng-hide="edittext" class="edit">
+         <p>{{currentquestion.text}} </p>  
+         <div ng-show="edittext" class="edit">
+          <a  href ng-click="editText()">Edit</a>
+           <a  href ng-click="deletequestion()" >Delete</a>
+          </div>
+		   <div ng-show="edittextarea">
+           <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
+            <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
+             </div>  
+        <!--  <div ng-hide="edittext" class="edit">
           <a  href ng-click="editText()">Edit</a>
           </div>
            <div ng-show="edittext">
            <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
             <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
-           </div>
+           </div> -->
          <a href ng-click="openQCommentsForm()"> Add Comments</a>
          <div ng-repeat="comment in currentquestion.comments" id="qcomment" style="padding-left: 8em;" class="answersection">
          	<p>{{comment.text}}</p></br>
@@ -21,14 +29,8 @@
          	<span> on  {{comment.createTime | date:' HH:mm:ss'}}</span> 
          </div>
           </div>
-          
-          <!--  <div ng-show="edittext">
-           <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
-            <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
-           </div> -->
-           
-           <div ng-hide="dataloading"  >
- <div ng-show="showanswers"  >
+       <div ng-hide="dataloading"  >
+		 <div ng-show="showanswers"  >
  <h4>{{currentquestion.answers.length}} Answer</h4>
  <hr style="border-top: solid 0.1px;" />
  
