@@ -166,7 +166,7 @@
 		
 		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
 		
-		$http.get('rest/question/' + $scope.questionid).
+		$http.get('rest/questions/' + $scope.questionid).
 		  success(function(data, status, headers, config) {
 			  $log.debug("detail blog="+ data);
 			  $scope.currentquestion = data;
@@ -235,7 +235,7 @@
 	        $log.debug("dleete blog=" + $scope.currentquestion.id + "===" + $cookies['token']);
 	        $http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 	       
-	        $http({ url: 'rest/question/' +  $scope.currentquestion.id, 
+	        $http({ url: 'rest/questions/' +  $scope.currentquestion.id, 
                 method: 'DELETE'
         }).then(function(res) {
             console.log("del Successful" +res.data);
@@ -268,7 +268,7 @@
 	$scope.updateBlog = function(blog) {
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 
-        var postData =  $http.post('rest/question', blog);
+        var postData =  $http.post('rest/questions', blog);
         postData.success(function (data) {
        	$log.debug(data);
        	$scope.edittext= true;
@@ -283,7 +283,7 @@
 		$log.debug("=====" + $cookies['token']);
 		$log.debug("Add Answers...");
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-        var postData =  $http.post('rest/answer/'+$scope.questionid, answer);
+        var postData =  $http.post('rest/answers/'+$scope.questionid, answer);
          postData.success(function (data) {
         	 $log.debug(data);
         	 $log.debug("Add Answers Success change the path...");
@@ -332,7 +332,7 @@
     	    	    $scope.postQComment = function(comment){
     	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
     	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-    	    	         var postData =  $http.post('rest/question/'+$scope.questionid +"/comment" , comment);
+    	    	         var postData =  $http.post('rest/questions/'+$scope.questionid +"/comments" , comment);
     	    	         postData.success(function (data) {
     	    	        	 $log.debug(data);
     	    	        	 $route.reload();
@@ -368,7 +368,7 @@
     	    		$scope.postAComment = function(comment, ansid){
     	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
     	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-    	    	         var postData =  $http.post('rest/answer/'+ansid +"/comment" , comment);
+    	    	         var postData =  $http.post('rest/answers/'+ansid +"/comments" , comment);
     	    	         postData.success(function (data) {
     	    	        	 $log.debug(data);
     	    	        	 $route.reload();
@@ -418,7 +418,7 @@
 			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
 		}
 		
-		$http.get('rest/question/'+$scope.offset +"-"+3 ).
+		$http.get('rest/questions/'+$scope.offset +"-"+3 ).
 		  success(function(data, status, headers, config) {
 			  $scope.count= data.length;
 			  //$scope.allblogs = data;
@@ -441,7 +441,7 @@
 			  $scope.error = status;
 		  });
 		$scope.getnextquestion = function() {
-			$http.get('rest/question/'+($scope.offset+$scope.pagesize) +"-"+1 ).
+			$http.get('rest/questions/'+($scope.offset+$scope.pagesize) +"-"+1 ).
 			  success(function(data, status, headers, config) {
 				  if(data.length != 0) {
 					  $log.debug("Next Data:" + data.length);
@@ -472,7 +472,7 @@
 		$log.debug("=====" + $cookies['token']);
 		$log.debug("Add Blogs...");
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-        var postData =  $http.post('rest/question', blog);
+        var postData =  $http.post('rest/questions', blog);
          postData.success(function (data) {
         	 $log.debug(data);
         	 $scope.question = data;
@@ -551,7 +551,7 @@ $scope.setPage = function () {
 			}
 			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
 			
-			$scope.url = 'rest/question/search/'+$scope.offset +"-"+$scope.pagesize;
+			$scope.url = 'rest/questions/search/'+$scope.offset +"-"+$scope.pagesize;
 			$log.debug("Getting Search results for..." + $routeParams.searchkey + "-" + $scope.url);
 			$http({
 		          method: 'POST', 
@@ -588,7 +588,7 @@ $scope.setPage = function () {
 		
 		$scope.getnextsearchresult = function() {
 			$scope.offset = $scope.offset + 1;
-			$scope.url = 'rest/question/search/'+$scope.offset +"-"+$scope.pagesize;
+			$scope.url = 'rest/questions/search/'+$scope.offset +"-"+$scope.pagesize;
 			$log.debug("Getting next Search results for..." + $routeParams.searchkey + "-" + $scope.url);
 			$http({
 		          method: 'POST', 

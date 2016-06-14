@@ -19,7 +19,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.Datastore;
 import org.cisco.blog.model.*;
 
-@Path("/answer")
+@Path("/answers")
 public class AnswerService {
 	@POST
 	@Path("/{param}")
@@ -118,7 +118,7 @@ public class AnswerService {
 //post & edit
 	@POST
 	@Secured
-	@Path("/{param}/comment")
+	@Path("/{param}/comments")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public String postComment(Comment com, 
@@ -172,7 +172,7 @@ public class AnswerService {
 
 	@DELETE
 	@Secured
-	@Path("/{param}/comment")
+	@Path("/{param}/comments")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String deleteComment(@PathParam("param") String id,
 	        					@Context SecurityContext securityContext ) {

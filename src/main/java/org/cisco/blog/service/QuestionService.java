@@ -23,7 +23,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.cisco.blog.model.*;
 
-@Path("/question")
+@Path("/questions")
 public class QuestionService {
 	@POST
 	@Secured
@@ -224,7 +224,7 @@ public class QuestionService {
 	//post & edit
 	@POST
 	@Secured
-	@Path("/{param}/comment")
+	@Path("/{param}/comments")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Question postComment(Comment com, 
@@ -273,7 +273,7 @@ public class QuestionService {
 	
 	@DELETE
 	@Secured
-	@Path("/{param}/comment")
+	@Path("/{param}/comments")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Question deleteComment(@PathParam("param") String id,
             					@Context SecurityContext securityContext ) {
