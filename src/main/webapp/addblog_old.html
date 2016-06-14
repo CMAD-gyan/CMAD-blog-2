@@ -11,24 +11,24 @@
           <label>Title</label>
         </div>
     <div class="form-group">
-          <input type="text" id="posttitle"  placeholder="Enter Title..."  ng-model="question.title" required="required"/>
+          <input type="text" id="posttitle"  ng-model="question.title" required="required"/>
         </div>
         <div class="form-group">
           <label>Details</label>
         </div>
         <div class="form-group">
-          <textarea cols=45 rows=15 id="postdesc"  placeholder="Enter Description..." ng-model="question.text" required="required"></textarea> <br />
+          <textarea cols=55 rows=15 id="postdesc"  ng-model="question.text" required="required"></textarea> <br />
         </div>
-       <!--  <div class="form-group">
+        <div class="form-group">
           <label class="form-remember">
             <input type="checkbox"/>Send me new responses to my posts via email</label>
-        </div> -->
-        <div class="ques-div">
-		<button class="ques-buttons" type="button" ng-click="addBlog(question)">Post Your Question</button>
-		 </div>
-		 
+        </div>
+        <div >
+        <input type="button" id="loginB" value="Post Your Question" ng-click="addBlog(question)"></input> 
+         </div>
+        <div class="form-group" id=addResultDiv>
+        </div>
       </form>
     </div>
   </div>
-
 </div>

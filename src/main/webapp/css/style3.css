@@ -246,3 +246,41 @@
   overflow: hidden;
   z-index :15;
 }
+
+.ques-buttons {
+	background-color: #8B5A00;
+	color: #FFFFFF;
+	
+}
+
+/* .ques-div {
+	padding-left: 8em;
+}  */
+.qcomment {
+	font : 8px;
+	padding-left: 5em;
+	color: #708090;
+}
+
+.qcomment p span {
+	font:normal 12px Georgia, "Times New Roman", Times, serif;
+	color:#959595;
+	float:right;
+}
+.acomment {
+	font : 8px;
+	padding-left: 3em;
+	color: #708090;
+}
+
+.acomment p {
+	font:normal 14px Georgia, "Times New Roman", Times, serif;
+	padding-left: 2em;
+	color: #708090;
+}
+
+.acomment p span {
+	font:normal 12px Georgia, "Times New Roman", Times, serif;
+	color:#959595;
+	float:right;
+}

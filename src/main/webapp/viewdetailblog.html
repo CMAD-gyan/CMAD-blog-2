@@ -14,19 +14,12 @@
            <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
             <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
              </div>  
-        <!--  <div ng-hide="edittext" class="edit">
-          <a  href ng-click="editText()">Edit</a>
-          </div>
-           <div ng-show="edittext">
-           <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
-            <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
-           </div> -->
+        
          <a href ng-click="openQCommentsForm()"> Add Comments</a>
-         <div ng-repeat="comment in currentquestion.comments" id="qcomment" style="padding-left: 8em;" class="answersection">
-         	<p>{{comment.text}}</p></br>
-         	<span>By {{comment.username}}</span>
-         	</br>
-         	<span> on  {{comment.createTime | date:' HH:mm:ss'}}</span> 
+         <div ng-repeat="comment in currentquestion.comments" class="qcomment" >
+         	<p>{{comment.text}}
+         	<span>By {{comment.username}} on  {{comment.createTime | date:' HH:mm:ss'}}</span>
+         	</p>
          </div>
           </div>
        <div ng-hide="dataloading"  >
@@ -42,15 +35,15 @@
       <span> on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
       <br>
       <a href ng-click="openACommentsForm(answer)"> Add Comments</a>
-      <div ng-repeat="comment in answer.comments" id="acomment" style="padding-left: 8em;" class="answersection">
-         	<p>{{comment.text}}</p></br>
-         	<span>By {{comment.username}}</span>
-         	</br>
-         	<span> on  {{comment.createTime | date:' HH:mm:ss'}}</span> 
-       </div>
-       <hr style="border-top: dotted 0.1px;" />      
+      <div ng-repeat="comment in answer.comments" class="acomment">
+         	<p>{{comment.text}}
+         	<span>By {{comment.username}} on  {{comment.createTime | date:' HH:mm:ss'}}</span>
+         	</p>
+       </div>    
+       <hr style="border-top: solid 0.1px;" />
  </div>
      </div>
+      </div>
      <hr>
   <div ng-hide="addanswers">
         <input type="button" id="answerB" value="Post Your Answer" ng-click="addanswer()"></input> 
@@ -66,8 +59,6 @@
         <div >
         <input type="button" id="answerB" value="Post Your Answer" ng-click="addYourAnswer(answer)"></input> 
          </div>
-        <div class="form-group" id=addResultDiv>
-        </div>
       </form>
     </div>
   </div>
