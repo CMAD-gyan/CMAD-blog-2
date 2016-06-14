@@ -13,7 +13,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.Datastore;
 import org.cisco.blog.model.User;
 
-@Path("/user")
+@Path("/users")
 public class UserService {
 	
 	@GET

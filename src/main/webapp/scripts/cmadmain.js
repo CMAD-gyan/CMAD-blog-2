@@ -57,7 +57,7 @@
 		$scope.users=[];
 		$scope.loading = true;
 		$log.debug("Getting users..." + $window.localStorage.getItem("loggedin"));
-		$http.get('rest/user').
+		$http.get('rest/users').
 		  success(function(data, status, headers, config) {
 			  $scope.users = data;
 			  $scope.loading = false;
@@ -118,7 +118,7 @@
 			$log.debug(user);
 			$scope.showEditForm=false;
 			$scope.showAddForm=true;
-	         $http.post('rest/user', user).success(function (data) {
+	         $http.post('rest/users', user).success(function (data) {
 	        	 $log.debug(data);
 	        	 $scope.users.push(user);
 	        	 $location.path("login");
@@ -137,7 +137,7 @@
 		
 		$scope.updateUser = function(user){
 			$log.debug(user);
-			$http.put('rest/user',user).
+			$http.put('rest/users',user).
 			  success(function(data, status, headers, config) {
 				  console.log(data);
 				  $scope.showEditForm=false;
