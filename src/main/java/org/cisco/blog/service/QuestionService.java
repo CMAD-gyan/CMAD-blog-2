@@ -1,4 +1,5 @@
 package org.cisco.blog.service;
+import java.net.URI;
 import java.util.ArrayList;
 //import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,19 @@ import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -25,80 +32,63 @@ import org.cisco.blog.model.*;
 
 @Path("/questions")
 public class QuestionService {
-	@POST
+	
+	
+	@PUT
 	@Secured
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String createQuestion(Question ques, 
-								@Context SecurityContext securityContext){
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response createUpdateQuestion(Question ques, 
+ 			@Context SecurityContext securityContext, 
+ 			@Context UriInfo uriInfo){
 		Question question = null;
 		User user;
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		String id=null;
-		
+
 		ques.setCreateTime();
 		ques.setUpdateTime();
 		ques.setUsername(username);
-		
+
 		question =  dataStore.find(Question.class).field("title").equal(ques.getTitle()).get();
 		
-		try {
-			
-			//no need to validate the user for null
-			if (question == null) {
-				try {
-					user =  dataStore.find(User.class).field("username").equal(username).get();
-				} catch (Exception e) {
-					throw  new NotAcceptableException("Unknown Error");
-				}
-				
-				if (user == null) {
-					throw  new NotAcceptableException("Unknown Error");
-				}
-				
-				ques.setUser(user);
-				dataStore.save(ques);
-				id = ques.getId();
+		if (question == null) {
+			user =  dataStore.find(User.class).field("username").equal(username).get();
+			ques.setUser(user);
+			dataStore.save(ques);
+			ques.getUser().setPassword("xxxxxxxxx");
+			URI uriOfCreatedResource = URI.create(uriInfo.getRequestUri() +"/" + ques.getId());
+			return Response.status(Response.Status.CREATED).location(uriOfCreatedResource).entity(ques).build();
+		} else {
+			if (question.getUsername().equals(username)) {
+				question.setText(ques.getText());
+				question.setUpdateTime();
+				dataStore.save(question);
+				question.getUser().setPassword("xxxxxxxxx");
+				return Response.status(Response.Status.OK).entity(question).build();
 			} else {
-				if (question.getUsername().equals(username)) {
-					question.setText(ques.getText());
-					question.setUpdateTime();
-					dataStore.save(question);
-					id = question.getId();
-				} else {
-					 throw new NotAcceptableException("Already Present");
-				}
+				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}
-		}catch (Exception e) {
-			throw new BadRequestException("Unknow Problem");
 		}
-		return id;
 	}
-	
 		
 	@GET
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
-	public Question getQuestionById(@PathParam("param") String id) {
+    public Response getQuestionById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
 		Question question = null;
-		
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
-			throw new BadRequestException("Bad param passed");
+			return Response.status(Response.Status.NO_CONTENT).build();
 		}
 		
 		question =  dataStore.get(Question.class, oid);
 		
-		// if question is found increment view count 
 		if (question != null) {
-			question.setViewCount(question.getViewCount() + 1);
-			dataStore.save(question);
 			question.getUser().setPassword("xxxxxxxxx");
-			
 			//@TBD get some better way to fix
 			for ( int i=0; i < question.getComments().size(); i++) {
 				question.getComments().get(i).getUser().setPassword("XXXXX");
@@ -108,38 +98,97 @@ public class QuestionService {
 				question.getAnswers().get(i).getUser().setPassword("XXXXX");
 			}
 			question.setVotes(null);
+			return Response.status(Response.Status.OK).entity(question).build();
 		}
-		return question;
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
+		
 	
 	@POST
-	@Path("/search/{offset}-{length}")
+	@Path("/search/length")
+	@Consumes({MediaType.TEXT_PLAIN})
+	@Produces({MediaType.TEXT_PLAIN})
+	public int getLengthQuestionBySerch(String searchString) {
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		Query<Question> q = dataStore.createQuery(Question.class).search(searchString);
+		int size  = q.asList().size();
+		return size;
+	}	
+	
+	@POST
+	@Path("/search")
 	@Produces({MediaType.APPLICATION_JSON})
 	@Consumes({MediaType.TEXT_PLAIN})
-	public List<Question> getQuestionBySerch(String search_string, @PathParam("offset") String offset, 
-            @PathParam("length") String length) {
+    public Response getQuestionBySearch(String search_string,
+			@QueryParam("offset") String offset,
+			@QueryParam("length") String length) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		ObjectId  oid;
-		Question question = null;
-		
-		
-		Query<Question> q = dataStore.createQuery(Question.class).search(search_string);
-		List<Question> ques = q.offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();;
-		
-		if (ques != null){
-			for (int i = 0; i < ques.size(); i++) {
-				//we should not send password
-				ques.get(i).setAnswers(null);
-				ques.get(i).setComments(null);
-				ques.get(i).setVotes(null);
-				ques.get(i).setUser(null);
+		try {
+			Query<Question> q = dataStore.createQuery(Question.class).search(search_string);
+			List<Question> ques = null;
+			
+			if (offset == null && length == null) {
+				ques = q.order("-viewCount").asList();
+			} else {
+				ques = q.offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
 			}
+			if (ques != null){
+				for (int i = 0; i < ques.size(); i++) {
+					//we should not send password
+					ques.get(i).setAnswers(null);
+					ques.get(i).setComments(null);
+					ques.get(i).setVotes(null);
+					ques.get(i).setUser(null);
+				}
+			}
+			return Response.status(Response.Status.OK).entity(ques).build();
+		}catch (Exception e) {
+			return Response.status(Response.Status.NO_CONTENT).build();
 		}
-		return ques;
 	}	
+	
+		
+	//FIXME add start and end
+	@Path("/length")
+	@Produces({MediaType.TEXT_PLAIN})
+	public int  getLengthAllQuestion() {
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		Query<Question> q = dataStore.createQuery(Question.class);
+		int size = q.asList().size();
+		return size;
+	}
+	
+	//FIXME add start and end
+	@GET
+	@Produces({MediaType.APPLICATION_JSON})
+	public List<Question> getallQuestion(
+			@QueryParam("offset") String offset,
+			@QueryParam("length") String length) {
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		List<Question> ques = null;
+		
+		try {
+			if (offset == null && length == null) {
+				ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
+			} else {
+				ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
+			}
+		
+			if (ques != null){
+				for (int i = 0; i < ques.size(); i++) {
+					//we should not send password
+					ques.get(i).setAnswers(null);
+					ques.get(i).setComments(null);
+					ques.get(i).setVotes(null);
+					ques.get(i).setUser(null);
+				}
+			}
+			return ques;
+		} catch (Exception e) {
+			throw new BadRequestException("Unknown Problem");
+		}
+	}
 
-	
-	
 	@DELETE
 	@Secured
 	@Path("/{param}")
@@ -176,50 +225,7 @@ public class QuestionService {
 		}
 		return "Ok";
 	}
-		
-	
-	
-	//FIXME add start and end
-	@GET
-	@Produces({MediaType.APPLICATION_JSON})
-	@Path("/{offset}-{length}")
-	public List<Question> getallQuestion(@PathParam("offset") String offset, 
-			                             @PathParam("length") String length) {
-		Datastore dataStore = ServiceFactory.getMongoDB();
-		List<Question> ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
-		
-		if (ques != null){
-			for (int i = 0; i < ques.size(); i++) {
-				//we should not send password
-				ques.get(i).setAnswers(null);
-				ques.get(i).setComments(null);
-				ques.get(i).setVotes(null);
-				ques.get(i).setUser(null);
-			}
-		}
-		return ques;
-	}
-		
-	//FIXME add start and end
-	@GET
-	@Produces({MediaType.APPLICATION_JSON})
-	public List<Question> getQuestions( ) {
-		Datastore dataStore = ServiceFactory.getMongoDB();
-		List<Question> ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
-		
-		if (ques != null) {
-			for (int i = 0; i < ques.size(); i++) {
-				//we should not send password
-				ques.get(i).setAnswers(null);
-				ques.get(i).setComments(null);
-				ques.get(i).setVotes(null);
-				ques.get(i).setUser(null);
-			}
-		}
-		return ques;
-	}		
-		
-		
+
 	//comments 
 	//post & edit
 	@POST
