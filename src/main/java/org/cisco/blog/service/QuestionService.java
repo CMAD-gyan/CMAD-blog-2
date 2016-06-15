@@ -147,8 +147,7 @@ public class QuestionService {
 		}
 	}	
 	
-		
-	//FIXME add start and end
+	@GET
 	@Path("/length")
 	@Produces({MediaType.TEXT_PLAIN})
 	public int  getLengthAllQuestion() {
@@ -158,7 +157,6 @@ public class QuestionService {
 		return size;
 	}
 	
-	//FIXME add start and end
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	public List<Question> getallQuestion(
