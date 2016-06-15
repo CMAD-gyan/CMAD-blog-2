@@ -159,9 +159,9 @@ public class QuestionService {
 	
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
-	public List<Question> getallQuestion(
-			@QueryParam("offset") String offset,
-			@QueryParam("length") String length) {
+	
+	public Response getallQuestion( @QueryParam("offset") String offset,
+									@QueryParam("length") String length){
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<Question> ques = null;
 		
@@ -171,7 +171,6 @@ public class QuestionService {
 			} else {
 				ques = dataStore.createQuery(Question.class).offset(Integer.parseInt(offset)).limit(Integer.parseInt(length)).order("-viewCount").asList();
 			}
-		
 			if (ques != null){
 				for (int i = 0; i < ques.size(); i++) {
 					//we should not send password
@@ -180,10 +179,14 @@ public class QuestionService {
 					ques.get(i).setVotes(null);
 					ques.get(i).setUser(null);
 				}
-			}
-			return ques;
+				
+				if (ques.size() > 0) {
+					return Response.status(Response.Status.OK).entity(ques).build();
+				}
+			} 
+			return Response.status(Response.Status.NO_CONTENT).build();
 		} catch (Exception e) {
-			throw new BadRequestException("Unknown Problem");
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 	}
 
@@ -191,7 +194,7 @@ public class QuestionService {
 	@Secured
 	@Path("/{param}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String deleteQuestionById(@PathParam("param") String id,
+	public Response deleteQuestionById(@PathParam("param") String id,
 			                       @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
@@ -200,7 +203,7 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
-			throw new BadRequestException("Bad param passed");
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		
 		question =  dataStore.get(Question.class, oid);
@@ -216,12 +219,13 @@ public class QuestionService {
 					dataStore.delete(Answer.class, idAns);
 				}	
 				dataStore.delete(Question.class, oid);
+				return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
 				
 			}else {
-				throw  new NotAuthorizedException("You Don't Have Permission");
+				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}	
 		}
-		return "Ok";
+		return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
 	}
 
 	//comments 
