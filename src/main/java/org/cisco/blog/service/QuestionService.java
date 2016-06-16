@@ -29,6 +29,22 @@ import org.cisco.blog.model.*;
 public class QuestionService {
 	
 	
+	private void fixQuestionDisplay(Question question)
+	{
+		question.getUser().setPassword("xxxxxxxxx");
+		//@TBD get some better way to fix
+		for ( int i=0; i < question.getComments().size(); i++) {
+			question.getComments().get(i).getUser().setPassword("XXXXX");
+		}
+		
+		for ( int i=0; i < question.getAnswers().size(); i++) {
+			question.getAnswers().get(i).getUser().setPassword("XXXXX");
+		}
+		question.setVotes(null);
+	}
+	
+	
+	
 	@PUT
 	@Secured
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -51,7 +67,7 @@ public class QuestionService {
 			user =  dataStore.find(User.class).field("username").equal(username).get();
 			ques.setUser(user);
 			dataStore.save(ques);
-			ques.getUser().setPassword("xxxxxxxxx");
+			fixQuestionDisplay(ques);
 			URI uriOfCreatedResource = URI.create(uriInfo.getRequestUri() +"/" + ques.getId());
 			return Response.status(Response.Status.CREATED).location(uriOfCreatedResource).entity(ques).build();
 		} else {
@@ -59,7 +75,7 @@ public class QuestionService {
 				question.setText(ques.getText());
 				question.setUpdateTime();
 				dataStore.save(question);
-				question.getUser().setPassword("xxxxxxxxx");
+				fixQuestionDisplay(question);
 				return Response.status(Response.Status.OK).entity(question).build();
 			} else {
 				return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -83,23 +99,14 @@ public class QuestionService {
 		question =  dataStore.get(Question.class, oid);
 		
 		if (question != null) {
-			question.getUser().setPassword("xxxxxxxxx");
-			//@TBD get some better way to fix
-			for ( int i=0; i < question.getComments().size(); i++) {
-				question.getComments().get(i).getUser().setPassword("XXXXX");
-			}
-			
-			for ( int i=0; i < question.getAnswers().size(); i++) {
-				question.getAnswers().get(i).getUser().setPassword("XXXXX");
-			}
-			question.setVotes(null);
+			fixQuestionDisplay(question);
 			return Response.status(Response.Status.OK).entity(question).build();
 		}
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 		
 	@POST
-	@Path("/{param}/views")
+	@Path("/views/{param}")
     public Response incViewCountById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
@@ -115,7 +122,7 @@ public class QuestionService {
 		if (question != null) {
 			question.setViewCount(question.getViewCount() + 1);
 			dataStore.save(question);
-			return Response.status(Response.Status.OK).entity(question).build();
+			return Response.status(Response.Status.OK).build();
 		}
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
@@ -293,6 +300,7 @@ public class QuestionService {
 			comment.add(newComment);
 		}
 		dataStore.save(question);
+		fixQuestionDisplay(question);
 		return question;
 	}
 	
@@ -329,9 +337,12 @@ public class QuestionService {
 				comment.remove(i);
 				question.setComments(comment);
 				dataStore.save(question);
+				
 			}else {
 				throw new BadRequestException ("Invalid comment");
 			}
+			
+			fixQuestionDisplay(question);
 		} else {
 			throw new BadRequestException ("Question not found");
 		}
@@ -400,6 +411,7 @@ public class QuestionService {
 		}
 		
 		dataStore.save(question);
+		fixQuestionDisplay(question);
 		return question;
 	}
 }
