@@ -345,69 +345,88 @@ public class QuestionService {
 		}
 	}
 	
+
+private Response postVote(String id,
+			             SecurityContext securityContext,
+			             boolean upvote ) {	
+	String username = securityContext.getUserPrincipal().getName();
+	Datastore dataStore = ServiceFactory.getMongoDB();
+	ObjectId  oid = null;
+	
+	int i;
+	int totalVote =0;
+	boolean found = false;
+	
+	try {
+		oid =  new ObjectId(id);
+	} catch (Exception e) {
+		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+	
+	Question question =  dataStore.get(Question.class, oid);
+	
+	if (question == null){
+		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+
+	List <Vote> votes = question.getVotes();
+	
+	if (votes == null) 
+		votes = new ArrayList <Vote>();
+	
+	for (i = 0; i < votes.size(); i++) {
+		if (votes.get(i).getUsername().equals(username)) {
+			votes.get(i).setVote( upvote ? 1 : -1);
+			question.setVotes(votes);
+			found = true;
+		}
+		totalVote +=  votes.get(i).getVote();
+	}
+	
+    //if vote from new user
+	if (found == false) {
+		User user =  dataStore.find(User.class).field("username").equal(username).get();
+		Vote vote = new Vote(upvote ? 1 : -1, username,user); 
+		votes.add(vote);
+		totalVote +=  vote.getVote();
+	}
+	
+	question.setTotalVotes(totalVote);
+	dataStore.save(question);
+	fixQuestionDisplay(question);
+
+	return Response.status(Response.Status.OK).build();
+}
+
+	
+	
 	
 ///Not tested ..........	
 	@POST
 	@Secured
-	@Path("/{param}/vote")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/{param}/vote_down")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Question postVote(Vote votein, @PathParam("param") String id,
-            			 @Context SecurityContext securityContext ) {
-		String username = securityContext.getUserPrincipal().getName();
-		Datastore dataStore = ServiceFactory.getMongoDB();
-		ObjectId  oid = null;
+	public Response postVoteDown(@PathParam("param") String id,
+			 @Context SecurityContext securityContext ) {
 		
-		int i;
-		int j = 0;
-		int totalVote =0;
-		boolean found = false;
+		return postVote(id, securityContext, false );
 		
-		try {
-			oid =  new ObjectId(id);
-		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
-		}
-		
-		if (votein.getVote() > 1 || votein.getVote() < -1 ){
-			throw new BadRequestException ("Invalid vote");
-		}
-		
-		Question question =  dataStore.get(Question.class, oid);
-		
-		if (question == null){
-			throw  new NotFoundException("Not found");
-		}
-
-		List <Vote> votes = question.getVotes();
-		
-		if (votes == null) 
-			votes = new ArrayList <Vote>();
-		
-		for (i = 0; i < votes.size(); i++) {
-			if (votes.get(i).getUsername().equals(username)) {
-				found = true;
-				j=i;
-			}
-			totalVote +=  votes.get(i).getVote();
-		}
-		
-		totalVote += votein.getVote();
-		
-		question.setTotalVotes(totalVote);
-		
-		if (found == true) {
-			votes.get(j).setVote( votein.getVote());
-			question.setVotes(votes);
-		} else {
-			User user =  dataStore.find(User.class).field("username").equal(username).get();
-			Vote vote = new Vote(votein.getVote(), username,user); 
-			votes.add(vote);
-			question.setVotes(votes);
-		}
-		
-		dataStore.save(question);
-		fixQuestionDisplay(question);
-		return question;
 	}
-}
+	
+	@POST
+	@Secured
+	@Path("/{param}/vote_up")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response postVoteUp(@PathParam("param") String id,
+            			 @Context SecurityContext securityContext ) {
+		return postVote(id, securityContext, true );
+	}
+	}
+	
+	
+	
+	
+	
+	
+	
+
