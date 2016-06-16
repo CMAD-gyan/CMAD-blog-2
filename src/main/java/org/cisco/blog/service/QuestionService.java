@@ -1,15 +1,12 @@
 package org.cisco.blog.service;
 import java.net.URI;
 import java.util.ArrayList;
-//import java.util.ArrayList;
 import java.util.List;
 import org.bson.types.ObjectId;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotAcceptableException;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -21,9 +18,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.mongodb.morphia.Datastore;
@@ -103,6 +98,27 @@ public class QuestionService {
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 		
+	@POST
+	@Path("/{param}/views")
+    public Response incViewCountById(@PathParam("param") String id) {
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		ObjectId  oid;
+		Question question = null;
+		try {
+			oid =  new ObjectId(id);
+		} catch(Exception e) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		
+		question =  dataStore.get(Question.class, oid);
+		
+		if (question != null) {
+			question.setViewCount(question.getViewCount() + 1);
+			dataStore.save(question);
+			return Response.status(Response.Status.OK).entity(question).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
 	
 	@POST
 	@Path("/search/length")
@@ -157,9 +173,9 @@ public class QuestionService {
 		return size;
 	}
 	
+	
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
-	
 	public Response getallQuestion( @QueryParam("offset") String offset,
 									@QueryParam("length") String length){
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -228,6 +244,7 @@ public class QuestionService {
 		return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
 	}
 
+	
 	//comments 
 	//post & edit
 	@POST
