@@ -359,10 +359,11 @@
     	    				}
     	    			);
     	    		};
-    	    	    $scope.postQComment = function(comment){
+  
+  $scope.postQComment = function(comment){
     	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
     	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-    	    	         var postData =  $http.post('rest/questions/'+$scope.questionid +"/comments" , comment);
+    	    	/*         var postData =  $http.post('rest/questions/'+$scope.questionid +"/comments" , comment);
     	    	         postData.success(function (data) {
     	    	        	 $log.debug(data);
     	    	        	 $route.reload();
@@ -372,7 +373,27 @@
     	    	         .error(function (data) {
     	    	        	 $log.debug("ERROR..." + comment);
     	    	        	 $log.debug(data);
-    	    	         });
+    	    	         });*/
+    	    	         $http.put('rest/questions/'+$scope.questionid +"/comments" , comment)
+    	    	         .then(
+    	    	         	       function(response){
+    	    	         	    	  $log.debug(response.data);
+    	     	    	        	 $route.reload();
+    	     	    	        	 $location.path('/viewdetailblog/' + $scope.questionid);
+    	     	    	        	 
+    	    	         	         }, 
+    	    	         	         function(response){
+    	    	         	        	 $log.debug("ERROR..." + response.status);  
+    	    	         	        	 if(response.status == 401) {
+    	    	         	        		 $log.debug("ERROR..." );
+    	    	         	        		 $cookies['token'] = "";
+    	    	         	        		 $scope.username = "";
+    	    	         	        		 $window.localStorage.setItem("loggedin", false);
+    	    	         	        		 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+    	    	         	            	
+    	    	         	        	 }
+    	    	         	         }
+    	    	         	      );
     	    	    };
     	    		
     	    		$scope.openACommentsForm = function(ans) {
@@ -487,22 +508,28 @@
 			  });
 		}
 	
-	$scope.addBlog = function (blog) {
-		$log.debug(blog);
-		$scope.showEditForm=false;
-		$scope.showAddForm=true;
-		$log.debug("=====" + $cookies['token']);
-		$log.debug("Add Blogs...");
+	$scope.addBlog = function (data) {
+		$log.debug("Add Blogs..." + data + "=====" + $cookies['token']);
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-        var postData =  $http.post('rest/questions', blog);
-         postData.success(function (data) {
-        	 $log.debug(data);
-        	 $scope.question = data;
-        	 $location.path('/viewallblogs');
-         })
-         .error(function (data) {
-        	 $log.debug(data);
-         });
+       	$http.put('rest/questions', data)
+         .then(
+         	       function(response){
+         	    		$log.debug("Question added .."+ response.data.id);
+         	    		
+         	           	$location.path('/viewdetailblog/' + response.data.id);
+         	         }, 
+         	         function(response){
+         	        	 $log.debug("ERROR..." + response.status);  
+         	        	 if(response.status == 401) {
+         	        		 $log.debug("ERROR..." );
+         	        		 $cookies['token'] = "";
+         	        		 $scope.username = "";
+         	        		 $window.localStorage.setItem("loggedin", false);
+         	        		 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+         	            	
+         	        	 }
+         	         }
+         	      );
     };
 $scope.setPage = function () {
     	
@@ -538,7 +565,7 @@ $scope.setPage = function () {
 		$scope.showprev = false;
 		 $scope.searchkey = "";
 		$scope.lastDataPoint = $scope.pagesize;
-		$scope.pagesize= 1;
+		$scope.pagesize= 5;
 		$scope.offset = 0;
 		$scope.prevpage = 1;
 		
@@ -552,62 +579,78 @@ $scope.setPage = function () {
 		if($routeParams.searchkey == undefined || $routeParams.searchkey == "") {
 			//$location.path('/viewallblogs/');
 		} else {
-			/*$scope.showprev = true;
-			$scope.nextpage = (parseInt( $routeParams.id) + 1);
-			$scope.offset = (parseInt( $routeParams.id) -1) * 3;
-			$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
-			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;*/
-			if($routeParams.id == undefined) {
+				if($routeParams.id == undefined) {
 				$scope.showprev = false;
 				$scope.nextpage = 2;
 				$scope.foundnext = false;
 				$scope.offset = 0;
 				$scope.prevpage = 0;
-				$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
-			} else {
-				//$scope.showprev = true;
+					} else {
+				
 				$scope.nextpage = (parseInt( $routeParams.id) + 1);
 				$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
-				$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
 				$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
 			}
 			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
+			console.log("printing key=" + $scope.searchkey); 
 			
-			$scope.url = 'rest/questions/search/'+$scope.offset +"-"+$scope.pagesize;
-			$log.debug("Getting Search results for..." + $routeParams.searchkey + "-" + $scope.url);
-			$http({
-		          method: 'POST', 
-		          url: $scope.url,
-		          data:  $routeParams.searchkey,
-		          headers: {
-		        	  'Content-Type': 'text/plain'
-		            
-		          },
-		        }).
-		        success(function(data, status, headers) {
-		          if (status == 200 || status == 201) {
-		        	  $scope.questions = data;
-		              $scope.searchcontact = {};
-		              $scope.getnextsearchresult();
-		          }
-		          if($routeParams.id == undefined) {
-		        	  $scope.showprev = false;
-		          } else {
-		        	  $scope.showprev = true;
-		          }
-		        }).
-		        error(function(data, status) {
-		        	$scope.shownext= false;
-		          if (status == 401) {
-		            notify('Forbidden', 'Authentication required to create new resource.');
-		          } else if (status == 403) {
-		            notify('Forbidden', 'You are not allowed to create new resource.');
-		          } else {
-		            notify('Failed '+ status + data);
-		          }
-		        });
+		$http({
+		    method: 'POST',
+		    url: 'rest/questions/search',
+		    data:  $scope.searchkey,
+		    headers: {
+	        	  'Content-Type': 'text/plain'
+	            
+	          },
+		    params: {
+		    	offset : $scope.offset,
+		    	length : $scope.pagesize
+		    }
+		}).then(function(response) {
+		    console.log("search successfully" + response.status);
+		    $scope.questions = response.data;
+            $scope.searchcontact = {};
+            $scope.setnext();
+        
+        if($routeParams.id == undefined) {
+      	  $scope.showprev = false;
+        } else {
+      	  $scope.showprev = true;
+        }
+		   
+		}, function(response) {
+		    console.log("Search Error message");   
+		});
 		}
 		
+		$scope.setnext = function() {
+			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
+			console.log("Search key=" + $routeParams.searchkey);
+			$http({
+			    method: 'POST',
+			    url: 'rest/questions/search/length',
+			    data:  $routeParams.searchkey ,
+			    headers: {
+		        	  'Content-Type': 'text/plain'
+		            
+		          }
+			}).success(function(length) {
+				 console.log("Search leng" + length);
+				 $scope.shownext= false;
+				  if(length != 0) {
+					  $scope.nextavail =  length - ($scope.offset + $scope.pagesize );
+					  $log.debug("Next Search :" + $scope.nextavail );
+					  if($scope.nextavail > 0) {
+						  $scope.shownext= true;
+				  }
+				  }
+			   
+			}).error(function(response) {
+			    console.log("Search Error message");   
+			    $scope.shownext= false;
+			});
+		
+		}
 		$scope.getnextsearchresult = function() {
 			$scope.offset = $scope.offset + 1;
 			$scope.url = 'rest/questions/search/'+$scope.offset +"-"+$scope.pagesize;
