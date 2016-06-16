@@ -414,14 +414,6 @@
 			$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
 			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
 		}
-<<<<<<< Updated upstream
-		
-		$http.get('rest/questions/'+$scope.offset +"-"+3 ).
-		  success(function(data, status, headers, config) {
-			  $scope.count= data.length;
-			  //$scope.allblogs = data;
-			  //$scope.shownext= true;
-=======
 
 		$http({
 		    method: 'GET',
@@ -434,7 +426,6 @@
 		    console.log("saved successfully" + response.status);
 		    $scope.count= response.data.length;
 			 
->>>>>>> Stashed changes
 			  if($scope.pagesize >  $scope.count) {
 				  $scope.shownext= false;
 			  } 
@@ -445,24 +436,6 @@
 			 } else {
 				 $scope.showprev = true;
 			 }
-<<<<<<< Updated upstream
-		  }).
-		  error(function(data, status, headers, config) {
-			  $scope.loading = false;
-			  $scope.error = status;
-		  });
-		$scope.getnextquestion = function() {
-			$http.get('rest/questions/'+($scope.offset+$scope.pagesize) +"-"+1 ).
-			  success(function(data, status, headers, config) {
-				  if(data.length != 0) {
-					  $log.debug("Next Data:" + data.length);
-					  $scope.foundnext = true;
-					  $scope.shownext= true;
-				  } else {
-					  $log.debug("No Next Data:" + data.length);
-					  $scope.foundnext = true;
-					  $scope.shownext= false;
-=======
 		}, function(response) {
 		    console.log("Error message");   
 		});
@@ -477,7 +450,6 @@
 					  if($scope.nextavail > 0) {
 						  $scope.shownext= true;
 				  }
->>>>>>> Stashed changes
 				  }
 			  }).
 			  error(function(response) {
