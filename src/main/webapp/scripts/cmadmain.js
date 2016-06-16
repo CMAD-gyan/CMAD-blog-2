@@ -57,7 +57,7 @@
 		$scope.users=[];
 		$scope.loading = true;
 		$log.debug("Getting users..." + $window.localStorage.getItem("loggedin"));
-		$http.get('rest/users').
+		/*$http.get('rest/users').
 		  success(function(data, status, headers, config) {
 			  $scope.users = data;
 			  $scope.loading = false;
@@ -66,7 +66,7 @@
 			  $scope.loading = false;
 			  $scope.error = status;
 		  });
-		
+		*/
 		$scope.getUserOnLogin = function(user) {
 			$log.debug(user);
 			$scope.showEditForm=false;
@@ -166,20 +166,20 @@
 		
 		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
 		
-		$http.get('rest/questions/' + $scope.questionid).
-		  success(function(data, status, headers, config) {
-			  $log.debug("detail blog="+ data);
-			  $scope.currentquestion = data;
+		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
+			  $log.debug("detail blog="+ response.data);
+			  $scope.currentquestion = response.data;
 			  
-			  $log.debug("detail blog="+ $scope.currentquestion.username + "-" + $scope.currentquestion.title);
+			 /* $log.debug("detail blog="+ $scope.currentquestion.username + "-" + $scope.currentquestion.title);
 			  $log.debug("Successful data retrieved:" +   $scope.currentquestion.answers.length);
-			  if($scope.currentquestion.answers.length > 0) {
+			 */ 
+			  if($scope.currentquestion.answers != undefined && $scope.currentquestion.answers.length > 0) {
 				  $scope.showanswers = true;
 			  } else {
 				  $scope.showanswers = false;
 			  }
 			  $scope.username= $window.localStorage.getItem("currentUser");
-			  if($scope.username == $scope.currentquestion.username) {
+			  if($scope.currentquestion.username != undefined && ($scope.username == $scope.currentquestion.username)) {
 			  $scope.edittext = true;
 			  } else {
 			  $scope.edittext = false;
@@ -187,10 +187,9 @@
 			  $scope.showansbtn = true;
 			  $scope.dataloading = false;
 			  $scope.edittextarea =false;
-		  }).
-		  error(function(data, status, headers, config) {
+		}, function(response) {
 			
-			  $scope.error = status;
+			  $scope.error = response.status;
 		  });
 		$scope.addanswer = function () {
 			$scope.showansbtn = false;
@@ -265,17 +264,30 @@
 	            return false;
 		}
 		}
-	$scope.updateBlog = function(blog) {
+	$scope.updateBlog = function(data) {
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 
-        var postData =  $http.post('rest/questions', blog);
-        postData.success(function (data) {
-       	$log.debug(data);
-       	$scope.edittext= true;
-       	$scope.edittextarea = false;
-       	$location.path('/viewdetailblog/' + data);
-        }).error(function (data) {
-	        	$log.debug("ERROR..." + data);        });
+		$http.put('rest/questions', data)
+        .then(
+        	       function(response){
+        	    		$log.debug(response.data);
+        	           	$scope.edittext= true;
+        	           	$scope.edittextarea = false;
+        	           	$location.path('/viewdetailblog/' + $scope.currentquestion.id);
+        	         }, 
+        	         function(response){
+        	        	 $log.debug("ERROR..." + response.status);  
+        	        	 if(response.status == 401) {
+        	        		 $log.debug("ERROR..." );
+        	        		 $cookies['token'] = "";
+        	        		 $scope.username = "";
+        	        		 $window.localStorage.setItem("loggedin", false);
+        	        		 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+        	            	
+        	        	 }
+        	         }
+        	      );
+        
     };
     
     $scope.addYourAnswer = function (answer) {

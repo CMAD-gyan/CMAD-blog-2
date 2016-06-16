@@ -1,5 +1,6 @@
 .detailques h2 {
-	font-size: 200%;
+	font-size: 250%;
+    border-bottom: none;
 }
 
 .showblog h2 a{
@@ -24,9 +25,7 @@
 	color:#959595;
 	float:right;
 }
-/* .answersection {
-	background : rgba(220,220,220, 0.8);
-} */
+
 .answersection span {
 	font:normal 12px Georgia, "Times New Roman", Times, serif;
 	color:#959595;
@@ -258,10 +257,15 @@
 }  */
 .qcomment {
 	font : 8px;
-	padding-left: 5em;
+	padding-left: 3em;
 	color: #708090;
 }
 
+.qcomment p {
+	font:normal 14px Georgia, "Times New Roman", Times, serif;
+	padding-left: 2em;
+	color: #708090;
+}
 .qcomment p span {
 	font:normal 12px Georgia, "Times New Roman", Times, serif;
 	color:#959595;
