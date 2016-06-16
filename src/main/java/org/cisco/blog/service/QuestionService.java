@@ -90,7 +90,7 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		question =  dataStore.get(Question.class, oid);
@@ -99,11 +99,11 @@ public class QuestionService {
 			fixQuestionDisplay(question);
 			return Response.status(Response.Status.OK).entity(question).build();
 		}
-		return Response.status(Response.Status.NO_CONTENT).build();
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 		
 	@POST
-	@Path("/{param}/views_increment")
+	@Path("/{param}/view_incrementer")
 	@Produces({MediaType.TEXT_PLAIN})
     public Response incViewCountById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -112,7 +112,7 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		question =  dataStore.get(Question.class, oid);
@@ -122,7 +122,7 @@ public class QuestionService {
 			dataStore.save(question);
 			return Response.status(Response.Status.OK).entity("Incremented View Count").build();
 		}
-		return Response.status(Response.Status.BAD_REQUEST).build();
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 	
 	@POST
@@ -224,7 +224,7 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		question =  dataStore.get(Question.class, oid);
@@ -249,15 +249,12 @@ public class QuestionService {
 		return Response.status(Response.Status.OK).entity("Successfully Deleted question").build();
 	}
 
-	
-	//comments 
-	//post & edit
-	@POST
+	@PUT
 	@Secured
 	@Path("/{param}/comments")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Question postComment(Comment com, 
+	public Response postComment(Comment com, 
 			                @PathParam("param") String id,
             				@Context SecurityContext securityContext ) {
 		int i,j=0;
@@ -268,13 +265,13 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		Question question =  dataStore.get(Question.class, oid);
 		
 		if (question == null){
-			throw  new NotFoundException("Not found");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
 		List <Comment> comment = question.getComments();
@@ -289,24 +286,29 @@ public class QuestionService {
 		}
 		
 		if (update) {
+			//EDIT case
 			comment.get(j).setText(com.getText());
 			comment.get(j).setUpdateTime();
 			question.setComments(comment);
+			dataStore.save(question);
+			fixQuestionDisplay(question);	
+			return Response.status(Response.Status.OK).entity(question).build();
 		} else {
+			//Create case
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
 			Comment newComment = new Comment(com.getText(), username,user);
 			comment.add(newComment);
+			dataStore.save(question);
+			fixQuestionDisplay(question);	
+			return Response.status(Response.Status.CREATED).entity(question).build();
 		}
-		dataStore.save(question);
-		fixQuestionDisplay(question);
-		return question;
 	}
 	
 	@DELETE
 	@Secured
 	@Path("/{param}/comments")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Question deleteComment(@PathParam("param") String id,
+	public Response deleteComment(@PathParam("param") String id,
             					@Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -317,7 +319,7 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		Question question =  dataStore.get(Question.class, oid);
 		
@@ -330,21 +332,17 @@ public class QuestionService {
 					break;
 				}
 			}
-			
 			if (found == true) {
 				comment.remove(i);
 				question.setComments(comment);
 				dataStore.save(question);
-				
-			}else {
-				throw new BadRequestException ("Invalid comment");
 			}
-			
 			fixQuestionDisplay(question);
+			return Response.status(Response.Status.OK).entity(question).build();
+			
 		} else {
-			throw new BadRequestException ("Question not found");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		return question;
 	}
 	
 	
