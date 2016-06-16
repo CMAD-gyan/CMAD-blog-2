@@ -395,46 +395,57 @@
 		$scope.showprev = false;
 		 $scope.nextpage = 2;
 		$scope.lastDataPoint = $scope.pagesize;
-		$scope.pagesize= 3;
+		$scope.pagesize= 5;
 		$scope.offset = 0;
 		$scope.prevpage = 1;
 		
 		 $scope.startpage = 0;
-		$log.debug("Getting Blogs..." + $window.localStorage.getItem("currentUser"));
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
+    	 console.log("Getting Blogs token=========" + $window.localStorage.getItem("loggedin"));
     	
 		if($routeParams.id == undefined) {
-			//$scope.showprev = false;
+			
 			$scope.nextpage = 2;
 			$scope.offset = 0;
 			$scope.prevpage = 0;
-			$log.debug("MainPage/" + "$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
 		} else {
-			//$scope.showprev = true;
+			
 			$scope.nextpage = (parseInt( $routeParams.id) + 1);
-			$scope.offset = (parseInt( $routeParams.id) -1) * 3;
-			$log.debug("$scope.nextpage" + $scope.nextpage + "$scope.offset" + $scope.offset);
+			$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
 			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
 		}
+<<<<<<< Updated upstream
 		
 		$http.get('rest/questions/'+$scope.offset +"-"+3 ).
 		  success(function(data, status, headers, config) {
 			  $scope.count= data.length;
 			  //$scope.allblogs = data;
 			  //$scope.shownext= true;
+=======
+
+		$http({
+		    method: 'GET',
+		    url: 'rest/questions',
+		    params: {
+		    	offset : $scope.offset,
+		    	length : $scope.pagesize
+		    }
+		}).then(function(response) {
+		    console.log("saved successfully" + response.status);
+		    $scope.count= response.data.length;
+			 
+>>>>>>> Stashed changes
 			  if($scope.pagesize >  $scope.count) {
 				  $scope.shownext= false;
 			  } 
-			  $log.debug($scope.nextpage + "Getting Blogs..." +  $scope.count + "last=" +$scope.pagesize);
-			 
-			 $scope.blogs = data;
-			 $scope.getnextquestion();
+			   $scope.blogs = response.data;
+			 $scope.setnext();
 			 if($routeParams.id == undefined) {
 					$scope.showprev = false;
 			 } else {
 				 $scope.showprev = true;
 			 }
+<<<<<<< Updated upstream
 		  }).
 		  error(function(data, status, headers, config) {
 			  $scope.loading = false;
@@ -451,17 +462,26 @@
 					  $log.debug("No Next Data:" + data.length);
 					  $scope.foundnext = true;
 					  $scope.shownext= false;
-				  }
-				 
-				 
-				  $log.debug("Next Data:" + data.length);
-				
-				
-				
-			  }).
-			  error(function(data, status, headers, config) {
+=======
+		}, function(response) {
+		    console.log("Error message");   
+		});
+		
+		$scope.setnext = function() {
+			$http.get('rest/questions/length' ).
+			  success(function(length) {
 				  $scope.shownext= false;
-				  $scope.error = status;
+				  if(length != 0) {
+					  $scope.nextavail =  length - ($scope.offset + $scope.pagesize );
+					  $log.debug("Next Data:" + $scope.nextavail );
+					  if($scope.nextavail > 0) {
+						  $scope.shownext= true;
+				  }
+>>>>>>> Stashed changes
+				  }
+			  }).
+			  error(function(response) {
+				  $scope.shownext= false;
 			  });
 		}
 	
