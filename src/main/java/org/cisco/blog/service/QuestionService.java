@@ -32,7 +32,6 @@ public class QuestionService {
 	private void fixQuestionDisplay(Question question)
 	{
 		question.getUser().setPassword("xxxxxxxxx");
-		//@TBD get some better way to fix
 		for ( int i=0; i < question.getComments().size(); i++) {
 			question.getComments().get(i).getUser().setPassword("XXXXX");
 		}
@@ -42,8 +41,6 @@ public class QuestionService {
 		}
 		question.setVotes(null);
 	}
-	
-	
 	
 	@PUT
 	@Secured
@@ -106,7 +103,8 @@ public class QuestionService {
 	}
 		
 	@POST
-	@Path("/views/{param}")
+	@Path("/{param}/views_increment")
+	@Produces({MediaType.TEXT_PLAIN})
     public Response incViewCountById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
@@ -122,7 +120,7 @@ public class QuestionService {
 		if (question != null) {
 			question.setViewCount(question.getViewCount() + 1);
 			dataStore.save(question);
-			return Response.status(Response.Status.OK).build();
+			return Response.status(Response.Status.OK).entity("Incremented View Count").build();
 		}
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
@@ -242,13 +240,13 @@ public class QuestionService {
 					dataStore.delete(Answer.class, idAns);
 				}	
 				dataStore.delete(Question.class, oid);
-				return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
+				return Response.status(Response.Status.OK).entity("Successfully Deleted question").build();
 				
 			}else {
 				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}	
 		}
-		return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
+		return Response.status(Response.Status.OK).entity("Successfully Deleted question").build();
 	}
 
 	
