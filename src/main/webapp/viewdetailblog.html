@@ -13,26 +13,25 @@
            <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
             <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
              </div>  
-             
+            <div class= "addanswer">
           <a href ng-click="openQCommentsForm()"> Add Comment</a>
-         <div ng-repeat="comment in currentquestion.comments" class="qcomment" >
-         	<p>{{comment.text}}
-         	<span>By {{comment.username}} on  {{comment.createTime | date:' HH:mm:ss'}}</span>
-         	</p>
          </div>
-         
+         <div ng-repeat="comment in currentquestion.comments" class="qcomment" >
+         	<span>{{comment.text}}
+         	<span style= "float:right; font:normal 12px Georgia, Times, serif;
+	color:#959595;">By {{comment.username}} on {{comment.createTime | date:' HH:mm:ss'}}</span>
+         	</span>
+         </div>
+         <br>
           
-       <div ng-hide="dataloading"  >
+       <div ng-hide="dataloading" class= "addanswer" >
 		 <div ng-show="showanswers"  >
- <h4>{{currentquestion.answers.length}} Answer</h4>
- <hr style="border-top: solid 0.1px;" />
- 
- <div ng-repeat="answer in currentquestion.answers" ng-controller="detailBlogController as detailBlogController" class="answersection" >
-    <p> {{answer.text}}</p>
-    </br>
-      <span>answered  By {{answer.userName}} </span> 
-      <span> on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
-      <br>
+ 	<h4>{{currentquestion.answers.length}} Answer</h4>
+	 <hr style="border-top: solid 0.1px;" />
+  <div ng-repeat="answer in currentquestion.answers" ng-controller="detailBlogController as detailBlogController" class="answersection" >
+    <p> {{answer.text}}
+      <span>answered  By {{answer.userName}} on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
+      </p>
       <a href ng-click="openACommentsForm(answer)"> Add Comments</a>
       <div ng-repeat="comment in answer.comments" class="acomment">
          	<p>{{comment.text}}
@@ -41,21 +40,10 @@
        </div>    
        <hr style="border-top: solid 0.1px;" />
  </div>
-     </div>   </div>
-     <hr>
-  <div ng-hide="addanswers">
-        <input type="button" id="answerB" value="Post Your Answer" ng-click="addanswer()"></input> 
+     </div>  
+      </div>
+  <div class= "addanswer" ng-hide="addanswers">
+   <a href ng-click="openQAnswerForm()"> Post Your Answer</a>
    </div>
    
- <div ng-show="addanswers">
-	<h4>Your Answer</h4>
-	<form>
-        <div class="form-group">
-          <textarea cols=55 rows=10 id="answertext"  ng-model="answer.text" required="required"></textarea> <br />
-        </div>
-        <div >
-        <input type="button" id="answerB" value="Post Your Answer" ng-click="addYourAnswer(answer)"></input> 
-         </div>
-      </form>
-    </div>
   </div>

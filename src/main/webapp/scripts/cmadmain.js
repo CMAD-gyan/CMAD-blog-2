@@ -290,6 +290,24 @@
         
     };
     
+    $scope.openQAnswerForm = function() {
+    	$log.debug('answer.html');
+		ngDialog.openConfirm({template: 'answerdialog.html',
+		  scope: $scope 
+		}).then(
+			function(value) {
+				$log.debug(value);
+				var answer = {
+						"text": value
+				};
+				$scope.addYourAnswer(answer);
+				
+			},
+			function(value) {
+				//Cancel or do nothing
+			}
+		);
+	};
     $scope.addYourAnswer = function (answer) {
 		$log.debug(answer);
 		$log.debug("=====" + $cookies['token']);

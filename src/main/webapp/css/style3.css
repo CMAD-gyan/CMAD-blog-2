@@ -7,9 +7,7 @@
 	
 	color: #8B814C;
 }
-.edit {
-	float: right;
-}
+
 #questionedit {
 	width: 80px;
 	height: 30px;
@@ -287,4 +285,19 @@
 	font:normal 12px Georgia, "Times New Roman", Times, serif;
 	color:#959595;
 	float:right;
+}
+
+.addanswer a {
+	font:normal 14px Georgia, "Times New Roman", Times, serif;
+	color:#8B4513;
+}
+
+.edit a {
+	font:normal 14px Georgia, "Times New Roman", Times, serif;
+	color:#8B4513;
+}
+.edit {
+	float: right;
+	font:normal 14px Georgia, "Times New Roman", Times, serif;
+	color:#8B4513;
 }
