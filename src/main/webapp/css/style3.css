@@ -314,6 +314,18 @@
          height: 25px;
 
 	}
+.upvoteimage {
+	background: url('upvote.svg');
+         width: 25px;
+         height: 25px;
+
+	}
+.downvoteimage {
+	background: url('downvote.svg');
+         width: 25px;
+         height: 25px;
+
+	}
 	.deldialog {
 	width: 100;
 	height: 10;
