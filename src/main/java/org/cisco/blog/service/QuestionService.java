@@ -395,7 +395,7 @@ private Response postVote(String id,
 	dataStore.save(question);
 	fixQuestionDisplay(question);
 
-	return Response.status(Response.Status.OK).build();
+	return Response.status(Response.Status.OK).entity(question).build();
 }
 
 	

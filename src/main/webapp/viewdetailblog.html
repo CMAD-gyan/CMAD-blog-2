@@ -1,4 +1,4 @@
-<div  ng-hide="dataloading" ng-controller="detailBlogController as detailBlogController" class="detailques">
+<div  ng-hide="dataloading"  class="detailques">
     <h2> {{currentquestion.title}} </h2>
       <h3><span>Asked By {{currentquestion.username}} </span></h3>
       <hr>
@@ -28,7 +28,7 @@
 		 <div ng-show="showanswers"  >
  	<h4>{{currentquestion.answers.length}} Answer</h4>
 	 <hr style="border-top: solid 0.1px;" />
-  <div ng-repeat="answer in currentquestion.answers" ng-controller="detailBlogController as detailBlogController" class="answersection" >
+  <div ng-repeat="answer in currentquestion.answers"  class="answersection" >
     <p> {{answer.text}}
       <span>answered  By {{answer.userName}} on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
       </p>
