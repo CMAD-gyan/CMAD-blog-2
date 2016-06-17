@@ -355,35 +355,25 @@
   $scope.postQComment = function(comment){
     	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
     	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-    	    	/*         var postData =  $http.post('rest/questions/'+$scope.questionid +"/comments" , comment);
-    	    	         postData.success(function (data) {
-    	    	        	 $log.debug(data);
-    	    	        	 $route.reload();
-    	    	        	 $location.path('/viewdetailblog/' + $scope.questionid);
-    	    	        	 
-    	    	         })
-    	    	         .error(function (data) {
-    	    	        	 $log.debug("ERROR..." + comment);
-    	    	        	 $log.debug(data);
-    	    	         });*/
-    	    	         $http.put('rest/questions/'+$scope.questionid +"/comments" , comment)
+
+        	    	         $http.put('rest/questions/'+$scope.questionid +"/comments" , comment)
     	    	         .then(
     	    	         	       function(response){
     	    	         	    	  $log.debug(response.data);
-    	     	    	        	 $route.reload();
-    	     	    	        	 $location.path('/viewdetailblog/' + $scope.questionid);
+    	     	    	        	 //$route.reload();
+    	    	         	       	  if(response.status == 200) {
+					 	$scope.currentquestion = response.data;
+						console.log("posting the question " );
+					  } else if(response.status == 401) {
+                                        	$log.debug("ERROR..." );
+						 $cookies['token'] = "";
+						$scope.username = "";
+                                                         $window.localStorage.setItem("loggedin", false);
+                                                         $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+
+                                          }
+    	     	    	        	 //$location.path('/viewdetailblog/' + $scope.questionid);
     	     	    	        	 
-    	    	         	         }, 
-    	    	         	         function(response){
-    	    	         	        	 $log.debug("ERROR..." + response.status);  
-    	    	         	        	 if(response.status == 401) {
-    	    	         	        		 $log.debug("ERROR..." );
-    	    	         	        		 $cookies['token'] = "";
-    	    	         	        		 $scope.username = "";
-    	    	         	        		 $window.localStorage.setItem("loggedin", false);
-    	    	         	        		 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	    	         	            	
-    	    	         	        	 }
     	    	         	         }
     	    	         	      );
     	    	    };
