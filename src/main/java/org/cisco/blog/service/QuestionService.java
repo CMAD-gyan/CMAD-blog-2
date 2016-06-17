@@ -224,7 +224,7 @@ public class QuestionService {
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
-			return Response.status(Response.Status.NOT_FOUND).build();
+			return Response.status(Response.Status.OK).entity("Successfully Deleted question").build();
 		}
 		
 		question =  dataStore.get(Question.class, oid);
@@ -394,8 +394,7 @@ private Response postVote(String id,
 	question.setTotalVotes(totalVote);
 	dataStore.save(question);
 	fixQuestionDisplay(question);
-
-	return Response.status(Response.Status.OK).entity(question).build();
+	return Response.status(Response.Status.OK).entity(totalVote).build();
 }
 
 	
@@ -405,7 +404,7 @@ private Response postVote(String id,
 	@POST
 	@Secured
 	@Path("/{param}/vote_down")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response postVoteDown(@PathParam("param") String id,
 			 @Context SecurityContext securityContext ) {
 		
@@ -416,7 +415,7 @@ private Response postVote(String id,
 	@POST
 	@Secured
 	@Path("/{param}/vote_up")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response postVoteUp(@PathParam("param") String id,
             			 @Context SecurityContext securityContext ) {
 		return postVote(id, securityContext, true );

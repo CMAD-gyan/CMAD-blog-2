@@ -8,12 +8,14 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.mongodb.morphia.Datastore;
@@ -21,12 +23,13 @@ import org.cisco.blog.model.*;
 
 @Path("/answers")
 public class AnswerService {
-	@POST
-	@Path("/{param}")
+	
+	@PUT
 	@Secured
+	@Path("/{param}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String setAnswerByQuestionId( Answer ans,
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response setAnswerByQuestionId(Answer ans,
 			                           @PathParam("param") String id,
 			                           @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -37,12 +40,12 @@ public class AnswerService {
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		Question question =  dataStore.get(Question.class,oid);
 		if (question == null){
-			throw  new NotFoundException("Not found");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		String username = securityContext.getUserPrincipal().getName();
@@ -74,29 +77,32 @@ public class AnswerService {
 		
 		dataStore.save(answers);
 		dataStore.save(question);
-		return "Ok";
+		return Response.status(Response.Status.OK).entity(question).build();
 	}
 	
 	@DELETE
 	@Secured
 	@Path("/{questionId}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String setAnswerByQuestionId(@PathParam("questionId") String id, @Context SecurityContext securityContext) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setAnswerByQuestionId(@PathParam("questionId") String id, @Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
 		ObjectId  answerOid = null;
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		Question question =  dataStore.get(Question.class, oid);
+		if (question == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		
 		String username = securityContext.getUserPrincipal().getName();
 		
 		if (question.getAnswers() != null) {
 			List<Answer> list = question.getAnswers();
-			
 			for (Iterator<Answer> iterator = list.iterator(); iterator.hasNext();) {
 				Answer answer = iterator.next();
 			    if (answer.getUserName().equals(username)) {
@@ -110,7 +116,7 @@ public class AnswerService {
 		if (answerOid != null) {
 			dataStore.delete(Answer.class, answerOid);
 		}
-		return  "Ok";
+		return Response.status(Response.Status.OK).entity(question).build();
 	}
 	
 	
