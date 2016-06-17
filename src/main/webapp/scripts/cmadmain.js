@@ -187,6 +187,7 @@
 			  $scope.showansbtn = true;
 			  $scope.dataloading = false;
 			  $scope.edittextarea =false;
+			 $http.post('rest/questions/' + $scope.questionid + '/view_incrementer');
 		}, function(response) {
 			
 			  $scope.error = response.status;
