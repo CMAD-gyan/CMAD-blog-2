@@ -4,12 +4,13 @@
       <hr>
       <h3><span>&nbsp;-- Votes: {{currentquestion.totalVotes}}</span><span> &nbsp;-- Viewed {{currentquestion.viewCount}} times </span> <span> on {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}}</span></h3>
         <p>{{currentquestion.text}} </p>  
+		
          <div ng-show="edittext" class="edit">
-        <button class="upvoteimage" data-toggle="tooltip" title="UpVote" type="button"  ng-click="questionUpvote()"></button>
-        <button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click=""></button>
         <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="editText()"></button>
 		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deletequestion()"></button>
  </div>
+ 		<button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click="questionDownvote()" style="float: right;"></button>
+		<button class="upvoteimage" data-toggle="tooltip" title="UpVote" type="button"  ng-click="questionUpvote()" style="float: right;"></button>
          <br> 
 		   <div ng-show="edittextarea">
            <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
