@@ -427,60 +427,65 @@
 	});
 	
 	app.controller('BlogController',function($http, $log, $scope,$window, $location,$rootScope,$cookies, $routeParams){
-		var controller = this;
-		
-		$scope.blogs=[];
-		$scope.allblogs=[];
-		$scope.count= 0;
+				var controller = this;
+                $scope.maxLengthPerPage=5;
+		$rootScope.blogLength;
 		$scope.loading = true;
 		$scope.shownext = false;
 		$scope.showprev = false;
-		 $scope.nextpage = 2;
-		$scope.lastDataPoint = $scope.pagesize;
-		$scope.pagesize= 5;
-		$scope.offset = 0;
-		$scope.prevpage = 1;
-		
-		 $scope.startpage = 0;
+			
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	 console.log("Getting Blogs token=========" + $window.localStorage.getItem("loggedin"));
+    	 	//console.log("Getting Blogs token=========" + $log + " " + $rootScope + " "  + $location + " "  + $routeParams.id  );
     	
-		if($routeParams.id == undefined) {
-			
-			$scope.nextpage = 2;
-			$scope.offset = 0;
-			$scope.prevpage = 0;
-		} else {
-			
-			$scope.nextpage = (parseInt( $routeParams.id) + 1);
-			$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
-			$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
-		}
+		if($routeParams.id == undefined  ) {
+			$http({ method: 'GET',
+                               url:'rest/questions/length' 
+			}).then(function(response) {
+				console.log("got length " + response.data); 
+				$rootScope.blogLength = (parseInt(response.data)) ;
+				$routeParams.id = 0;
+				$location.path('/viewallblogs/'+ $routeParams.id);
+			})
+		} else 	if($routeParams.id != undefined  ) {
+			$scope.blogCurrentOffset = $routeParams.id * $scope.maxLengthPerPage;
+			$scope.blogCurrentLength = $scope.maxLengthPerPage;
+			if ( ($rootScope.blogLength - $scope.blogCurrentOffset )    <  $scope.maxLengthPerPage) {
+					$scope.blogCurrentLength = $rootScope.blogLength;
+				} else {
+					$scope.blogCurrentLength = $scope.maxLengthPerPage;
+				}
+					console.log("id is  "+ $routeParams.id + " " + $scope.blogCurrentOffset + " " + $scope.blogCurrentLength  );
+			console.log("length  is " + $scope.blogLength); 
+			$http({
+		    		method: 'GET',
+		    		url: 'rest/questions',
+		    		params: {
+		    			offset : $scope.blogCurrentOffset ,
+		    			length : $scope.blogCurrentLength 
+		    		}
+			}).then(function(response) {
+		    		console.log("received  successfully" + response.status);
+		    		$scope.count= response.data.length;
+	            		$scope.blogs = response.data;
 
-		$http({
-		    method: 'GET',
-		    url: 'rest/questions',
-		    params: {
-		    	offset : $scope.offset,
-		    	length : $scope.pagesize
-		    }
-		}).then(function(response) {
-		    console.log("saved successfully" + response.status);
-		    $scope.count= response.data.length;
-			 
-			  if($scope.pagesize >  $scope.count) {
-				  $scope.shownext= false;
-			  } 
-			   $scope.blogs = response.data;
-			 $scope.setnext();
-			 if($routeParams.id == undefined) {
-					$scope.showprev = false;
-			 } else {
-				 $scope.showprev = true;
-			 }
+				if ($routeParams.id  != 0 ) {
+					$scope.showprev = true;
+					 $scope.prevpage =  (parseInt($routeParams.id))  - 1;
+				}
+				if ( ($rootScope.blogLength - $scope.blogCurrentOffset )    >   $scope.maxLengthPerPage) {
+					$scope.shownext = true;
+					$scope.nextpage = (parseInt($routeParams.id)) + 1;
+				}			
+
+
 		}, function(response) {
 		    console.log("Error message");   
 		});
+
+
+		
+		}
+
 		
 		$scope.setnext = function() {
 			$http.get('rest/questions/length' ).
