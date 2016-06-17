@@ -6,7 +6,8 @@
         <p>{{currentquestion.text}} </p>  
 		
          <div ng-show="edittext" class="edit">
-        <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="editText()"></button>
+        <!-- <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="editText()"></button> -->
+        <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="openEditQuestion()"></button>
 		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deletequestion()"></button>
  </div>
  		<button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click="questionDownvote()" style="float: right;"></button>

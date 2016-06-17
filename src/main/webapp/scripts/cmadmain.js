@@ -209,6 +209,22 @@
 			$scope.updateBlog(changedques);
 		}
 
+		$scope.openEditQuestion = function() {
+			
+			ngDialog.openConfirm({template: 'editQuestionDialog.html',
+			scope: $scope, //Pass the scope object if you need to access in the template,
+//			className: 'ngdialog-theme-default custom-width-100'
+			}).then(
+				function(value) {
+					$scope.questionupdate(value)
+			        
+				},
+				function(value) {
+					 $log.debug("Dont delete blog=" + $scope.currentquestion.id);
+				}
+			);
+		};
+		
 		$scope.editText = function () {
 
 
