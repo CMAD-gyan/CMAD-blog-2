@@ -5,10 +5,10 @@
       <h3><span> -- Viewed {{currentquestion.viewCount}} times </span> <span> on {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}}</span></h3>
         <p>{{currentquestion.text}} </p>  
          <div ng-show="edittext" class="edit">
-          <a  href ng-click="editText()">Edit</a>
-           <a  href ng-click="deletequestion()" >Delete</a>
-          </div>
-          
+         <button class="imagetest" type="button"  ng-click="editText()"></button>
+		<button class="delimage" type="button"  ng-click="deletequestion()"></button>
+ </div>
+         <br> 
 		   <div ng-show="edittextarea">
            <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
             <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>

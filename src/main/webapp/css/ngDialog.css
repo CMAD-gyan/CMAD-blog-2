@@ -112,3 +112,11 @@ html.ngdialog-open,
 body.ngdialog-open {
   overflow: hidden;
 }
+
+.ngdialog.ngdialog-theme-default.custom-width-100 .ngdialog-content {
+    width: 300px;
+    height: 150px;
+}
+.ngdialog.ngdialog-theme-default.custom-width-900 .ngdialog-content {
+    width: 900px;
+}

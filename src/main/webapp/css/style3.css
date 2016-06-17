@@ -301,3 +301,21 @@
 	font:normal 14px Georgia, "Times New Roman", Times, serif;
 	color:#8B4513;
 }
+
+.imagetest {
+	background: url('edit.svg');
+         width: 25px;
+         height: 25px;
+}
+
+.delimage {
+	background: url('delete.svg');
+         width: 25px;
+         height: 25px;
+
+	}
+	.deldialog {
+	width: 100;
+	height: 10;
+	}
+}

@@ -164,7 +164,7 @@
 
 		 $scope.edittextarea = false;
 		
-		$log.debug($routeParams.id  + "Getting Detail Blogs..." + $scope.questionid);
+		$log.debug($routeParams.id  + "Getting New Detail Blogs..." + $scope.questionid);
 		
 		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
 			  $log.debug("detail blog="+ response.data);
@@ -227,43 +227,34 @@
 			}
 		
 		$scope.deletequestion = function () {
-			var retVal = $window.confirm("Do you want to delete ?");
-
-	        if (retVal == true) {
-
-	        $log.debug("dleete blog=" + $scope.currentquestion.id + "===" + $cookies['token']);
-	        $http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-	       
-	        $http({ url: 'rest/questions/' +  $scope.currentquestion.id, 
-                method: 'DELETE'
-        }).then(function(res) {
-            console.log("del Successful" +res.data);
-        	$location.path('/viewallblogs');
-        }, function(error) {
-            console.log("del UnSuccessful" + error);
-        });
-	        /*
-	            $http.put('url', myData).
-
-	            success(function (data, status, headers, config) {
-
-	                alert('Saved');
-
-	            }).error(function (data, status, headers, config) {
-
-	                alert('Error while updating');
-
-	            });
-*/
-	            return true;
-
-	        } else {
-
-	        $log.debug("Dont delete blog=" + $scope.currentquestion.id);
-
-	            return false;
+			$scope.openDelConfirmForm();
+			
 		}
-		}
+		$scope.openDelConfirmForm = function() {
+			
+			ngDialog.openConfirm({template: 'deleteform.html',
+			  scope: $scope, //Pass the scope object if you need to access in the template,
+			  className: 'ngdialog-theme-default custom-width-100'
+			}).then(
+				function(value) {
+					 $log.debug("delete blog=" + $scope.currentquestion.id + "===" + $cookies['token']);
+				        $http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+				       
+				        $http({ url: 'rest/questions/' +  $scope.currentquestion.id, 
+			                method: 'DELETE'
+			        }).then(function(res) {
+			            console.log("del Successful" +res.data);
+			        	$location.path('/viewallblogs');
+			        }, function(error) {
+			            console.log("del UnSuccessful" + error);
+			        });
+					
+				},
+				function(value) {
+					 $log.debug("Dont delete blog=" + $scope.currentquestion.id);
+				}
+			);
+		};
 	$scope.updateBlog = function(data) {
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 
