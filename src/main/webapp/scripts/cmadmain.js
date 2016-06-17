@@ -1,55 +1,55 @@
 (function(){
 	var app = angular.module('myApp',['ngRoute','ngCookies','ngDialog']);
-	
-	
+
+
 	app.config(function($routeProvider) {
-        $routeProvider
-        // route for the home page
-        // route for the login page
-        .when('/', {
-            templateUrl : 'viewallblogs.html',
-            controller  : 'BlogController'
-        }).when('/viewallblogs', {
-            templateUrl : 'viewallblogs.html',
-            controller  : 'BlogController'
-        }).when('/viewallblogs/:id', {
-            templateUrl : 'viewallblogs.html',
-            controller  : 'BlogController'
-        }).when('/viewallblogs/tagged/:searchkey', {
-            templateUrl : 'viewsearchquestions.html',
-            controller  : 'searchCtrl'
-        }).when('/viewallblogs/tagged/:searchkey/:id', {
-            templateUrl : 'viewsearchquestions.html',
-            controller  : 'searchCtrl'
-        }).when('/viewdetailblog/:id', {
-            templateUrl : 'viewdetailblog.html',
-            controller  : 'detailBlogController'
-        }).when('/viewnextblogs', {
-            templateUrl : 'viewnextblogs.html',
-            controller  : 'BlogController'
-        }).when('/viewnextblogs/:id', {
-        	  templateUrl : 'viewnextblogs.html',
-              controller  : 'detailBlogController'
-        }).when('/user', {
-            templateUrl : 'user.html',
-            controller  : 'UserController'
-        }).when('/signup', {
-        	// route for the signup page
-                templateUrl : 'signup.html',
-                controller  : 'UserController'
-        }).when('/login', {
-            	// route for the login page
-                templateUrl : 'login.html',
-                controller  : 'UserController'
-        }).when('/addblog', {
-                templateUrl : 'addblog.html',
-                controller  : 'BlogController'
-        }).otherwise({
-            	redirectTo : '/',
-        })
-    });
-	
-	
+		$routeProvider
+		// route for the home page
+		// route for the login page
+		.when('/', {
+			templateUrl : 'viewallblogs.html',
+			controller  : 'BlogController'
+		}).when('/viewallblogs', {
+			templateUrl : 'viewallblogs.html',
+			controller  : 'BlogController'
+		}).when('/viewallblogs/:id', {
+			templateUrl : 'viewallblogs.html',
+			controller  : 'BlogController'
+		}).when('/viewallblogs/tagged/:searchkey', {
+			templateUrl : 'viewsearchquestions.html',
+			controller  : 'searchCtrl'
+		}).when('/viewallblogs/tagged/:searchkey/:id', {
+			templateUrl : 'viewsearchquestions.html',
+			controller  : 'searchCtrl'
+		}).when('/viewdetailblog/:id', {
+			templateUrl : 'viewdetailblog.html',
+			controller  : 'detailBlogController'
+		}).when('/viewnextblogs', {
+			templateUrl : 'viewnextblogs.html',
+			controller  : 'BlogController'
+		}).when('/viewnextblogs/:id', {
+			templateUrl : 'viewnextblogs.html',
+			controller  : 'detailBlogController'
+		}).when('/user', {
+			templateUrl : 'user.html',
+			controller  : 'UserController'
+		}).when('/signup', {
+			// route for the signup page
+			templateUrl : 'signup.html',
+			controller  : 'UserController'
+		}).when('/login', {
+			// route for the login page
+			templateUrl : 'login.html',
+			controller  : 'UserController'
+		}).when('/addblog', {
+			templateUrl : 'addblog.html',
+			controller  : 'BlogController'
+		}).otherwise({
+			redirectTo : '/',
+		})
+	});
+
+
 	app.controller('UserController',function($http, $log, $scope, $window, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
 		$rootScope.loginstatus = false;
@@ -66,89 +66,91 @@
 			  $scope.loading = false;
 			  $scope.error = status;
 		  });
-		*/
+		 */
 		$scope.getUserOnLogin = function(user) {
 			$log.debug(user);
 			$scope.showEditForm=false;
 			$scope.showAddForm=true;
-			 var postlogin =  $http.post('rest/authentication', user);
-	         postlogin.success(function(data) {
-	        	 $rootScope.loginstatus = true;
-	        	 console.log("Success");
-	        	 $log.debug(data);
-	        	 $cookies['token'] = data;
-	        	 $window.localStorage.setItem("currentUser", user.username);
-	        	 $window.localStorage.setItem("loggedin", true);
-	        	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-	        	 $log.debug($cookies['token']);
-	        	 $location.path("viewallblogs");
-	         })
-	         .error(function (data) {
-	        	 $log.debug("Login failed");
-	        	 $log.debug(data);
-	         });
-	    };
-	    $scope.getUserLogout = function() {
-	    	$log.debug("Inside logout function");
+			var postlogin =  $http.post('rest/authentication', user);
+			postlogin.success(function(data) {
+				$rootScope.loginstatus = true;
+				console.log("Success");
+				$log.debug(data);
+				$cookies['token'] = data;
+				$window.localStorage.setItem("currentUser", user.username);
+				$window.localStorage.setItem("loggedin", true);
+				console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
+				$log.debug($cookies['token']);
+				$location.path("viewallblogs");
+			})
+			.error(function (data) {
+				$log.debug("Login failed");
+				$log.debug(data);
+			});
+		};
+		$scope.getUserLogout = function() {
+			$log.debug("Inside logout function");
 			$scope.showEditForm=false;
 			$scope.showAddForm=true;
 			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 			var postlogin =  $http.delete('rest/authentication');
-	        postlogin.success(function(data) {
-	        	 $rootScope.loginstatus = false;
-	        	 console.log("Success");
-	        	 $log.debug(data);
-	        	 $cookies['token'] = "";
-	        	 $window.localStorage.setItem("currentUser", "");
-	        	 $window.localStorage.setItem("loggedin", false);
-	        	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-	        	
-	        	 console.log("printing token=========");
-	        	 $log.debug($cookies['token']);
-	        	 $location.path("login");
-	         })
-	         .error(function (data) {
-	        	 $log.debug("Logout failed");
-	        	 $log.debug(data);
-	         });
-	    };
-	    
+			postlogin.success(function(data) {
+				$rootScope.loginstatus = false;
+				console.log("Success");
+				$log.debug(data);
+				$cookies['token'] = "";
+				$window.localStorage.setItem("currentUser", "");
+				$window.localStorage.setItem("loggedin", false);
+				console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
+
+				console.log("printing token=========");
+				$log.debug($cookies['token']);
+				$location.path("login");
+			})
+			.error(function (data) {
+				$log.debug("Logout failed");
+				$log.debug(data);
+			});
+		};
+
 		$scope.addUser = function (user) {
 			$log.debug("Inside user creation");
 			$log.debug(user);
 			$scope.showEditForm=false;
 			$scope.showAddForm=true;
-	         $http.post('rest/users', user).success(function (data) {
-	        	 $log.debug(data);
-	        	 $scope.users.push(user);
-	        	 $location.path("login");
-//	        	 $window.location.href= "#login";
-	         }).error(function (data) {
-	        	 $log.debug("Failed to create user");
-	        	 $log.debug(data);
-	         });
-	    };
+			$http.post('rest/users', user).success(function (data) {
+				$log.debug(data);
+				$scope.users.push(user);
+				$location.path("login");
+//				$window.location.href= "#login";
+			}).error(function (data) {
+				$log.debug("Failed to create user");
+				$log.debug(data);
+			});
+		};
 		$scope.editUser = function(user){
 			console.log(user);
 			$scope.user = user;
 			$scope.showEditForm=true;
 			$scope.showAddForm=false;
 		}
-		
+
 		$scope.updateUser = function(user){
 			$log.debug(user);
 			$http.put('rest/users',user).
-			  success(function(data, status, headers, config) {
-				  console.log(data);
-				  $scope.showEditForm=false;
-			  }).
-			  error(function(data, status, headers, config) {
-				  $scope.error = status;
-				  $scope.showEditForm=false;
-			  });
+			success(function(data, status, headers, config) {
+				console.log(data);
+				$scope.showEditForm=false;
+			}).
+			error(function(data, status, headers, config) {
+				$scope.error = status;
+				$scope.showEditForm=false;
+			});
 
 		}
 	});
+
+//	=========================================================================================================================================================================	
 	app.controller('detailBlogController',function($http, $log, $scope, $window, $route, $location,$rootScope, $cookies, $routeParams, ngDialog){
 		var controller = this;
 		$scope.question=[];
@@ -158,45 +160,41 @@
 		$scope.addanswers = false;
 		$scope.showansbtn = false;
 		$scope.showanswers = false;
-		 $scope.questionid = $routeParams.id;
-		 $scope.dataloading = true;
-		 $scope.edittext = false;
+		$scope.questionid = $routeParams.id;
+		$scope.dataloading = true;
+		$scope.edittext = false;
 
-		 $scope.edittextarea = false;
-		
+		$scope.edittextarea = false;
+
 		$log.debug($routeParams.id  + "Getting New Detail Blogs..." + $scope.questionid);
-		
+
 		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
-			  $log.debug("detail blog="+ response.data);
-			  $scope.currentquestion = response.data;
-			  
-			 /* $log.debug("detail blog="+ $scope.currentquestion.username + "-" + $scope.currentquestion.title);
-			  $log.debug("Successful data retrieved:" +   $scope.currentquestion.answers.length);
-			 */ 
-			  if($scope.currentquestion.answers != undefined && $scope.currentquestion.answers.length > 0) {
-				  $scope.showanswers = true;
-			  } else {
-				  $scope.showanswers = false;
-			  }
-			  $scope.username= $window.localStorage.getItem("currentUser");
-			  if($scope.currentquestion.username != undefined && ($scope.username == $scope.currentquestion.username)) {
-			  $scope.edittext = true;
-			  } else {
-			  $scope.edittext = false;
-			  }
-			  $scope.showansbtn = true;
-			  $scope.dataloading = false;
-			  $scope.edittextarea =false;
-			 $http.post('rest/questions/' + $scope.questionid + '/view_incrementer');
+			$log.debug("detail blog="+ response.data);
+			$scope.currentquestion = response.data;
+			if($scope.currentquestion.answers != undefined && $scope.currentquestion.answers.length > 0) {
+				$scope.showanswers = true;
+			} else {
+				$scope.showanswers = false;
+			}
+			$scope.username= $window.localStorage.getItem("currentUser");
+			if($scope.currentquestion.username != undefined && ($scope.username == $scope.currentquestion.username)) {
+				$scope.edittext = true;
+			} else {
+				$scope.edittext = false;
+			}
+			$scope.showansbtn = true;
+			$scope.dataloading = false;
+			$scope.edittextarea =false;
+			$http.post('rest/questions/' + $scope.questionid + '/view_incrementer');
 		}, function(response) {
-			
-			  $scope.error = response.status;
-		  });
+
+			$scope.error = response.status;
+		});
 		$scope.addanswer = function () {
 			$scope.showansbtn = false;
 			$scope.addanswers = true;
 		}
-		
+
 		$scope.questionupdate = function (updatedtext) {
 			$log.debug(updatedtext);
 			var changedques= {
@@ -208,7 +206,7 @@
 			$scope.updatedquestion.title = $scope.currentquestion.title;
 			$scope.updateBlog(changedques);
 		}
-		
+
 		$scope.editText = function () {
 
 
@@ -216,221 +214,228 @@
 
 			if($scope.username == $scope.currentquestion.username) {
 
-			$scope.edittext= false;
+				$scope.edittext= false;
 
-			$scope.edittextarea = true;
+				$scope.edittextarea = true;
 			} else {
-			$window.alert("No Previledge to edit the Post");
-			$scope.edittextarea = false;
-			return;
+				$window.alert("No Previledge to edit the Post");
+				$scope.edittextarea = false;
+				return;
 			}
 			$log.debug("edit text=" + $scope.edittext);
-			}
-		
+		}
+
 		$scope.deletequestion = function () {
 			$scope.openDelConfirmForm();
-			
+
 		}
 		$scope.openDelConfirmForm = function() {
-			
+
 			ngDialog.openConfirm({template: 'deleteform.html',
-			  scope: $scope, //Pass the scope object if you need to access in the template,
-			  className: 'ngdialog-theme-default custom-width-100'
+				scope: $scope, //Pass the scope object if you need to access in the template,
+				className: 'ngdialog-theme-default custom-width-100'
 			}).then(
-				function(value) {
-					 $log.debug("delete blog=" + $scope.currentquestion.id + "===" + $cookies['token']);
-				        $http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-				       
-				        $http({ url: 'rest/questions/' +  $scope.currentquestion.id, 
-			                method: 'DELETE'
-			        }).then(function(res) {
-			            console.log("del Successful" +res.data);
-			        	$location.path('/viewallblogs');
-			        }, function(error) {
-			            console.log("del UnSuccessful" + error);
-			        });
-					
-				},
-				function(value) {
-					 $log.debug("Dont delete blog=" + $scope.currentquestion.id);
-				}
+					function(value) {
+						$log.debug("delete blog=" + $scope.currentquestion.id + "===" + $cookies['token']);
+						$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+
+						$http({ url: 'rest/questions/' +  $scope.currentquestion.id, 
+							method: 'DELETE'
+						}).then(function(res) {
+							console.log("del Successful" +res.data);
+							$location.path('/viewallblogs');
+						}, function(error) {
+							console.log("del UnSuccessful" + error);
+						});
+
+					},
+					function(value) {
+						$log.debug("Dont delete blog=" + $scope.currentquestion.id);
+					}
 			);
 		};
-	$scope.updateBlog = function(data) {
-		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+		$scope.updateBlog = function(data) {
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+			$http.put('rest/questions', data)
+			.then(
+					function(response){
+						$log.debug(response.data);
+						//$route.reload();
+						if(response.status == 200) {
+							$scope.currentquestion = response.data;
+							console.log("posting the question " );
+						} else if(response.status == 401) {
+							$log.debug("ERROR..." );
+							$cookies['token'] = "";
+							$scope.username = "";
+							$window.localStorage.setItem("loggedin", false);
+							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
-		$http.put('rest/questions', data)
-        .then(
-        	       function(response){
-        	    		$log.debug(response.data);
-        	           	$scope.edittext= true;
-        	           	$scope.edittextarea = false;
-        	           	$location.path('/viewdetailblog/' + $scope.currentquestion.id);
-        	         }, 
-        	         function(response){
-        	        	 $log.debug("ERROR..." + response.status);  
-        	        	 if(response.status == 401) {
-        	        		 $log.debug("ERROR..." );
-        	        		 $cookies['token'] = "";
-        	        		 $scope.username = "";
-        	        		 $window.localStorage.setItem("loggedin", false);
-        	        		 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-        	            	
-        	        	 }
-        	         }
-        	      );
-        
-    };
-    
-    $scope.openQAnswerForm = function() {
-    	$log.debug('answer.html');
-		ngDialog.openConfirm({template: 'answerdialog.html',
-		  scope: $scope 
-		}).then(
-			function(value) {
-				$log.debug(value);
-				var answer = {
-						"text": value
-				};
-				$scope.addYourAnswer(answer);
-				
-			},
-			function(value) {
-				//Cancel or do nothing
+						}
+					}
+			);
+
+		};
+
+		$scope.openQAnswerForm = function() {
+			$log.debug('answer.html');
+			ngDialog.openConfirm({template: 'answerdialog.html',
+				scope: $scope 
+			}).then(
+					function(value) {
+						$log.debug(value);
+						var answer = {
+								"text": value
+						};
+						$scope.addYourAnswer(answer);
+
+					},
+					function(value) {
+						//Cancel or do nothing
+					}
+			);
+		};
+		$scope.addYourAnswer = function (answer) {
+			$log.debug(answer);
+			$log.debug("=====" + $cookies['token']);
+			$log.debug("Add Answers...");
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+			$http.put('rest/answers/'+$scope.questionid, answer)
+			.then(
+					function(response){
+						$log.debug(response.data);
+						//$route.reload();
+						if(response.status == 200) {
+							$scope.currentquestion = response.data;
+							console.log("posting the question " );
+						} else if(response.status == 401) {
+							$log.debug("ERROR..." );
+							$cookies['token'] = "";
+							$scope.username = "";
+							$window.localStorage.setItem("loggedin", false);
+							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+
+						}
+					}
+			);
+		};
+		$scope.setPage = function () {
+
+			$log.debug("setPagecunt" +  $scope.nextpage);
+			$location.path('/viewallblogs/'+ $scope.prevpage);
+		};
+		$scope.setPrevPage = function () {
+
+			$log.debug("setPrev" +  $scope.prevpage);
+			if(($scope.prevpage) === 0) {
+				$log.debug("0 matched" );
+				$location.path('/viewallblogs');
+			} else {
+				$log.debug("not matched" );
+				$location.path('/viewallblogs/'+ $scope.prevpage);
 			}
-		);
-	};
-    $scope.addYourAnswer = function (answer) {
-		$log.debug(answer);
-		$log.debug("=====" + $cookies['token']);
-		$log.debug("Add Answers...");
-		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-        var postData =  $http.post('rest/answers/'+$scope.questionid, answer);
-         postData.success(function (data) {
-        	 $log.debug(data);
-        	 $log.debug("Add Answers Success change the path...");
-        	 $route.reload();
-        	 $location.path('/viewdetailblog/' + $scope.questionid);
-         })
-         .error(function (data) {
-        	 $log.debug(data);
-         });
-    };
-    $scope.setPage = function () {
-    	
-    	$log.debug("setPagecunt" +  $scope.nextpage);
-    	$location.path('/viewallblogs/'+ $scope.prevpage);
-    	    };
-    $scope.setPrevPage = function () {
-    	    	
-    	    	$log.debug("setPrev" +  $scope.prevpage);
-    	    	if(($scope.prevpage) === 0) {
-    	    		$log.debug("0 matched" );
-    	    		$location.path('/viewallblogs');
-    	    	} else {
-    	    		$log.debug("not matched" );
-    	    		$location.path('/viewallblogs/'+ $scope.prevpage);
-    	    	}
-    	    	
-    	    	    };
-    $scope.openQCommentsForm = function() {
-    	    			ngDialog.openConfirm({template: 'comments.html',
-    	    			  scope: $scope //Pass the scope object if you need to access in the template
-    	    			}).then(
-    	    				function(value) {
-    	    					//save the contact form
-    	    					$log.debug(value);
-    	    					var comment= {
-    	    							"text": value
-    	    					};
-    	    					$scope.postQComment(comment);
-    	    					
-    	    				},
-    	    				function(value) {
-    	    					//Cancel or do nothing
-    	    				}
-    	    			);
-    	    		};
-  
-  $scope.postQComment = function(comment){
-    	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
-    	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 
-        	    	         $http.put('rest/questions/'+$scope.questionid +"/comments" , comment)
-    	    	         .then(
-    	    	         	       function(response){
-    	    	         	    	  $log.debug(response.data);
-    	     	    	        	 //$route.reload();
-    	    	         	       	  if(response.status == 200) {
-					 	$scope.currentquestion = response.data;
-						console.log("posting the question " );
-					  } else if(response.status == 401) {
-                                        	$log.debug("ERROR..." );
-						 $cookies['token'] = "";
-						$scope.username = "";
-                                                         $window.localStorage.setItem("loggedin", false);
-                                                         $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+		};
+		$scope.openQCommentsForm = function() {
+			ngDialog.openConfirm({template: 'comments.html',
+				scope: $scope //Pass the scope object if you need to access in the template
+			}).then(
+					function(value) {
+						//save the contact form
+						$log.debug(value);
+						var comment= {
+								"text": value
+						};
+						$scope.postQComment(comment);
 
-                                          }
-    	     	    	        	 //$location.path('/viewdetailblog/' + $scope.questionid);
-    	     	    	        	 
-    	    	         	         }
-    	    	         	      );
-    	    	    };
-    	    		
-    	    		$scope.openACommentsForm = function(ans) {
-    	    			ngDialog.openConfirm({template: 'comments.html',
-    	    			  scope: $scope //Pass the scope object if you need to access in the template
-    	    			}).then(
-    	    				function(value) {
-    	    					//save the contact form
-    	    					$log.debug("comment is:" + value);
-    	    					$log.debug("answer id: " + ans.id);
-    	    					var comment= {
-    	    							"text": value
-    	    					};
-    	    					$scope.postAComment(comment, ans.id);
-    	    					
-    	    				},
-    	    				function(value) {
-    	    					//Cancel or do nothing
-    	    				}
-    	    			);
-    	    		};
-    	    		
-    	    		$scope.postAComment = function(comment, ansid){
-    	    	    	$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
-    	    			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-    	    	         var postData =  $http.post('rest/answers/'+ansid +"/comments" , comment);
-    	    	         postData.success(function (data) {
-    	    	        	 $log.debug(data);
-    	    	        	 $route.reload();
-    	    	        	 $location.path('/viewdetailblog/' + $scope.questionid);    	    	        	 
-    	    	         })
-    	    	         .error(function (data) {
-    	    	        	 $log.debug("ERROR..." + comment);
-    	    	        	 $log.debug(data);
-    	    	         });
-    	    	    };
-    	    		
-    	    		
+					},
+					function(value) {
+						//Cancel or do nothing
+					}
+			);
+		};
+
+		$scope.postQComment = function(comment){
+			$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+
+			$http.put('rest/questions/'+$scope.questionid +"/comments" , comment)
+			.then(
+					function(response){
+						$log.debug(response.data);
+						//$route.reload();
+						if(response.status == 200) {
+							$scope.currentquestion = response.data;
+							console.log("posting the question " );
+						} else if(response.status == 401) {
+							$log.debug("ERROR..." );
+							$cookies['token'] = "";
+							$scope.username = "";
+							$window.localStorage.setItem("loggedin", false);
+							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+
+						}
+						//$location.path('/viewdetailblog/' + $scope.questionid);
+
+					}
+			);
+		};
+
+		$scope.openACommentsForm = function(ans) {
+			ngDialog.openConfirm({template: 'comments.html',
+				scope: $scope //Pass the scope object if you need to access in the template
+			}).then(
+					function(value) {
+						//save the contact form
+						$log.debug("comment is:" + value);
+						$log.debug("answer id: " + ans.id);
+						var comment= {
+								"text": value
+						};
+						$scope.postAComment(comment, ans.id);
+
+					},
+					function(value) {
+						//Cancel or do nothing
+					}
+			);
+		};
+
+		$scope.postAComment = function(comment, ansid){
+			$log.debug("edit blog=" + comment + "=== token " + $cookies['token']);
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+			var postData =  $http.post('rest/answers/'+ansid +"/comments" , comment);
+			postData.success(function (data) {
+				$log.debug(data);
+				$route.reload();
+				$location.path('/viewdetailblog/' + $scope.questionid);    	    	        	 
+			})
+			.error(function (data) {
+				$log.debug("ERROR..." + comment);
+				$log.debug(data);
+			});
+		};
+
+
 
 	});
-	
+
+//	===========================================================================================	
+
 	app.controller('BlogController',function($http, $log, $scope,$window, $location,$rootScope,$cookies, $routeParams){
-				var controller = this;
-                $scope.maxLengthPerPage=5;
+		var controller = this;
+		$scope.maxLengthPerPage=5;
 		$rootScope.blogLength;
 		$scope.loading = true;
 		$scope.shownext = false;
 		$scope.showprev = false;
-			
+
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	 	//console.log("Getting Blogs token=========" + $log + " " + $rootScope + " "  + $location + " "  + $routeParams.id  );
-    	
+		//console.log("Getting Blogs token=========" + $log + " " + $rootScope + " "  + $location + " "  + $routeParams.id  );
+
 		if($routeParams.id == undefined  ) {
 			$http({ method: 'GET',
-                               url:'rest/questions/length' 
+				url:'rest/questions/length' 
 			}).then(function(response) {
 				console.log("got length " + response.data); 
 				$rootScope.blogLength = (parseInt(response.data)) ;
@@ -441,27 +446,27 @@
 			$scope.blogCurrentOffset = $routeParams.id * $scope.maxLengthPerPage;
 			$scope.blogCurrentLength = $scope.maxLengthPerPage;
 			if ( ($rootScope.blogLength - $scope.blogCurrentOffset )    <  $scope.maxLengthPerPage) {
-					$scope.blogCurrentLength = $rootScope.blogLength;
-				} else {
-					$scope.blogCurrentLength = $scope.maxLengthPerPage;
-				}
-					console.log("id is  "+ $routeParams.id + " " + $scope.blogCurrentOffset + " " + $scope.blogCurrentLength  );
+				$scope.blogCurrentLength = $rootScope.blogLength;
+			} else {
+				$scope.blogCurrentLength = $scope.maxLengthPerPage;
+			}
+			console.log("id is  "+ $routeParams.id + " " + $scope.blogCurrentOffset + " " + $scope.blogCurrentLength  );
 			console.log("length  is " + $scope.blogLength); 
 			$http({
-		    		method: 'GET',
-		    		url: 'rest/questions',
-		    		params: {
-		    			offset : $scope.blogCurrentOffset ,
-		    			length : $scope.blogCurrentLength 
-		    		}
+				method: 'GET',
+				url: 'rest/questions',
+				params: {
+					offset : $scope.blogCurrentOffset ,
+					length : $scope.blogCurrentLength 
+				}
 			}).then(function(response) {
-		    		console.log("received  successfully" + response.status);
-		    		$scope.count= response.data.length;
-	            		$scope.blogs = response.data;
+				console.log("received  successfully" + response.status);
+				$scope.count= response.data.length;
+				$scope.blogs = response.data;
 
 				if ($routeParams.id  != 0 ) {
 					$scope.showprev = true;
-					 $scope.prevpage =  (parseInt($routeParams.id))  - 1;
+					$scope.prevpage =  (parseInt($routeParams.id))  - 1;
 				}
 				if ( ($rootScope.blogLength - $scope.blogCurrentOffset )    >   $scope.maxLengthPerPage) {
 					$scope.shownext = true;
@@ -469,240 +474,243 @@
 				}			
 
 
-		}, function(response) {
-		    console.log("Error message");   
-		});
+			}, function(response) {
+				console.log("Error message");   
+			});
 
 
-		
+
 		}
 
-		
+
 		$scope.setnext = function() {
 			$http.get('rest/questions/length' ).
-			  success(function(length) {
-				  $scope.shownext= false;
-				  if(length != 0) {
-					  $scope.nextavail =  length - ($scope.offset + $scope.pagesize );
-					  $log.debug("Next Data:" + $scope.nextavail );
-					  if($scope.nextavail > 0) {
-						  $scope.shownext= true;
-				  }
-				  }
-			  }).
-			  error(function(response) {
-				  $scope.shownext= false;
-			  });
+			success(function(length) {
+				$scope.shownext= false;
+				if(length != 0) {
+					$scope.nextavail =  length - ($scope.offset + $scope.pagesize );
+					$log.debug("Next Data:" + $scope.nextavail );
+					if($scope.nextavail > 0) {
+						$scope.shownext= true;
+					}
+				}
+			}).
+			error(function(response) {
+				$scope.shownext= false;
+			});
 		}
-	
-	$scope.addBlog = function (data) {
-		$log.debug("Add Blogs..." + data + "=====" + $cookies['token']);
-		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
-       	$http.put('rest/questions', data)
-         .then(
-         	       function(response){
-         	    		$log.debug("Question added .."+ response.data.id);
-         	    		
-         	           	$location.path('/viewdetailblog/' + response.data.id);
-         	         }, 
-         	         function(response){
-         	        	 $log.debug("ERROR..." + response.status);  
-         	        	 if(response.status == 401) {
-         	        		 $log.debug("ERROR..." );
-         	        		 $cookies['token'] = "";
-         	        		 $scope.username = "";
-         	        		 $window.localStorage.setItem("loggedin", false);
-         	        		 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-         	            	
-         	        	 }
-         	         }
-         	      );
-    };
-$scope.setPage = function () {
-    	
-    	$log.debug("Change Path" +  $scope.nextpage);
-    	$location.path('/viewallblogs/'+ $scope.nextpage);
-    	
-    	    };
-   
-    	    $scope.setPrevPage = function () {
-    	    	$log.debug("setPrev" +  $scope.prevpage);
-    	    	if(($scope.prevpage) === 1) {
-    	    		$log.debug("1 matched" );
-    	    		$location.path('/viewallblogs');
-    	    	} else {
-    	    		$log.debug("not matched" );
-    	    		$location.path('/viewallblogs/'+ $scope.prevpage);
-    	    	}
-    	    	    };
-   $scope.showBlogDetails = function (id) {
-    	    	
-    	    	$log.debug("id" +  id);
-    	    	$location.path('/viewdetailblog/'+ id);
-    	    	    };
+
+		$scope.addBlog = function (data) {
+			$log.debug("Add Blogs..." + data + "=====" + $cookies['token']);
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+			$http.put('rest/questions', data)
+			.then(
+					function(response){
+						$log.debug("Question added .."+ response.data.id);
+
+						$location.path('/viewdetailblog/' + response.data.id);
+					}, 
+					function(response){
+						$log.debug("ERROR..." + response.status);  
+						if(response.status == 401) {
+							$log.debug("ERROR..." );
+							$cookies['token'] = "";
+							$scope.username = "";
+							$window.localStorage.setItem("loggedin", false);
+							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+
+						}
+					}
+			);
+		};
+		$scope.setPage = function () {
+
+			$log.debug("Change Path" +  $scope.nextpage);
+			$location.path('/viewallblogs/'+ $scope.nextpage);
+
+		};
+
+		$scope.setPrevPage = function () {
+			$log.debug("setPrev" +  $scope.prevpage);
+			if(($scope.prevpage) === 1) {
+				$log.debug("1 matched" );
+				$location.path('/viewallblogs');
+			} else {
+				$log.debug("not matched" );
+				$location.path('/viewallblogs/'+ $scope.prevpage);
+			}
+		};
+		$scope.showBlogDetails = function (id) {
+
+			$log.debug("id" +  id);
+			$location.path('/viewdetailblog/'+ id);
+		};
 
 	});
+
+
+//	======================================================================================================================================	
 	app.controller('searchCtrl',function($http, $log, $scope, $window, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
 		$scope.questions=[];
-	
+
 		$scope.count= 0;
 		$scope.loading = true;
 		$scope.shownext = false;
 		$scope.showprev = false;
-		 $scope.searchkey = "";
+		$scope.searchkey = "";
 		$scope.lastDataPoint = $scope.pagesize;
 		$scope.pagesize= 5;
 		$scope.offset = 0;
 		$scope.prevpage = 1;
-		
-		 $scope.startpage = 0;
-		
+
+		$scope.startpage = 0;
+
 		$log.debug("Getting Search Blogs..." + $rootScope.loginstatus);
 		$log.debug("Getting Blogs..." + $window.localStorage.getItem("currentUser"));
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-    	 console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-    	
+		console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
+
 		if($routeParams.searchkey == undefined || $routeParams.searchkey == "") {
 			//$location.path('/viewallblogs/');
 		} else {
-				if($routeParams.id == undefined) {
+			if($routeParams.id == undefined) {
 				$scope.showprev = false;
 				$scope.nextpage = 2;
 				$scope.foundnext = false;
 				$scope.offset = 0;
 				$scope.prevpage = 0;
-					} else {
-				
+			} else {
+
 				$scope.nextpage = (parseInt( $routeParams.id) + 1);
 				$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
 				$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
 			}
 			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
 			console.log("printing key=" + $scope.searchkey); 
-			
-		$http({
-		    method: 'POST',
-		    url: 'rest/questions/search',
-		    data:  $scope.searchkey,
-		    headers: {
-	        	  'Content-Type': 'text/plain'
-	            
-	          },
-		    params: {
-		    	offset : $scope.offset,
-		    	length : $scope.pagesize
-		    }
-		}).then(function(response) {
-		    console.log("search successfully" + response.status);
-		    $scope.questions = response.data;
-            $scope.searchcontact = {};
-            $scope.setnext();
-        
-        if($routeParams.id == undefined) {
-      	  $scope.showprev = false;
-        } else {
-      	  $scope.showprev = true;
-        }
-		   
-		}, function(response) {
-		    console.log("Search Error message");   
-		});
+
+			$http({
+				method: 'POST',
+				url: 'rest/questions/search',
+				data:  $scope.searchkey,
+				headers: {
+					'Content-Type': 'text/plain'
+
+				},
+				params: {
+					offset : $scope.offset,
+					length : $scope.pagesize
+				}
+			}).then(function(response) {
+				console.log("search successfully" + response.status);
+				$scope.questions = response.data;
+				$scope.searchcontact = {};
+				$scope.setnext();
+
+				if($routeParams.id == undefined) {
+					$scope.showprev = false;
+				} else {
+					$scope.showprev = true;
+				}
+
+			}, function(response) {
+				console.log("Search Error message");   
+			});
 		}
-		
+
 		$scope.setnext = function() {
 			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
 			console.log("Search key=" + $routeParams.searchkey);
 			$http({
-			    method: 'POST',
-			    url: 'rest/questions/search/length',
-			    data:  $routeParams.searchkey ,
-			    headers: {
-		        	  'Content-Type': 'text/plain'
-		            
-		          }
+				method: 'POST',
+				url: 'rest/questions/search/length',
+				data:  $routeParams.searchkey ,
+				headers: {
+					'Content-Type': 'text/plain'
+
+				}
 			}).success(function(length) {
-				 console.log("Search leng" + length);
-				 $scope.shownext= false;
-				  if(length != 0) {
-					  $scope.nextavail =  length - ($scope.offset + $scope.pagesize );
-					  $log.debug("Next Search :" + $scope.nextavail );
-					  if($scope.nextavail > 0) {
-						  $scope.shownext= true;
-				  }
-				  }
-			   
+				console.log("Search leng" + length);
+				$scope.shownext= false;
+				if(length != 0) {
+					$scope.nextavail =  length - ($scope.offset + $scope.pagesize );
+					$log.debug("Next Search :" + $scope.nextavail );
+					if($scope.nextavail > 0) {
+						$scope.shownext= true;
+					}
+				}
+
 			}).error(function(response) {
-			    console.log("Search Error message");   
-			    $scope.shownext= false;
+				console.log("Search Error message");   
+				$scope.shownext= false;
 			});
-		
+
 		}
 		$scope.getnextsearchresult = function() {
 			$scope.offset = $scope.offset + 1;
 			$scope.url = 'rest/questions/search/'+$scope.offset +"-"+$scope.pagesize;
 			$log.debug("Getting next Search results for..." + $routeParams.searchkey + "-" + $scope.url);
 			$http({
-		          method: 'POST', 
-		          url: $scope.url,
-		          data:  $routeParams.searchkey,
-		          headers: {
-		        	  'Content-Type': 'text/plain'
-		            
-		          },
-		        }).
-		        success(function(data, status, headers) {
-		        	if(data.length != 0) {
-						  $log.debug("Next Data:" + data.length);
-						
-						  $scope.shownext= true;
-					  } else {
-						  $log.debug("No Next Data:" + data.length);
-						  $scope.foundnext = true;
-						  $scope.shownext= false;
-					  }
-		        }).
-		        error(function(data, status) {
-		        	$scope.shownext= false;
-		          if (status == 401) {
-		        	  
-		            notify('Forbidden', 'Authentication required to create new resource.');
-		          } else if (status == 403) {
-		            notify('Forbidden', 'You are not allowed to create new resource.');
-		          } else {
-		            notify('Failed '+ status + data);
-		          }
-		        });
-			
-			
+				method: 'POST', 
+				url: $scope.url,
+				data:  $routeParams.searchkey,
+				headers: {
+					'Content-Type': 'text/plain'
+
+				},
+			}).
+			success(function(data, status, headers) {
+				if(data.length != 0) {
+					$log.debug("Next Data:" + data.length);
+
+					$scope.shownext= true;
+				} else {
+					$log.debug("No Next Data:" + data.length);
+					$scope.foundnext = true;
+					$scope.shownext= false;
+				}
+			}).
+			error(function(data, status) {
+				$scope.shownext= false;
+				if (status == 401) {
+
+					notify('Forbidden', 'Authentication required to create new resource.');
+				} else if (status == 403) {
+					notify('Forbidden', 'You are not allowed to create new resource.');
+				} else {
+					notify('Failed '+ status + data);
+				}
+			});
+
+
 		}
 		$scope.showsearchresult = function(searchkey) {
 			$location.path('/viewallblogs/tagged/'+ searchkey);
 		}
-         
-	
-$scope.setPage = function () {
-    	
-    	$log.debug("Change Path" +  $scope.nextpage);
-    	$location.path('/viewallblogs/tagged/'+ $scope.searchkey+ "/" + $scope.nextpage );
-    	
-    	    };
-   
-    	    $scope.setPrevPage = function () {
-    	    	$log.debug("setPrev" +  $scope.prevpage);
-    	    	if(($scope.prevpage) === 1) {
-    	    		$log.debug("1 matched" );
-    	    		$location.path('/viewallblogs/tagged/'+ $scope.searchkey);
-    	    	} else {
-    	    		$log.debug("not matched" );
-    	    		$location.path('/viewallblogs/tagged/'+ $scope.searchkey + "/" + $scope.prevpage);
-    	    	}
-    	    	    };
-   $scope.showBlogDetails = function (id) {
-    	    	
-    	    	$log.debug("id" +  id);
-    	    	$location.path('/viewdetailblog/'+ id);
-    	    	  };
+
+
+		$scope.setPage = function () {
+
+			$log.debug("Change Path" +  $scope.nextpage);
+			$location.path('/viewallblogs/tagged/'+ $scope.searchkey+ "/" + $scope.nextpage );
+
+		};
+
+		$scope.setPrevPage = function () {
+			$log.debug("setPrev" +  $scope.prevpage);
+			if(($scope.prevpage) === 1) {
+				$log.debug("1 matched" );
+				$location.path('/viewallblogs/tagged/'+ $scope.searchkey);
+			} else {
+				$log.debug("not matched" );
+				$location.path('/viewallblogs/tagged/'+ $scope.searchkey + "/" + $scope.prevpage);
+			}
+		};
+		$scope.showBlogDetails = function (id) {
+
+			$log.debug("id" +  id);
+			$location.path('/viewdetailblog/'+ id);
+		};
 
 	})
 })();
