@@ -321,6 +321,7 @@
 			);
 		};
 		
+
 		$scope.addYourAnswer = function (answer) {
 			$log.debug(answer);
 			$log.debug("=====" + $cookies['token']);
@@ -365,8 +366,46 @@
 				$log.debug("not matched" );
 				$location.path('/viewallblogs/'+ $scope.prevpage);
 			}
-
 		};
+    
+    $scope.questionUpvote = function() {
+    	$log.debug("=== token " + $cookies['token']);
+		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+	    $http.post('rest/questions/'+$scope.questionid +"/vote_up")
+         .then(function(response){
+        	 $log.debug(response.data);
+	    	        	 // $route.reload();
+         	 if(response.status == 200) {
+         		 $scope.currentquestion.totalVotes = response.data;
+         	 } else if(response.status == 401) {
+         		 $log.debug("ERROR..." );
+         		 $cookies['token'] = "";
+         		 $scope.username = "";
+                 $window.localStorage.setItem("loggedin", false);
+                 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+             }
+         });
+	};
+	
+	$scope.questionDownvote = function() {
+    	$log.debug("=== token " + $cookies['token']);
+		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+	    $http.post('rest/questions/'+$scope.questionid +"/vote_down")
+         .then(function(response){
+        	 $log.debug(response.data);
+	    	        	 // $route.reload();
+         	 if(response.status == 200) {
+         		 $scope.currentquestion.totalVotes = response.data;
+         	 } else if(response.status == 401) {
+         		 $log.debug("ERROR..." );
+         		 $cookies['token'] = "";
+         		 $scope.username = "";
+                 $window.localStorage.setItem("loggedin", false);
+                 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+             }
+         });
+	};
+    
 		$scope.openQCommentsForm = function() {
 			ngDialog.openConfirm({template: 'comments.html',
 				scope: $scope //Pass the scope object if you need to access in the template
