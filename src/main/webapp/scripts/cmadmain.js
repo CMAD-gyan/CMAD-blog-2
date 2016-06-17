@@ -149,8 +149,6 @@
 
 		}
 	});
-
-//	=========================================================================================================================================================================	
 	app.controller('detailBlogController',function($http, $log, $scope, $window, $route, $location,$rootScope, $cookies, $routeParams, ngDialog){
 		var controller = this;
 		$scope.question=[];
@@ -171,6 +169,10 @@
 		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
 			$log.debug("detail blog="+ response.data);
 			$scope.currentquestion = response.data;
+
+			/* $log.debug("detail blog="+ $scope.currentquestion.username + "-" + $scope.currentquestion.title);
+			  $log.debug("Successful data retrieved:" +   $scope.currentquestion.answers.length);
+			 */ 
 			if($scope.currentquestion.answers != undefined && $scope.currentquestion.answers.length > 0) {
 				$scope.showanswers = true;
 			} else {
@@ -254,8 +256,10 @@
 					}
 			);
 		};
+
 		$scope.updateBlog = function(data) {
 			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+
 			$http.put('rest/questions', data)
 			.then(
 					function(response){
@@ -272,9 +276,30 @@
 							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
 						}
+						//$location.path('/viewdetailblog/' + $scope.questionid);
+
 					}
 			);
 
+		};
+
+		$scope.questionUpvote = function() {
+			$log.debug("=== token " + $cookies['token']);
+			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+			$http.post('rest/questions/'+$scope.questionid +"/vote_up")
+			.then(function(response){
+				$log.debug(response.data);
+				// $route.reload();
+				if(response.status == 200) {
+					$scope.currentquestion.totalVotes = response.data;
+				} else if(response.status == 401) {
+					$log.debug("ERROR..." );
+					$cookies['token'] = "";
+					$scope.username = "";
+					$window.localStorage.setItem("loggedin", false);
+					$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+				}
+			});
 		};
 
 		$scope.openQAnswerForm = function() {
@@ -295,10 +320,12 @@
 					}
 			);
 		};
+		
 		$scope.addYourAnswer = function (answer) {
 			$log.debug(answer);
 			$log.debug("=====" + $cookies['token']);
 			$log.debug("Add Answers...");
+		
 			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 			$http.put('rest/answers/'+$scope.questionid, answer)
 			.then(
@@ -316,14 +343,18 @@
 							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
 						}
+						//$location.path('/viewdetailblog/' + $scope.questionid);
+
 					}
 			);
 		};
+		
 		$scope.setPage = function () {
 
 			$log.debug("setPagecunt" +  $scope.nextpage);
 			$location.path('/viewallblogs/'+ $scope.prevpage);
 		};
+
 		$scope.setPrevPage = function () {
 
 			$log.debug("setPrev" +  $scope.prevpage);
@@ -347,7 +378,6 @@
 								"text": value
 						};
 						$scope.postQComment(comment);
-
 					},
 					function(value) {
 						//Cancel or do nothing
@@ -420,8 +450,6 @@
 
 	});
 
-//	===========================================================================================	
-
 	app.controller('BlogController',function($http, $log, $scope,$window, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
 		$scope.maxLengthPerPage=5;
@@ -477,11 +505,7 @@
 			}, function(response) {
 				console.log("Error message");   
 			});
-
-
-
 		}
-
 
 		$scope.setnext = function() {
 			$http.get('rest/questions/length' ).
@@ -547,9 +571,6 @@
 		};
 
 	});
-
-
-//	======================================================================================================================================	
 	app.controller('searchCtrl',function($http, $log, $scope, $window, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
 		$scope.questions=[];
