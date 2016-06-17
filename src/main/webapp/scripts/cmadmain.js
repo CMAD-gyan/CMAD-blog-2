@@ -256,6 +256,7 @@
 				}
 			);
 		};
+		
 	$scope.updateBlog = function(data) {
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 
@@ -281,6 +282,25 @@
         	      );
         
     };
+    
+    $scope.questionUpvote = function() {
+    	$log.debug("=== token " + $cookies['token']);
+		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+	    $http.post('rest/questions/'+$scope.questionid +"/vote_up")
+         .then(function(response){
+        	 $log.debug(response.data);
+	    	        	 // $route.reload();
+         	 if(response.status == 200) {
+         		 $scope.currentquestion.totalVotes = response.data;
+         	 } else if(response.status == 401) {
+         		 $log.debug("ERROR..." );
+         		 $cookies['token'] = "";
+         		 $scope.username = "";
+                 $window.localStorage.setItem("loggedin", false);
+                 $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+             }
+         });
+	};
     
     $scope.openQAnswerForm = function() {
     	$log.debug('answer.html');
