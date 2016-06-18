@@ -277,6 +277,8 @@
 							$window.localStorage.setItem("loggedin", false);
 							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
+						} else {
+							console.log("Comment posted respomse was " + response.status  );
 						}
 						//$location.path('/viewdetailblog/' + $scope.questionid);
 
@@ -300,6 +302,8 @@
 					$scope.username = "";
 					$window.localStorage.setItem("loggedin", false);
 					$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+				} else {
+					console.log("Comment posted respomse was " + response.status  );
 				}
 			});
 		};
@@ -345,6 +349,8 @@
 							$window.localStorage.setItem("loggedin", false);
 							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
+						}  else {
+							console.log("Comment posted respomse was " + response.status  );
 						}
 					}
 			);
@@ -383,7 +389,9 @@
          		 $scope.username = "";
                  $window.localStorage.setItem("loggedin", false);
                  $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-             }
+             } else {
+					console.log("Comment posted respomse was " + response.status  );
+				}
          });
 	};
 	
@@ -442,6 +450,8 @@
 							$window.localStorage.setItem("loggedin", false);
 							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
+						} else {
+							console.log("Comment posted respomse was " + response.status  );
 						}
 						//$location.path('/viewdetailblog/' + $scope.questionid);
 					}
@@ -486,6 +496,8 @@
 					$window.localStorage.setItem("loggedin", false);
 					$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 
+				} else {
+					console.log("Comment posted respomse was " + response.status  );
 				}
 				//$location.path('/viewdetailblog/' + $scope.questionid);
 			});
