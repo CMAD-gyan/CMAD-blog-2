@@ -56,17 +56,6 @@
 		var controller = this;
 		$scope.users=[];
 		$scope.loading = true;
-		$log.debug("Getting users..." + $window.localStorage.getItem("loggedin"));
-		/*$http.get('rest/users').
-		  success(function(data, status, headers, config) {
-			  $scope.users = data;
-			  $scope.loading = false;
-		  }).
-		  error(function(data, status, headers, config) {
-			  $scope.loading = false;
-			  $scope.error = status;
-		  });
-		 */
 		$scope.getUserOnLogin = function(user) {
 			$log.debug(user);
 			$scope.showEditForm=false;
@@ -77,6 +66,7 @@
 				console.log("Success");
 				$log.debug(data);
 				$cookies['token'] = data;
+				$cookies['username'] = user.username;
 				$window.localStorage.setItem("currentUser", user.username);
 				$window.localStorage.setItem("loggedin", true);
 				console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
@@ -514,7 +504,7 @@
 		$scope.showprev = false;
 
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-		//console.log("Getting Blogs token=========" + $log + " " + $rootScope + " "  + $location + " "  + $routeParams.id  );
+		console.log("Getting Blogs token=========" + $log + " " + $rootScope + " "  + $location + " "  + $routeParams.id  );
 
 		if($routeParams.id == undefined  ) {
 			$http({ method: 'GET',
@@ -522,11 +512,11 @@
 			}).then(function(response) {
 				console.log("got length " + response.data); 
 				$rootScope.blogLength = (parseInt(response.data)) ;
-				$routeParams.id = 0;
+				$routeParams.id = 1;
 				$location.path('/viewallblogs/'+ $routeParams.id);
 			})
 		} else 	if($routeParams.id != undefined  ) {
-			$scope.blogCurrentOffset = $routeParams.id * $scope.maxLengthPerPage;
+			$scope.blogCurrentOffset = ($routeParams.id-1) * $scope.maxLengthPerPage;
 			$scope.blogCurrentLength = $scope.maxLengthPerPage;
 			if ( ($rootScope.blogLength - $scope.blogCurrentOffset )    <  $scope.maxLengthPerPage) {
 				$scope.blogCurrentLength = $rootScope.blogLength;
@@ -547,7 +537,7 @@
 				$scope.count= response.data.length;
 				$scope.blogs = response.data;
 
-				if ($routeParams.id  != 0 ) {
+				if ($routeParams.id  > 1 ) {
 					$scope.showprev = true;
 					$scope.prevpage =  (parseInt($routeParams.id))  - 1;
 				}
@@ -559,23 +549,6 @@
 
 			}, function(response) {
 				console.log("Error message");   
-			});
-		}
-
-		$scope.setnext = function() {
-			$http.get('rest/questions/length' ).
-			success(function(length) {
-				$scope.shownext= false;
-				if(length != 0) {
-					$scope.nextavail =  length - ($scope.offset + $scope.pagesize );
-					$log.debug("Next Data:" + $scope.nextavail );
-					if($scope.nextavail > 0) {
-						$scope.shownext= true;
-					}
-				}
-			}).
-			error(function(response) {
-				$scope.shownext= false;
 			});
 		}
 
@@ -629,137 +602,98 @@
 	app.controller('searchCtrl',function($http, $log, $scope, $window, $location,$rootScope,$cookies, $routeParams){
 		var controller = this;
 		$scope.questions=[];
-
+		$scope.maxLengthPerPage =5;
+		$rootScope.quesLength;
 		$scope.count= 0;
 		$scope.loading = true;
 		$scope.shownext = false;
 		$scope.showprev = false;
 		$scope.searchkey = "";
-		$scope.lastDataPoint = $scope.pagesize;
-		$scope.pagesize= 5;
-		$scope.offset = 0;
+		
 		$scope.prevpage = 1;
 
-		$scope.startpage = 0;
-
-		$log.debug("Getting Search Blogs..." + $rootScope.loginstatus);
-		$log.debug("Getting Blogs..." + $window.localStorage.getItem("currentUser"));
+		$log.debug("Getting  Search Results..." + $rootScope.loginstatus);
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 		console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
 
 		if($routeParams.searchkey == undefined || $routeParams.searchkey == "") {
-			//$location.path('/viewallblogs/');
+			// DO Nothing
 		} else {
 			if($routeParams.id == undefined) {
 				$scope.showprev = false;
 				$scope.nextpage = 2;
-				$scope.foundnext = false;
-				$scope.offset = 0;
 				$scope.prevpage = 0;
-			} else {
+				$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
+				console.log("Search key=" + $scope.searchkey);
+				$http({
+					method: 'POST',
+					url: 'rest/questions/search/length',
+					data:  $scope.searchkey ,
+					headers: {
+						'Content-Type': 'text/plain'
 
-				$scope.nextpage = (parseInt( $routeParams.id) + 1);
-				$scope.offset = (parseInt( $routeParams.id) -1) * $scope.pagesize;
-				$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
-			}
-			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
-			console.log("printing key=" + $scope.searchkey); 
-
-			$http({
-				method: 'POST',
-				url: 'rest/questions/search',
-				data:  $scope.searchkey,
-				headers: {
-					'Content-Type': 'text/plain'
-
-				},
-				params: {
-					offset : $scope.offset,
-					length : $scope.pagesize
-				}
-			}).then(function(response) {
-				console.log("search successfully" + response.status);
-				$scope.questions = response.data;
-				$scope.searchcontact = {};
-				$scope.setnext();
-
-				if($routeParams.id == undefined) {
-					$scope.showprev = false;
-				} else {
-					$scope.showprev = true;
-				}
-
-			}, function(response) {
-				console.log("Search Error message");   
-			});
-		}
-
-		$scope.setnext = function() {
-			$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
-			console.log("Search key=" + $routeParams.searchkey);
-			$http({
-				method: 'POST',
-				url: 'rest/questions/search/length',
-				data:  $routeParams.searchkey ,
-				headers: {
-					'Content-Type': 'text/plain'
-
-				}
-			}).success(function(length) {
-				console.log("Search leng" + length);
-				$scope.shownext= false;
-				if(length != 0) {
-					$scope.nextavail =  length - ($scope.offset + $scope.pagesize );
-					$log.debug("Next Search :" + $scope.nextavail );
-					if($scope.nextavail > 0) {
-						$scope.shownext= true;
 					}
-				}
+				}).success(function(response) {
+					$rootScope.quesLength = (parseInt(response)) ;
+					
+					console.log(response + "Search length" + $rootScope.quesLength);
+					$routeParams.id = 1;
+					$location.path('/viewallblogs/tagged/'+ $routeParams.searchkey+ "/" + $routeParams.id );
 
-			}).error(function(response) {
-				console.log("Search Error message");   
-				$scope.shownext= false;
-			});
-
-		}
-		$scope.getnextsearchresult = function() {
-			$scope.offset = $scope.offset + 1;
-			$scope.url = 'rest/questions/search/'+$scope.offset +"-"+$scope.pagesize;
-			$log.debug("Getting next Search results for..." + $routeParams.searchkey + "-" + $scope.url);
-			$http({
-				method: 'POST', 
-				url: $scope.url,
-				data:  $routeParams.searchkey,
-				headers: {
-					'Content-Type': 'text/plain'
-
-				},
-			}).
-			success(function(data, status, headers) {
-				if(data.length != 0) {
-					$log.debug("Next Data:" + data.length);
-
-					$scope.shownext= true;
-				} else {
-					$log.debug("No Next Data:" + data.length);
-					$scope.foundnext = true;
+				}).error(function(response) {
+					console.log("Search Error message");   
 					$scope.shownext= false;
-				}
-			}).
-			error(function(data, status) {
-				$scope.shownext= false;
-				if (status == 401) {
-
-					notify('Forbidden', 'Authentication required to create new resource.');
-				} else if (status == 403) {
-					notify('Forbidden', 'You are not allowed to create new resource.');
+				});
+			} else if($routeParams.id != undefined  ) {
+				$scope.blogCurrentOffset = ($routeParams.id-1) * $scope.maxLengthPerPage;
+				$scope.blogCurrentLength = $scope.maxLengthPerPage;
+				if ( ($rootScope.quesLength - $scope.blogCurrentOffset )    <  $scope.maxLengthPerPage) {
+					$scope.blogCurrentLength = $rootScope.quesLength;
 				} else {
-					notify('Failed '+ status + data);
+					$scope.blogCurrentLength = $scope.maxLengthPerPage;
 				}
-			});
+				console.log("route id is  "+ $routeParams.id + " " + $scope.blogCurrentOffset + " " + $scope.blogCurrentLength  );
+				console.log("ques length  is " + $rootScope.quesLength); 
+				$scope.nextpage = (parseInt( $routeParams.id) + 1);
+				$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
+				$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
+				console.log("printing key=" + $scope.searchkey); 
+				$http({
+					method: 'POST',
+					url: 'rest/questions/search',
+					data:  $scope.searchkey,
+					headers: {
+						'Content-Type': 'text/plain'
 
+					},
+					params: {
+						offset : $scope.blogCurrentOffset,
+						length : $scope.blogCurrentLength
+					}
+				}).then(function(response) {
+					console.log("searched successfully" + response.status);
+
+					$scope.count= response.data.length;
+					$scope.questions = response.data;
+
+					if ($routeParams.id  > 1 ) {
+						$scope.showprev = true;
+						$scope.prevpage =  (parseInt($routeParams.id))  - 1;
+					}
+					if ( ($rootScope.quesLength - $scope.blogCurrentOffset )    >   $scope.maxLengthPerPage) {
+						$scope.shownext = true;
+						$scope.nextpage = (parseInt($routeParams.id)) + 1;
+					}
+
+				}, function(response) {
+					console.log("Search Error message");   
+				});
+			}
+			
 
 		}
+
+		
 		$scope.showsearchresult = function(searchkey) {
 			$location.path('/viewallblogs/tagged/'+ searchkey);
 		}
@@ -767,8 +701,8 @@
 
 		$scope.setPage = function () {
 
-			$log.debug("Change Path" +  $scope.nextpage);
-			$location.path('/viewallblogs/tagged/'+ $scope.searchkey+ "/" + $scope.nextpage );
+			$log.debug("Change search Path" +  $routeParams.searchkey);
+			$location.path('/viewallblogs/tagged/'+ $routeParams.searchkey+ "/" + $scope.nextpage );
 
 		};
 
@@ -776,10 +710,10 @@
 			$log.debug("setPrev" +  $scope.prevpage);
 			if(($scope.prevpage) === 1) {
 				$log.debug("1 matched" );
-				$location.path('/viewallblogs/tagged/'+ $scope.searchkey);
+				$location.path('/viewallblogs/tagged/'+ $routeParams.searchkey);
 			} else {
 				$log.debug("not matched" );
-				$location.path('/viewallblogs/tagged/'+ $scope.searchkey + "/" + $scope.prevpage);
+				$location.path('/viewallblogs/tagged/'+ $routeParams.searchkey + "/" + $scope.prevpage);
 			}
 		};
 		$scope.showBlogDetails = function (id) {
