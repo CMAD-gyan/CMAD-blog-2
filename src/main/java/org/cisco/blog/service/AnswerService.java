@@ -38,7 +38,6 @@ public class AnswerService {
 		question.setVotes(null);
 	}
 	
-	
 	@PUT
 	@Secured
 	@Path("/{param}")
@@ -134,17 +133,12 @@ public class AnswerService {
 		fixQuestionDisplay(question);
 		return Response.status(Response.Status.OK).entity(question).build();
 	}
-	
 
-	
-//comments 
-//post & edit
 	@PUT
 	@Secured
 	@Path("/{param}/comments")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	
 	public Response postComment(Comment com, 
 			                @PathParam("param") String id,
 	        				@Context SecurityContext securityContext ) {
@@ -214,8 +208,8 @@ public class AnswerService {
 	@DELETE
 	@Secured
 	@Path("/{param}/comments")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String deleteComment(@PathParam("param") String id,
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteComment(@PathParam("param") String id,
 	        					@Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -226,98 +220,109 @@ public class AnswerService {
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		Answer anwser =  dataStore.get(Answer.class, oid);
 		
-		if (anwser != null) {
-			List <Comment> comment = anwser.getComments();
+		if (anwser == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		
+		List <Comment> comment = anwser.getComments();
 			
-			if (comment != null) { 
-				for (i = 0; i < comment.size(); i++) {
-					if (comment.get(i).getUsername().equals(username)) {
-						found = true;
-						break;
-					}
-				}
-				
-				if (found == true) {
-					comment.remove(i);
-					anwser.setComments(comment);
-					dataStore.save(anwser);
+		if (comment != null) { 
+			for (i = 0; i < comment.size(); i++) {
+				if (comment.get(i).getUsername().equals(username)) {
+					found = true;
+					break;
 				}
 			}
+			
+			if (found == true) {
+				comment.remove(i);
+				anwser.setComments(comment);
+				dataStore.save(anwser);
+			}
 		}
-		return "Ok";
+		
+		Question q = dataStore.createQuery(Question.class).field("answers").hasThisElement(anwser).get();
+		
+		if (q == null) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		fixQuestionDisplay(q);
+		return Response.status(Response.Status.OK).entity(q).build();
 	}
 
-
-	///Not tested ..........	
-	@POST
-	@Secured
-	@Path("/{param}/vote")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String postVote(Vote votein, @PathParam("param") String id,
-	        			 @Context SecurityContext securityContext ) {
+	private Response postVote(String id,
+			SecurityContext securityContext,
+			boolean upvote ) {	
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
-		
+
 		int i;
-		int j = 0;
 		int totalVote =0;
 		boolean found = false;
-		
+
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
-		if (votein.getVote() > 1 || votein.getVote() < -1 ){
-			throw new BadRequestException ("Invalid vote");
-		}
-		
+
 		Answer answer =  dataStore.get(Answer.class, oid);
-		
+
 		if (answer == null){
-			throw  new NotFoundException("Not found");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-	
+
 		List <Vote> votes = answer.getVotes();
-		
 
 		if (votes == null) 
 			votes = new ArrayList <Vote>();
-		
+
 		for (i = 0; i < votes.size(); i++) {
-			
 			if (votes.get(i).getUsername().equals(username)) {
+				votes.get(i).setVote( upvote ? 1 : -1);
+				answer.setVotes(votes);
 				found = true;
-				j=i;
 			}
 			totalVote +=  votes.get(i).getVote();
 		}
-		
-		totalVote += votein.getVote();
-		
-		answer.setTotalVotes(totalVote);
-		
-		if (found == true) {
-			votes.get(j).setVote( votein.getVote());
-			answer.setVotes(votes);
-		} else {
+
+		//if vote from new user
+		if (found == false) {
 			User user =  dataStore.find(User.class).field("username").equal(username).get();
-			Vote vote = new Vote(votein.getVote(), username,user); 
+			Vote vote = new Vote(upvote ? 1 : -1, username,user); 
 			votes.add(vote);
-			answer.setVotes(votes);
+			totalVote +=  vote.getVote();
 		}
-		
+
+		answer.setTotalVotes(totalVote);
 		dataStore.save(answer);
-		return "Ok";
+		answer.getUser().setPassword("xxxxxxx");
+		
+		return Response.status(Response.Status.OK).entity(totalVote).build();
 	}
-	
-	
-	
+
+	@POST
+	@Secured
+	@Path("/{param}/vote_down")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response postVoteDown(@PathParam("param") String id,
+			@Context SecurityContext securityContext ) {
+
+		return postVote(id, securityContext, false );
+
+	}
+
+	@POST
+	@Secured
+	@Path("/{param}/vote_up")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response postVoteUp(@PathParam("param") String id,
+			@Context SecurityContext securityContext ) {
+		return postVote(id, securityContext, true );
+	}
 }
