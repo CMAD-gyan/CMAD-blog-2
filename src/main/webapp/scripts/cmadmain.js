@@ -218,6 +218,7 @@
 			$scope.openDelConfirmForm();
 
 		}
+		
 		$scope.openDelConfirmForm = function() {
 
 			ngDialog.openConfirm({template: 'deleteform.html',
@@ -515,6 +516,38 @@ $scope.openEditAnswer = function(answerTxt) {
 				}
 				//$location.path('/viewdetailblog/' + $scope.questionid);
 			});
+		};
+		$scope.deleteanswer = function () {
+			$scope.openAnswerDelConfirmForm();
+
+		}
+		$scope.openAnswerDelConfirmForm = function() {
+
+			ngDialog.openConfirm({template: 'deleteform.html',
+				scope: $scope, //Pass the scope object if you need to access in the template,
+				className: 'ngdialog-theme-default custom-width-100'
+			}).then(
+					function(value) {
+						$log.debug("delete answernow =" + $scope.currentquestion.id + "===" + $cookies['token']);
+						$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
+
+						$http({ url: 'rest/answers/' +  $scope.currentquestion.id, 
+							method: 'DELETE'
+						}).then(function(response) {
+							console.log("del Successful" +response.data);
+							if(response.status == 200 || response.status == 201) {
+								$scope.currentquestion = response.data;
+							
+							}
+						}, function(error) {
+							console.log("del answer UnSuccessful" + error);
+						});
+
+					},
+					function(value) {
+						$log.debug("Dont delete answer=" + $scope.currentquestion.id);
+					}
+			);
 		};
 	});
 

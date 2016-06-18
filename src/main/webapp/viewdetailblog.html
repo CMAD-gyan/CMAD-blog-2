@@ -14,10 +14,10 @@
          <div ng-show="edittext" class="edit">
          <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="openEditQuestion()"></button>
 		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deletequestion()"></button>
-
- 		<button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click="questionDownvote()" style="float: right;"></button>
+ 		 </div>
+ 		 <button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click="questionDownvote()" style="float: right;"></button>
 		<button class="upvoteimage" data-toggle="tooltip" title="UpVote" type="button"  ng-click="questionUpvote()" style="float: right;"></button>
-         </div>
+        
           <br>  
           
         <div class= "addanswer">
@@ -38,7 +38,7 @@
   <div ng-repeat="answer in currentquestion.answers"  class="answersection" >
   <div ng-show="username == '{{answer.userName}}'" class="edit">
          <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="openEditAnswer(answer.text)"></button>
-		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deletequestion()"></button>
+		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deleteanswer()"></button>
 
  	  </div>
  	  <br>
