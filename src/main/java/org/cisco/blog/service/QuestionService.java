@@ -368,16 +368,16 @@ public class QuestionService {
 		if (question == null){
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-
+		
 		List <Vote> votes = question.getVotes();
 
+		
 		if (votes == null) 
 			votes = new ArrayList <Vote>();
 
 		for (i = 0; i < votes.size(); i++) {
 			if (votes.get(i).getUsername().equals(username)) {
 				votes.get(i).setVote( upvote ? 1 : -1);
-				question.setVotes(votes);
 				found = true;
 			}
 			totalVote +=  votes.get(i).getVote();
@@ -390,11 +390,11 @@ public class QuestionService {
 			votes.add(vote);
 			totalVote +=  vote.getVote();
 		}
-
+		
+		question.setVotes(votes);
 		question.setTotalVotes(totalVote);
 		dataStore.save(question);
-		fixQuestionDisplay(question);
-		return Response.status(Response.Status.OK).entity(totalVote).build();
+		return Response.status(Response.Status.OK).entity( String.valueOf(totalVote)  ).build();
 	}
 
 

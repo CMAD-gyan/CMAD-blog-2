@@ -40,7 +40,9 @@ public class Question {
 	private String username;
 	private int    totalVotes;
 	private int    viewCount;
+	
 	@Embedded
+	@Indexed
 	private List<Vote> votes;
 
 	@Embedded
