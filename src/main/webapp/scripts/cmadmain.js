@@ -49,6 +49,18 @@
 		})
 	});
 
+	app.config(['$httpProvider', function ($httpProvider,$location) {
+	    $httpProvider.interceptors.push(function ($q) {
+	        return {
+	            'responseError': function (rejection) {
+	            	if(rejection.status === 401) {
+	            		location.replace("#/login");
+	                }
+	                return $q.reject(rejection);
+	            }
+	        };
+	    });
+	}]);
 
 	app.controller('UserController',function($http, $log, $scope, $window, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
