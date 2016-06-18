@@ -98,13 +98,16 @@
 				$window.localStorage.setItem("currentUser", "");
 				$window.localStorage.setItem("loggedin", false);
 				console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
-
 				console.log("printing token=========");
 				$log.debug($cookies['token']);
 				$location.path("login");
 			})
 			.error(function (data) {
 				$log.debug("Logout failed");
+				$rootScope.loginstatus = false;
+				$cookies['token'] = "";
+				$window.localStorage.setItem("loggedin", false);
+				$window.localStorage.setItem("currentUser", "");
 				$log.debug(data);
 			});
 		};
