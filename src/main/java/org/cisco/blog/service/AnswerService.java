@@ -19,10 +19,25 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 import org.cisco.blog.model.*;
 
 @Path("/answers")
 public class AnswerService {
+	
+	private void fixQuestionDisplay(Question question)
+	{
+		question.getUser().setPassword("xxxxxxxxx");
+		for ( int i=0; i < question.getComments().size(); i++) {
+			question.getComments().get(i).getUser().setPassword("XXXXX");
+		}
+		
+		for ( int i=0; i < question.getAnswers().size(); i++) {
+			question.getAnswers().get(i).getUser().setPassword("XXXXX");
+		}
+		question.setVotes(null);
+	}
+	
 	
 	@PUT
 	@Secured
@@ -116,18 +131,21 @@ public class AnswerService {
 		if (answerOid != null) {
 			dataStore.delete(Answer.class, answerOid);
 		}
+		fixQuestionDisplay(question);
 		return Response.status(Response.Status.OK).entity(question).build();
 	}
 	
+
 	
 //comments 
 //post & edit
-	@POST
+	@PUT
 	@Secured
 	@Path("/{param}/comments")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String postComment(Comment com, 
+	@Produces(MediaType.APPLICATION_JSON)
+	
+	public Response postComment(Comment com, 
 			                @PathParam("param") String id,
 	        				@Context SecurityContext securityContext ) {
 		int i,j=0;
@@ -135,16 +153,20 @@ public class AnswerService {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		String username = securityContext.getUserPrincipal().getName();
 		ObjectId  oid = null;
+		
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
-			throw new BadRequestException ("OID passed is not okay");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
 		Answer ans =  dataStore.get(Answer.class, oid);
 		
+		//Question question =  dataStore.find(Question.class).field("title").equal(ques.getTitle()).get();
+		
+		
 		if (ans == null){
-			throw  new NotFoundException("Not found");
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	
 		List <Comment> comment = ans.getComments();
@@ -171,8 +193,21 @@ public class AnswerService {
 			comment.add(newComment);
 			ans.setComments(comment);
 		}
+		
+		
 		dataStore.save(ans);
-		return "Ok";
+		Question q = dataStore.createQuery(Question.class).field("answers").hasThisElement(ans).get();
+		
+		if (q == null) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		fixQuestionDisplay(q);
+		
+		if (update) {
+			return Response.status(Response.Status.OK).entity(q).build();
+		} else {
+			return Response.status(Response.Status.CREATED).entity(q).build();
+		}
 	}
 
 

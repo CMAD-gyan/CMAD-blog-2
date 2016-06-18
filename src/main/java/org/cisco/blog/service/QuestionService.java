@@ -397,10 +397,7 @@ private Response postVote(String id,
 	return Response.status(Response.Status.OK).entity(totalVote).build();
 }
 
-	
-	
-	
-///Not tested ..........	
+		
 	@POST
 	@Secured
 	@Path("/{param}/vote_down")
