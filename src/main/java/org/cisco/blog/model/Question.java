@@ -21,13 +21,13 @@ import org.mongodb.morphia.utils.IndexType;
 
 @Entity
 @Indexes({
-@Index(fields = @Field(value = "$**", type = IndexType.TEXT))
+	@Index(fields = @Field(value = "$**", type = IndexType.TEXT))
 })
 
 public class Question {
 	@Id
-    private ObjectId id;
-	
+	private ObjectId id;
+
 	@Indexed(value=IndexDirection.ASC, name="title", unique=true, dropDups=true)
 	private String title;
 	private String text;
@@ -35,18 +35,18 @@ public class Question {
 	private Timestamp createTime;
 	private Timestamp updateTime;
 
-@Reference	
+	@Reference	
 	private User   user;
 	private String username;
 	private int    totalVotes;
 	private int    viewCount;
-@Embedded
+	@Embedded
 	private List<Vote> votes;
 
-@Embedded
+	@Embedded
 	private List<Comment>  comments;
 
-@Reference
+	@Reference
 	private List<Answer>  answers;
 
 	public Question() {
@@ -56,7 +56,7 @@ public class Question {
 		this.totalVotes       = 0;
 		this.viewCount   = 0;		
 	}
-	
+
 	public Question(String title, String text, String username, User user) {
 		this.title = title;
 		this.text  = text;
@@ -71,89 +71,89 @@ public class Question {
 		this.totalVotes    = 0;
 		this.viewCount   = 0;
 	}
-	
+
 	public String getId(){
 		return this.id.toHexString();
 	}
-	
+
 	public String getTitle(){
 		return this.title;
 	}
-	
+
 	public void setTitle(String title){
 		this.title = title;
 	}
-	
+
 	public String getText(){
 		return this.text;
 	}
-	
+
 	public void setText(String text){
 		this.text = text;
 	}
-	
+
 	public Timestamp getCreateTime(){
 		return this.createTime;
 	}
-	
+
 	public void setCreateTime(Timestamp createTime){
 		this.createTime = createTime;
 	}
-	
+
 	public void setCreateTime(){
 		this.createTime = new Timestamp(System.currentTimeMillis());
 	}
-	
+
 	public Timestamp getUpdateTime(){
 		return this.updateTime;
 	}
-	
+
 	public void setUpdateTime(Timestamp updateTime){
 		this.updateTime = updateTime;
 	}
-	
+
 	public void setUpdateTime(){
 		this.updateTime = new Timestamp(System.currentTimeMillis());
 	}
-	
+
 	public String getUsername(){
 		return this.username;
 	}
-	
+
 	public void setUsername (String username){
 		this.username = username;
 	}
-	
+
 	public User getUser(){
 		return this.user;
 	}
-	
+
 	public void setUser(User user){
 		this.user = user;
 	}
-	
+
 	public int getViewCount(){
 		return this.viewCount;
 	}
-	
+
 	public void setViewCount(int viewCount){
 		this.viewCount = viewCount;
 	}
-	
+
 	public int getTotalVotes(){
 		return this.totalVotes;
 	}
-	
+
 	public void setTotalVotes(int totalVotes){
 		this.totalVotes = totalVotes;
 	}
-	
+
 	public List< Vote > getVotes() { return votes; }
 	public void setVotes( List< Vote > votes ) { this.votes = votes; }
-	
+
 	public List< Comment > getComments() { return comments; }
 	public void setComments( List< Comment > comments ) { this.comments = comments; }
-	
+
 	public List< Answer > getAnswers() { return answers; }
 	public void setAnswers( List< Answer > answers ) { this.answers = answers; }
 

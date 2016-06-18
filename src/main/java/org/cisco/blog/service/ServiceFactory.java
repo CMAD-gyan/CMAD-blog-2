@@ -6,10 +6,10 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 public class ServiceFactory {
-	
-	
+
+
 	private static ThreadLocal<Datastore> mongoTL = new ThreadLocal<Datastore>();
-	
+
 	/**
 	 * Method to retrieve a mongo database client from the thread local storage
 	 * @return
@@ -17,7 +17,7 @@ public class ServiceFactory {
 	public static Datastore getMongoDB(){
 		if(mongoTL.get()==null){
 			MongoClientURI connectionString = new MongoClientURI("mongodb://162.222.181.52:27017");
-//			MongoClientURI connectionString = new MongoClientURI("mongodb://vm-ajchande-001.cisco.com:27017");
+			//			MongoClientURI connectionString = new MongoClientURI("mongodb://vm-ajchande-001.cisco.com:27017");
 			MongoClient mongoClient = new MongoClient(connectionString);	
 			Morphia morphia = new Morphia();
 			//morphia.mapPackage("com.mysocial.model");
@@ -29,5 +29,5 @@ public class ServiceFactory {
 		}
 		return mongoTL.get();
 	}
-	
+
 }

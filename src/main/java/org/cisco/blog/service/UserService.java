@@ -15,32 +15,32 @@ import org.cisco.blog.model.User;
 
 @Path("/users")
 public class UserService {
-	
+
 	@GET
 	@Secured
 	@Produces({MediaType.APPLICATION_JSON})
 	public List<User> getAllUser( @Context SecurityContext securityContext) {
-		
+
 		if (!securityContext.getUserPrincipal().getName().equals("admin"))
 			throw  new NotAuthorizedException("You Don't Have Permission");
-			
+
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<User> user = dataStore.createQuery(User.class).order("-score").asList();
-		
+
 		for (int i = 0; i < user.size(); i++) {
 			user.get(i).setPassword(null);
 		}
 		return user;
 	}
 
-	
-    //get user by Id
+
+	//get user by Id
 	@GET
 	@Secured
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
 	public User getUserById(@PathParam("param") String id,  
-			                @Context SecurityContext securityContext) {
+			@Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		User user = null;
 
@@ -50,7 +50,7 @@ public class UserService {
 		} catch ( Exception e) {
 			throw  new ForbiddenException("Not found Error");
 		}
-		
+
 		if (user == null) {
 			throw  new NotAuthorizedException("Invalid user");
 		}
@@ -64,8 +64,8 @@ public class UserService {
 			throw  new NotAuthorizedException("You Don't Have Permission");
 		}
 	}
-	
-	
+
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
@@ -73,7 +73,7 @@ public class UserService {
 		//check if create of update
 		//boolean update = false;
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		
+
 		if ( user.getUsername() == null||
 				user.getName() == null ||
 				user.getPassword() == null ||
@@ -81,12 +81,12 @@ public class UserService {
 				!user.isValidEmailAddress(user.getEmail()) ) {
 			throw  new  NotAllowedException("Invalid form ");
 		}
-		
+
 		user.setUsername(user.getUsername().toLowerCase());
-		
+
 		User userdb = dataStore.find(User.class).field("username").equal(
-				                user.getUsername()).get();
-		
+				user.getUsername()).get();
+
 		if (userdb == null) {
 			user.setCreateTime();
 			user.setUpdateTime();
@@ -101,7 +101,7 @@ public class UserService {
 		}
 		return "Ok";
 	}
-	
+
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
@@ -109,8 +109,8 @@ public class UserService {
 	public String editUser(User user, @Context SecurityContext securityContext){
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
-		
-		
+
+
 		if(user.getUsername() == null) {
 			user.setUsername(username.toLowerCase());
 		} else {
@@ -118,24 +118,24 @@ public class UserService {
 			if (!user.getUsername().equals(username))
 				throw new  NotAuthorizedException("Passed username and actual are not matching");
 		}
-		
+
 		User userdb = dataStore.find(User.class).field("username").equal(
-				                user.getUsername()).get();
-		
+				user.getUsername()).get();
+
 		if (userdb == null) 
 			throw  new BadRequestException("Unknown Error");
-		
+
 		//Old user either password change or email change
 		if ( (user.getPassword() == null) && (user.getEmail() == null) )
 			throw  new BadRequestException("Unknown Error");
-			
-		
+
+
 		if (user.getPassword() != null) 
 			userdb.setPassword(user.getPassword());
-		
+
 		if (user.getEmail() != null && user.isValidEmailAddress(user.getEmail()))
 			userdb.setEmail(user.getEmail());	
-		
+
 		userdb.setUpdateTime();
 		try {
 			dataStore.save(userdb);
@@ -145,25 +145,25 @@ public class UserService {
 		return "Ok";
 	}
 
-	
+
 	//delete user
 	@DELETE
 	@Secured
 	@Path("/{param}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String deleteUserById(@PathParam("param") String id,  
-			                @Context SecurityContext securityContext) {
+			@Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
 		User user = null;
-		
+
 		try {
 			oid = new ObjectId(id);
 			user =  dataStore.get(User.class, oid);
 		} catch ( Exception e) {
 			throw  new ForbiddenException("Not found Error");
 		}
-		
+
 		if (user == null) {
 			throw  new ForbiddenException("Not found Error");
 		}

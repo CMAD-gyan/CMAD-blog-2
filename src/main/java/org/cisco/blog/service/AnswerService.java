@@ -24,52 +24,52 @@ import org.cisco.blog.model.*;
 
 @Path("/answers")
 public class AnswerService {
-	
+
 	private void fixQuestionDisplay(Question question)
 	{
 		question.getUser().setPassword("xxxxxxxxx");
 		for ( int i=0; i < question.getComments().size(); i++) {
 			question.getComments().get(i).getUser().setPassword("XXXXX");
 		}
-		
+
 		for ( int i=0; i < question.getAnswers().size(); i++) {
 			question.getAnswers().get(i).getUser().setPassword("XXXXX");
 		}
 		question.setVotes(null);
 	}
-	
+
 	@PUT
 	@Secured
 	@Path("/{param}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response setAnswerByQuestionId(Answer ans,
-			                           @PathParam("param") String id,
-			                           @Context SecurityContext securityContext) {
+	public Response setAnswerByQuestionId(Answer ans,
+			@PathParam("param") String id,
+			@Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
 		boolean update = false;
 		int index;
-		
+
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		Question question =  dataStore.get(Question.class,oid);
 		if (question == null){
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		String username = securityContext.getUserPrincipal().getName();
 		User user =  dataStore.find(User.class).field("username").equal(username).get();
-		
+
 		List< Answer > answers = question.getAnswers();
-		
+
 		if ( answers == null ) 
 			answers = new ArrayList <Answer>();
-		
+
 		//iterate to see of user had already answered something  here 
 
 		for (index = 0; index < answers.size(); index++) {
@@ -82,18 +82,18 @@ public class AnswerService {
 		if (update) {
 			answers.get(index).setText(ans.getText());
 			answers.get(index).setUpdateTime();
-			
+
 		} else {
 			Answer answer = new Answer(ans.getText(), username, user);
 			answers.add(answer);
 			question.setAnswers(answers);
 		}
-		
+
 		dataStore.save(answers);
 		dataStore.save(question);
 		return Response.status(Response.Status.OK).entity(question).build();
 	}
-	
+
 	@DELETE
 	@Secured
 	@Path("/{questionId}")
@@ -107,23 +107,23 @@ public class AnswerService {
 		} catch (Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		Question question =  dataStore.get(Question.class, oid);
 		if (question == null) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		String username = securityContext.getUserPrincipal().getName();
-		
+
 		if (question.getAnswers() != null) {
 			List<Answer> list = question.getAnswers();
 			for (Iterator<Answer> iterator = list.iterator(); iterator.hasNext();) {
 				Answer answer = iterator.next();
-			    if (answer.getUserName().equals(username)) {
-			    	answerOid = new ObjectId(answer.getId());
-			    	iterator.remove();
-			    	
-			    }
+				if (answer.getUserName().equals(username)) {
+					answerOid = new ObjectId(answer.getId());
+					iterator.remove();
+
+				}
 			}
 		}
 		dataStore.save(question);
@@ -140,35 +140,35 @@ public class AnswerService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response postComment(Comment com, 
-			                @PathParam("param") String id,
-	        				@Context SecurityContext securityContext ) {
+			@PathParam("param") String id,
+			@Context SecurityContext securityContext ) {
 		int i,j=0;
 		boolean update = false;
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		String username = securityContext.getUserPrincipal().getName();
 		ObjectId  oid = null;
-		
+
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		Answer ans =  dataStore.get(Answer.class, oid);
-		
+
 		//Question question =  dataStore.find(Question.class).field("title").equal(ques.getTitle()).get();
-		
-		
+
+
 		if (ans == null){
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-	
+
 		List <Comment> comment = ans.getComments();
-		
+
 		if (comment == null) {
 			comment = new ArrayList <Comment>();
 		}
-		
+
 		for (i = 0; i < comment.size(); i++) {
 			if (comment.get(i).getUsername().equals(username)) {
 				update = true;
@@ -176,7 +176,7 @@ public class AnswerService {
 				break;
 			}
 		}
-		
+
 		if (update) {
 			comment.get(j).setText(com.getText());
 			comment.get(j).setUpdateTime();
@@ -187,16 +187,16 @@ public class AnswerService {
 			comment.add(newComment);
 			ans.setComments(comment);
 		}
-		
-		
+
+
 		dataStore.save(ans);
 		Question q = dataStore.createQuery(Question.class).field("answers").hasThisElement(ans).get();
-		
+
 		if (q == null) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 		fixQuestionDisplay(q);
-		
+
 		if (update) {
 			return Response.status(Response.Status.OK).entity(q).build();
 		} else {
@@ -210,26 +210,26 @@ public class AnswerService {
 	@Path("/{param}/comments")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteComment(@PathParam("param") String id,
-	        					@Context SecurityContext securityContext ) {
+			@Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
 		int i;
 		boolean found = false;
-		
+
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		Answer anwser =  dataStore.get(Answer.class, oid);
-		
+
 		if (anwser == null) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		List <Comment> comment = anwser.getComments();
-			
+
 		if (comment != null) { 
 			for (i = 0; i < comment.size(); i++) {
 				if (comment.get(i).getUsername().equals(username)) {
@@ -237,16 +237,16 @@ public class AnswerService {
 					break;
 				}
 			}
-			
+
 			if (found == true) {
 				comment.remove(i);
 				anwser.setComments(comment);
 				dataStore.save(anwser);
 			}
 		}
-		
+
 		Question q = dataStore.createQuery(Question.class).field("answers").hasThisElement(anwser).get();
-		
+
 		if (q == null) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
@@ -302,7 +302,7 @@ public class AnswerService {
 		answer.setTotalVotes(totalVote);
 		dataStore.save(answer);
 		answer.getUser().setPassword("xxxxxxx");
-		
+
 		return Response.status(Response.Status.OK).entity(totalVote).build();
 	}
 

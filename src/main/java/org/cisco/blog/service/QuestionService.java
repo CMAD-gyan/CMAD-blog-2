@@ -27,28 +27,28 @@ import org.cisco.blog.model.*;
 
 @Path("/questions")
 public class QuestionService {
-	
-	
+
+
 	private void fixQuestionDisplay(Question question)
 	{
 		question.getUser().setPassword("xxxxxxxxx");
 		for ( int i=0; i < question.getComments().size(); i++) {
 			question.getComments().get(i).getUser().setPassword("XXXXX");
 		}
-		
+
 		for ( int i=0; i < question.getAnswers().size(); i++) {
 			question.getAnswers().get(i).getUser().setPassword("XXXXX");
 		}
 		question.setVotes(null);
 	}
-	
+
 	@PUT
 	@Secured
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response createUpdateQuestion(Question ques, 
- 			@Context SecurityContext securityContext, 
- 			@Context UriInfo uriInfo){
+	public Response createUpdateQuestion(Question ques, 
+			@Context SecurityContext securityContext, 
+			@Context UriInfo uriInfo){
 		Question question = null;
 		User user;
 		String username = securityContext.getUserPrincipal().getName();
@@ -59,7 +59,7 @@ public class QuestionService {
 		ques.setUsername(username);
 
 		question =  dataStore.find(Question.class).field("title").equal(ques.getTitle()).get();
-		
+
 		if (question == null) {
 			user =  dataStore.find(User.class).field("username").equal(username).get();
 			ques.setUser(user);
@@ -79,11 +79,11 @@ public class QuestionService {
 			}
 		}
 	}
-		
+
 	@GET
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
-    public Response getQuestionById(@PathParam("param") String id) {
+	public Response getQuestionById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
 		Question question = null;
@@ -92,20 +92,20 @@ public class QuestionService {
 		} catch(Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		question =  dataStore.get(Question.class, oid);
-		
+
 		if (question != null) {
 			fixQuestionDisplay(question);
 			return Response.status(Response.Status.OK).entity(question).build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
-		
+
 	@POST
 	@Path("/{param}/view_incrementer")
 	@Produces({MediaType.TEXT_PLAIN})
-    public Response incViewCountById(@PathParam("param") String id) {
+	public Response incViewCountById(@PathParam("param") String id) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
 		Question question = null;
@@ -114,9 +114,9 @@ public class QuestionService {
 		} catch(Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		question =  dataStore.get(Question.class, oid);
-		
+
 		if (question != null) {
 			question.setViewCount(question.getViewCount() + 1);
 			dataStore.save(question);
@@ -124,7 +124,7 @@ public class QuestionService {
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
-	
+
 	@POST
 	@Path("/search/length")
 	@Consumes({MediaType.TEXT_PLAIN})
@@ -135,19 +135,19 @@ public class QuestionService {
 		int size  = q.asList().size();
 		return size;
 	}	
-	
+
 	@POST
 	@Path("/search")
 	@Produces({MediaType.APPLICATION_JSON})
 	@Consumes({MediaType.TEXT_PLAIN})
-    public Response getQuestionBySearch(String search_string,
+	public Response getQuestionBySearch(String search_string,
 			@QueryParam("offset") String offset,
 			@QueryParam("length") String length) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		try {
 			Query<Question> q = dataStore.createQuery(Question.class).search(search_string);
 			List<Question> ques = null;
-			
+
 			if (offset == null && length == null) {
 				ques = q.order("-viewCount").asList();
 			} else {
@@ -167,7 +167,7 @@ public class QuestionService {
 			return Response.status(Response.Status.NO_CONTENT).build();
 		}
 	}	
-	
+
 	@GET
 	@Path("/length")
 	@Produces({MediaType.TEXT_PLAIN})
@@ -177,15 +177,15 @@ public class QuestionService {
 		int size = q.asList().size();
 		return size;
 	}
-	
-	
+
+
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	public Response getallQuestion( @QueryParam("offset") String offset,
-									@QueryParam("length") String length){
+			@QueryParam("length") String length){
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		List<Question> ques = null;
-		
+
 		try {
 			if (offset == null && length == null) {
 				ques = dataStore.createQuery(Question.class).order("-viewCount").asList();
@@ -200,7 +200,7 @@ public class QuestionService {
 					ques.get(i).setVotes(null);
 					ques.get(i).setUser(null);
 				}
-				
+
 				if (ques.size() > 0) {
 					return Response.status(Response.Status.OK).entity(ques).build();
 				}
@@ -216,32 +216,32 @@ public class QuestionService {
 	@Path("/{param}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response deleteQuestionById(@PathParam("param") String id,
-			                       @Context SecurityContext securityContext) {
+			@Context SecurityContext securityContext) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid;
 		Question question = null;
-		
+
 		try {
 			oid =  new ObjectId(id);
 		} catch(Exception e) {
 			return Response.status(Response.Status.OK).entity("Successfully Deleted question").build();
 		}
-		
+
 		question =  dataStore.get(Question.class, oid);
 
 		question =  dataStore.get(Question.class, oid);
 		if (question != null){
 			if( securityContext.getUserPrincipal().getName().equals("admin") || 
 					securityContext.getUserPrincipal().getName().equals(
-							             question.getUser().getUsername()))	{
-				
+							question.getUser().getUsername()))	{
+
 				for ( int i=0; i < question.getAnswers().size(); i++) {
 					ObjectId idAns =  new ObjectId(question.getAnswers().get(i).getId());
 					dataStore.delete(Answer.class, idAns);
 				}	
 				dataStore.delete(Question.class, oid);
 				return Response.status(Response.Status.OK).entity("Successfully Deleted question").build();
-				
+
 			}else {
 				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}	
@@ -255,8 +255,8 @@ public class QuestionService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response postComment(Comment com, 
-			                @PathParam("param") String id,
-            				@Context SecurityContext securityContext ) {
+			@PathParam("param") String id,
+			@Context SecurityContext securityContext ) {
 		int i,j=0;
 		boolean update = false;
 		Datastore dataStore = ServiceFactory.getMongoDB();
@@ -267,24 +267,24 @@ public class QuestionService {
 		} catch (Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		Question question =  dataStore.get(Question.class, oid);
-		
+
 		if (question == null){
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
 		List <Comment> comment = question.getComments();
-		
+
 		for (i = 0; i < comment.size(); i++) {
-			
+
 			if (comment.get(i).getUsername().equals(username)) {
 				update = true;
 				j = i;
 				break;
 			}
 		}
-		
+
 		if (update) {
 			//EDIT case
 			comment.get(j).setText(com.getText());
@@ -303,29 +303,29 @@ public class QuestionService {
 			return Response.status(Response.Status.CREATED).entity(question).build();
 		}
 	}
-	
+
 	@DELETE
 	@Secured
 	@Path("/{param}/comments")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteComment(@PathParam("param") String id,
-            					@Context SecurityContext securityContext ) {
+			@Context SecurityContext securityContext ) {
 		String username = securityContext.getUserPrincipal().getName();
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid = null;
 		int i;
 		boolean found = false;
-		
+
 		try {
 			oid =  new ObjectId(id);
 		} catch (Exception e) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		Question question =  dataStore.get(Question.class, oid);
-		
+
 		if (question != null) {
 			List <Comment> comment = question.getComments();
-				
+
 			for (i = 0; i < comment.size(); i++) {
 				if (comment.get(i).getUsername().equals(username)) {
 					found = true;
@@ -339,90 +339,90 @@ public class QuestionService {
 			}
 			fixQuestionDisplay(question);
 			return Response.status(Response.Status.OK).entity(question).build();
-			
+
 		} else {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	}
-	
 
-private Response postVote(String id,
-			             SecurityContext securityContext,
-			             boolean upvote ) {	
-	String username = securityContext.getUserPrincipal().getName();
-	Datastore dataStore = ServiceFactory.getMongoDB();
-	ObjectId  oid = null;
-	
-	int i;
-	int totalVote =0;
-	boolean found = false;
-	
-	try {
-		oid =  new ObjectId(id);
-	} catch (Exception e) {
-		return Response.status(Response.Status.NOT_FOUND).build();
-	}
-	
-	Question question =  dataStore.get(Question.class, oid);
-	
-	if (question == null){
-		return Response.status(Response.Status.NOT_FOUND).build();
-	}
 
-	List <Vote> votes = question.getVotes();
-	
-	if (votes == null) 
-		votes = new ArrayList <Vote>();
-	
-	for (i = 0; i < votes.size(); i++) {
-		if (votes.get(i).getUsername().equals(username)) {
-			votes.get(i).setVote( upvote ? 1 : -1);
-			question.setVotes(votes);
-			found = true;
+	private Response postVote(String id,
+			SecurityContext securityContext,
+			boolean upvote ) {	
+		String username = securityContext.getUserPrincipal().getName();
+		Datastore dataStore = ServiceFactory.getMongoDB();
+		ObjectId  oid = null;
+
+		int i;
+		int totalVote =0;
+		boolean found = false;
+
+		try {
+			oid =  new ObjectId(id);
+		} catch (Exception e) {
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		totalVote +=  votes.get(i).getVote();
-	}
-	
-    //if vote from new user
-	if (found == false) {
-		User user =  dataStore.find(User.class).field("username").equal(username).get();
-		Vote vote = new Vote(upvote ? 1 : -1, username,user); 
-		votes.add(vote);
-		totalVote +=  vote.getVote();
-	}
-	
-	question.setTotalVotes(totalVote);
-	dataStore.save(question);
-	fixQuestionDisplay(question);
-	return Response.status(Response.Status.OK).entity(totalVote).build();
-}
 
-		
+		Question question =  dataStore.get(Question.class, oid);
+
+		if (question == null){
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		List <Vote> votes = question.getVotes();
+
+		if (votes == null) 
+			votes = new ArrayList <Vote>();
+
+		for (i = 0; i < votes.size(); i++) {
+			if (votes.get(i).getUsername().equals(username)) {
+				votes.get(i).setVote( upvote ? 1 : -1);
+				question.setVotes(votes);
+				found = true;
+			}
+			totalVote +=  votes.get(i).getVote();
+		}
+
+		//if vote from new user
+		if (found == false) {
+			User user =  dataStore.find(User.class).field("username").equal(username).get();
+			Vote vote = new Vote(upvote ? 1 : -1, username,user); 
+			votes.add(vote);
+			totalVote +=  vote.getVote();
+		}
+
+		question.setTotalVotes(totalVote);
+		dataStore.save(question);
+		fixQuestionDisplay(question);
+		return Response.status(Response.Status.OK).entity(totalVote).build();
+	}
+
+
 	@POST
 	@Secured
 	@Path("/{param}/vote_down")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response postVoteDown(@PathParam("param") String id,
-			 @Context SecurityContext securityContext ) {
-		
+			@Context SecurityContext securityContext ) {
+
 		return postVote(id, securityContext, false );
-		
+
 	}
-	
+
 	@POST
 	@Secured
 	@Path("/{param}/vote_up")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response postVoteUp(@PathParam("param") String id,
-            			 @Context SecurityContext securityContext ) {
+			@Context SecurityContext securityContext ) {
 		return postVote(id, securityContext, true );
 	}
-	}
-	
-	
-	
-	
-	
-	
-	
+}
+
+
+
+
+
+
+
 

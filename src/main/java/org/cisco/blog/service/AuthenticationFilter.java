@@ -25,7 +25,7 @@ import java.sql.Timestamp;
 public class AuthenticationFilter implements ContainerRequestFilter {
 	String username = null;
 	//String id = null;
-	
+
 	void validateToken ( String token) {
 		Datastore dataStore = ServiceFactory.getMongoDB();
 		ObjectId  oid =  new ObjectId(token);
@@ -37,60 +37,60 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		sess.setLastLoginTime(new Timestamp(System.currentTimeMillis()));
 		//update the last active time 
 		dataStore.save(sess);
-		
+
 	}
-	
-    public void filter(ContainerRequestContext requestContext) throws IOException {
 
-        // Get the HTTP Authorization header from the request
-        String authorizationHeader = 
-            requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+	public void filter(ContainerRequestContext requestContext) throws IOException {
 
-        // Check if the HTTP Authorization header is present and formatted correctly 
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new NotAuthorizedException("Authorization header must be provided");
-        }
+		// Get the HTTP Authorization header from the request
+		String authorizationHeader = 
+				requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-        // Extract the token from the HTTP Authorization header
-        String token = authorizationHeader.substring("Bearer".length()).trim();
+		// Check if the HTTP Authorization header is present and formatted correctly 
+		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+			throw new NotAuthorizedException("Authorization header must be provided");
+		}
 
-        try {
-            // Validate the token
-            validateToken(token);
+		// Extract the token from the HTTP Authorization header
+		String token = authorizationHeader.substring("Bearer".length()).trim();
 
-        } catch (Exception e) {
-            requestContext.abortWith(
-                Response.status(Response.Status.UNAUTHORIZED).build());
-        }
-        
-        requestContext.setSecurityContext(new SecurityContext() {
-        	 //@Override
-             public Principal getUserPrincipal() {
-            	 return new Principal() {
+		try {
+			// Validate the token
+			validateToken(token);
 
-                     //@Override
-                     public String getName() {
-                         return username;
-                     }
-                 };
-        		 
-        	 }
-        	 
-             //@Override
-             public boolean isUserInRole(String role) {
-                 return true;
-             }
+		} catch (Exception e) {
+			requestContext.abortWith(
+					Response.status(Response.Status.UNAUTHORIZED).build());
+		}
 
-             //@Override
-             public boolean isSecure() {
-                 return false;
-             }
+		requestContext.setSecurityContext(new SecurityContext() {
+			//@Override
+			public Principal getUserPrincipal() {
+				return new Principal() {
 
-             //@Override
-             public String getAuthenticationScheme() {
-                 return null;
-             }
-        });
-    }
+					//@Override
+					public String getName() {
+						return username;
+					}
+				};
+
+			}
+
+			//@Override
+			public boolean isUserInRole(String role) {
+				return true;
+			}
+
+			//@Override
+			public boolean isSecure() {
+				return false;
+			}
+
+			//@Override
+			public String getAuthenticationScheme() {
+				return null;
+			}
+		});
+	}
 }
 

@@ -17,30 +17,30 @@ public class Session {
 	private ObjectId id;
 	@Indexed(value=IndexDirection.ASC, name="username", unique=true)
 	private String username;
-	
+
 	//Sessio expires after one hour
 	@Indexed(name="user_last_login_time_indx", expireAfterSeconds = 60*60*1)
 	private Date lastLoginTime;
-	
+
 	public Session() {
 	}
-	
+
 	public String getId(){
 		return this.id.toHexString();
 	}
-	
+
 	public String getUsername(){
 		return this.username;
 	}
-	
+
 	public void setUsername( String username){
 		this.username = username;
 	}
-	
+
 	public Date getLastLoginTime(){
 		return this.lastLoginTime;
 	}
-	
+
 	public void setLastLoginTime( Date lastLoginTime){
 		this.lastLoginTime = lastLoginTime;
 	}
