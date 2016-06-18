@@ -12,13 +12,13 @@
         <p>{{currentquestion.text}} </p>  
 		
          <div ng-show="edittext" class="edit">
-        <!-- <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="editText()"></button> -->
-        <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="openEditQuestion()"></button>
+         <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="openEditQuestion()"></button>
 		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deletequestion()"></button>
- </div>
+
  		<button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click="questionDownvote()" style="float: right;"></button>
 		<button class="upvoteimage" data-toggle="tooltip" title="UpVote" type="button"  ng-click="questionUpvote()" style="float: right;"></button>
-         <br>  
+         </div>
+          <br>  
           
         <div class= "addanswer">
           <a href ng-click="openQCommentsForm()"> Add Comment</a>
@@ -36,9 +36,16 @@
  	<h4>{{currentquestion.answers.length}} Answer</h4>
 	 <hr style="border-top: solid 0.1px;" />
   <div ng-repeat="answer in currentquestion.answers"  class="answersection" >
+  <div ng-show="username == '{{answer.userName}}'" class="edit">
+         <button class="imagetest" data-toggle="tooltip" title="Edit" type="button"  ng-click="openEditAnswer(answer.text)"></button>
+		<button class="delimage" data-toggle="tooltip" title="Delete" type="button"  ng-click="deletequestion()"></button>
+
+ 	  </div>
+ 	  <br>
     <p> {{answer.text}}
       <span>answered  By {{answer.userName}} on  {{answer.createTime | date:' HH:mm:ss'}}</span> 
       </p>
+      
       <a href ng-click="openACommentsForm(answer)"> Add Comments</a>
       <div ng-repeat="comment in answer.comments" class="acomment">
          	<p>{{comment.text}}

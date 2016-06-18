@@ -151,15 +151,17 @@
 		$scope.questionid = $routeParams.id;
 		$scope.dataloading = true;
 		$scope.edittext = false;
-
-		$scope.edittextarea = false;
-
+		$scope.editanswer = true;
+		$scope.oldText = "";
+		$scope.oldAnsText = "";
+		$scope.answerText = "";
 		$log.debug($routeParams.id  + "Getting New Detail Blogs..." + $scope.questionid);
 
 		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
 			$log.debug("detail blog="+ response.data);
 			$scope.currentquestion = response.data;
-			$scope.oldText = "";
+			$scope.oldText = $scope.currentquestion.text;
+			
 			if($scope.currentquestion.answers != undefined && $scope.currentquestion.answers.length > 0) {
 				$scope.showanswers = true;
 			} else {
@@ -168,13 +170,12 @@
 			$scope.username= $window.localStorage.getItem("currentUser");
 			if($scope.currentquestion.username != undefined && ($scope.username == $scope.currentquestion.username)) {
 				$scope.edittext = true;
-				$scope.oldText = $scope.currentquestion.text;
 			} else {
 				$scope.edittext = false;
 			}
 			$scope.showansbtn = true;
 			$scope.dataloading = false;
-			$scope.edittextarea =false;
+			
 			$http.post('rest/questions/' + $scope.questionid + '/view_incrementer');
 		}, function(response) {
 
@@ -198,36 +199,20 @@
 		}
 
 		$scope.openEditQuestion = function() {
+			
 			ngDialog.openConfirm({template: 'editQuestionDialog.html',
 			scope: $scope, //Pass the scope object if you need to access in the template,
 			className: 'ngdialog-theme-default custom-width-400'
 			}).then(
 				function(value) {
 					$scope.questionupdate(value)
+			        
 				},
 				function(value) {
 					  $scope.currentquestion.text =  $scope.oldText;
 				}
 			);
 		};
-		
-		$scope.editText = function () {
-
-
-			$scope.username= $window.localStorage.getItem("currentUser");
-
-			if($scope.username == $scope.currentquestion.username) {
-
-				$scope.edittext= false;
-
-				$scope.edittextarea = true;
-			} else {
-				$window.alert("No Previledge to edit the Post");
-				$scope.edittextarea = false;
-				return;
-			}
-			$log.debug("edit text=" + $scope.edittext);
-		}
 
 		$scope.deletequestion = function () {
 			$scope.openDelConfirmForm();
@@ -267,8 +252,9 @@
 					function(response){
 						$log.debug(response.data);
 						//$route.reload();
-						if(response.status == 200 || response.status == 201) {
+						if(response.status == 200) {
 							$scope.currentquestion = response.data;
+							$scope.oldText = $scope.currentquestion.text;
 							console.log("posting the question " );
 						} else if(response.status == 401) {
 							$log.debug("ERROR..." );
@@ -327,7 +313,41 @@
 			);
 		};
 		
-
+$scope.openEditAnswer = function(answerTxt) {
+		$scope.answerText = answerTxt;
+		$scope.oldAnsText = answerTxt;
+			ngDialog.openConfirm({template: 'editAnswerDialog.html',
+			scope: $scope, //Pass the scope object if you need to access in the template,
+			className: 'ngdialog-theme-default custom-width-400'
+			}).then(
+				function(value) {
+					$log.debug("ansTxt=" + value);
+					$log.debug("scope.oldAnsText=" + $scope.oldAnsText);
+					var answer = {
+							"text": value
+					};
+					$scope.addYourAnswer(answer)
+			        
+				},
+				function(value) {
+					$log.debug("Can ansTxt=" + $scope.answerText);
+					$log.debug("value=" + $scope.oldAnsText);
+					  //$scope.currentquestion.answer.text =  $scope.oldAnsText;
+				}
+			);
+		};
+		
+		$scope.answerupdate = function (updatedtext) {
+			$log.debug(updatedtext);
+			var changedques= {
+					"title":  $scope.currentquestion.title,
+					"text": updatedtext
+			};
+			$log.debug("edit text" + changedques);
+			$scope.updatedquestion.text = updatedtext;
+			$scope.updatedquestion.title = $scope.currentquestion.title;
+			$scope.updateBlog(changedques);
+		}
 		$scope.addYourAnswer = function (answer) {
 			$log.debug(answer);
 			$log.debug("=====" + $cookies['token']);
@@ -339,16 +359,15 @@
 					function(response){
 						$log.debug(response.data);
 						//$route.reload();
-						if(response.status == 200 || response.status == 201) {
+						if(response.status == 200) {
 							$scope.currentquestion = response.data;
-							console.log("posting the Answer " );
+							console.log("posting the question " );
 						} else if(response.status == 401) {
 							$log.debug("ERROR..." );
 							$cookies['token'] = "";
 							$scope.username = "";
 							$window.localStorage.setItem("loggedin", false);
 							$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-
 						}  else {
 							console.log("Comment posted respomse was " + response.status  );
 						}
@@ -389,9 +408,9 @@
          		 $scope.username = "";
                  $window.localStorage.setItem("loggedin", false);
                  $rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-             } else {
-					console.log("Comment posted respomse was " + response.status  );
-				}
+         	} else {
+				console.log("Comment posted respomse was " + response.status  );
+			}
          });
 	};
 	
@@ -400,10 +419,10 @@
 		$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 	    $http.post('rest/questions/'+$scope.questionid +"/vote_down")
          .then(function(response){
-        	 $log.debug(response.data);;
+        	 $log.debug(response.data);
+	    	        	 // $route.reload();
          	 if(response.status == 200) {
          		 $scope.currentquestion.totalVotes = response.data;
-         		 console.log("Question downvoted posted successfully" + response.data);
          	 } else if(response.status == 401) {
          		 $log.debug("ERROR..." );
          		 $cookies['token'] = "";
@@ -440,9 +459,10 @@
 			.then(
 					function(response){
 						$log.debug(response.data);
-						if(response.status == 200 || response.status == 201) {
+						//$route.reload();
+						if(response.status == 200) {
 							$scope.currentquestion = response.data;
-							console.log("Comment posted successfully" );
+							console.log("posting the question " );
 						} else if(response.status == 401) {
 							$log.debug("ERROR..." );
 							$cookies['token'] = "";
@@ -454,6 +474,7 @@
 							console.log("Comment posted respomse was " + response.status  );
 						}
 						//$location.path('/viewdetailblog/' + $scope.questionid);
+
 					}
 			);
 		};
@@ -486,16 +507,15 @@
 			function(response){
 				$log.debug(response.data);
 				//$route.reload();
-				if(response.status == 200 || response.status == 201) {
+				if(response.status == 200) {
 					$scope.currentquestion = response.data;
-					console.log("Answer Comment posted successfully" );
+					console.log("posting the question " );
 				} else if(response.status == 401) {
 					$log.debug("ERROR..." );
 					$cookies['token'] = "";
 					$scope.username = "";
 					$window.localStorage.setItem("loggedin", false);
 					$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-
 				} else {
 					console.log("Comment posted respomse was " + response.status  );
 				}
@@ -511,11 +531,15 @@
 		$scope.loading = true;
 		$scope.shownext = false;
 		$scope.showprev = false;
+		 $scope.addOper= false;
 
 		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-		console.log("Getting Blogs token=========" + $log + " " + $rootScope + " "  + $location + " "  + $routeParams.id  );
-
-		if($routeParams.id == undefined  ) {
+		console.log("Getting Blogs token========="  + $location.url() + " "  + $location.url().indexOf('addblog')  );
+		if($location.url().indexOf('addblog') > -1){    
+			$scope.addOper= true;
+	           
+	    }
+		if(!($scope.addOper) && $routeParams.id == undefined  ) {
 			$http({ method: 'GET',
 				url:'rest/questions/length' 
 			}).then(function(response) {
@@ -524,7 +548,7 @@
 				$routeParams.id = 1;
 				$location.path('/viewallblogs/'+ $routeParams.id);
 			})
-		} else 	if($routeParams.id != undefined  ) {
+		} else 	if(!($scope.addOper) && $routeParams.id != undefined  ) {
 			$scope.blogCurrentOffset = ($routeParams.id-1) * $scope.maxLengthPerPage;
 			$scope.blogCurrentLength = $scope.maxLengthPerPage;
 			if ( ($rootScope.blogLength - $scope.blogCurrentOffset )    <  $scope.maxLengthPerPage) {
@@ -709,8 +733,10 @@
 
 
 		$scope.setPage = function () {
+
 			$log.debug("Change search Path" +  $routeParams.searchkey);
 			$location.path('/viewallblogs/tagged/'+ $routeParams.searchkey+ "/" + $scope.nextpage );
+
 		};
 
 		$scope.setPrevPage = function () {
