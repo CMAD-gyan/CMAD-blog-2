@@ -692,7 +692,7 @@ $scope.openEditAnswer = function(answerTxt) {
 				$scope.showprev = false;
 				$scope.nextpage = 2;
 				$scope.prevpage = 0;
-				$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
+				$scope.searchkey = $routeParams.searchkey; 
 				console.log("Search key=" + $scope.searchkey);
 				$http({
 					method: 'POST',
@@ -725,7 +725,7 @@ $scope.openEditAnswer = function(answerTxt) {
 				console.log("ques length  is " + $rootScope.quesLength); 
 				$scope.nextpage = (parseInt( $routeParams.id) + 1);
 				$scope.prevpage =  (parseInt( $routeParams.id) - 1);;
-				$scope.searchkey = "\"" +$routeParams.searchkey +"\""; 
+				$scope.searchkey = $routeParams.searchkey; 
 				console.log("printing key=" + $scope.searchkey); 
 				$http({
 					method: 'POST',
