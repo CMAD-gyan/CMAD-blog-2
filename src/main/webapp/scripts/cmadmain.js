@@ -52,10 +52,16 @@
 
 	app.controller('UserController',function($http, $log, $scope, $window, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
-		$rootScope.loginstatus = false;
+//		$rootScope.loginstatus = false;
 		var controller = this;
 		$scope.users=[];
 		$scope.loading = true;
+		if($window.localStorage.getItem("loggedin") === "true"){
+			$rootScope.loginstatus = true;
+		} else {
+			$rootScope.loginstatus = false;
+		}
+		$log.debug("loginstatus value after refresh and if cond'n: "+ $rootScope.loginstatus);
 		$scope.getUserOnLogin = function(user) {
 			$log.debug(user);
 			$scope.showEditForm=false;
@@ -560,7 +566,7 @@ $scope.openEditAnswer = function(answerTxt) {
 		$scope.showprev = false;
 		 $scope.addOper= false;
 
-		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+//		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 		console.log("Getting Blogs token========="  + $location.url() + " "  + $location.url().indexOf('addblog')  );
 		if($location.url().indexOf('addblog') > -1){    
 			$scope.addOper= true;
@@ -673,7 +679,7 @@ $scope.openEditAnswer = function(answerTxt) {
 		$scope.prevpage = 1;
 
 		$log.debug("Getting  Search Results..." + $rootScope.loginstatus);
-		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
+//		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 		console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
 
 		if($routeParams.searchkey == undefined || $routeParams.searchkey == "") {
