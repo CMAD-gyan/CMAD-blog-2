@@ -91,7 +91,10 @@ public class AnswerService {
 
 		dataStore.save(answers);
 		dataStore.save(question);
-		return Response.status(Response.Status.OK).entity(question).build();
+		if (update)
+			return Response.status(Response.Status.OK).entity(question).build();
+		else
+			return Response.status(Response.Status.CREATED).entity(question).build();
 	}
 
 	@DELETE
