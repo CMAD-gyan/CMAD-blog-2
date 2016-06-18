@@ -1,8 +1,14 @@
 <div  ng-hide="dataloading"  class="detailques">
     <h2> {{currentquestion.title}} </h2>
-      <h3><span>Asked By {{currentquestion.username}} </span></h3>
-      <hr>
-      <h3><span>&nbsp;-- Votes: {{currentquestion.totalVotes}}</span><span> &nbsp;-- Viewed {{currentquestion.viewCount}} times </span> <span> on {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}}</span></h3>
+      <h3><span> Asked By {{currentquestion.username}} on 
+      {{currentquestion.createTime | date:'M/d/yyyy HH:mm:ss'}} 
+      </span> 
+      </h3>
+      <hr style="border-bottom: none;">
+      <h2><span>&nbsp;-- Votes: {{currentquestion.totalVotes}}</span>
+      <span> &nbsp; Viewed {{currentquestion.viewCount}} times </span> 
+      </h2>
+      <br>
         <p>{{currentquestion.text}} </p>  
 		
          <div ng-show="edittext" class="edit">
@@ -12,12 +18,9 @@
  </div>
  		<button class="downvoteimage" data-toggle="tooltip" title="DownVote" type="button"  ng-click="questionDownvote()" style="float: right;"></button>
 		<button class="upvoteimage" data-toggle="tooltip" title="UpVote" type="button"  ng-click="questionUpvote()" style="float: right;"></button>
-         <br> 
-		   <div ng-show="edittextarea">
-           <textarea cols=55 rows=10 id="questiontext"  ng-model="currentquestion.text" required="required"></textarea> <br />
-            <input type="button" id="questionedit" value="Edit" ng-click="questionupdate(currentquestion.text)"></input>
-             </div>  
-            <div class= "addanswer">
+         <br>  
+          
+        <div class= "addanswer">
           <a href ng-click="openQCommentsForm()"> Add Comment</a>
          </div>
          <div ng-repeat="comment in currentquestion.comments" class="qcomment" >

@@ -117,6 +117,7 @@ body.ngdialog-open {
     width: 300px;
     height: 150px;
 }
-.ngdialog.ngdialog-theme-default.custom-width-900 .ngdialog-content {
-    width: 900px;
+.ngdialog.ngdialog-theme-default.custom-width-400 .ngdialog-content {
+    width: 400px;
+    height: 280px;
 }

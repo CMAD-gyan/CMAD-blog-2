@@ -159,7 +159,7 @@
 		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
 			$log.debug("detail blog="+ response.data);
 			$scope.currentquestion = response.data;
-
+			$scope.oldText = "";
 			/* $log.debug("detail blog="+ $scope.currentquestion.username + "-" + $scope.currentquestion.title);
 			  $log.debug("Successful data retrieved:" +   $scope.currentquestion.answers.length);
 			 */ 
@@ -171,6 +171,7 @@
 			$scope.username= $window.localStorage.getItem("currentUser");
 			if($scope.currentquestion.username != undefined && ($scope.username == $scope.currentquestion.username)) {
 				$scope.edittext = true;
+				$scope.oldText = $scope.currentquestion.text;
 			} else {
 				$scope.edittext = false;
 			}
@@ -203,14 +204,14 @@
 			
 			ngDialog.openConfirm({template: 'editQuestionDialog.html',
 			scope: $scope, //Pass the scope object if you need to access in the template,
-//			className: 'ngdialog-theme-default custom-width-100'
+			className: 'ngdialog-theme-default custom-width-400'
 			}).then(
 				function(value) {
 					$scope.questionupdate(value)
 			        
 				},
 				function(value) {
-					 $log.debug("Dont delete blog=" + $scope.currentquestion.id);
+					  $scope.currentquestion.text =  $scope.oldText;
 				}
 			);
 		};

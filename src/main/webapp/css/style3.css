@@ -15,15 +15,20 @@
 }
 .detailques a {
 	font:normal 12px Georgia, "Times New Roman", Times, serif;
-	color:#778899;
+	color:#778899; 
 	text-decoration:none;
 }
-.detailques h3 span {
-	font:normal 12px Georgia, "Times New Roman", Times, serif;
-	color:#959595;
+.detailques h2 span {
+	font:normal 14px Georgia, "Times New Roman", Times, serif;
+	color:#B8860B;
 	float:right;
 }
 
+.detailques h3 span {
+	font:normal 12px Georgia, "Times New Roman", Times, serif;
+	 color:#959595;
+	float:right;
+}
 .answersection span {
 	font:normal 12px Georgia, "Times New Roman", Times, serif;
 	color:#959595;
