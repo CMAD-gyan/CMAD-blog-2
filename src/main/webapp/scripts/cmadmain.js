@@ -252,7 +252,7 @@
 					function(response){
 						$log.debug(response.data);
 						//$route.reload();
-						if(response.status == 200) {
+						if(response.status == 200 || response.status == 201) {
 							$scope.currentquestion = response.data;
 							$scope.oldText = $scope.currentquestion.text;
 							console.log("posting the question " );
@@ -358,8 +358,7 @@ $scope.openEditAnswer = function(answerTxt) {
 			.then(
 					function(response){
 						$log.debug(response.data);
-						//$route.reload();
-						if(response.status == 200) {
+						if(response.status == 200 || response.status == 201) {
 							$scope.currentquestion = response.data;
 							console.log("posting the question " );
 						} else if(response.status == 401) {
@@ -399,8 +398,7 @@ $scope.openEditAnswer = function(answerTxt) {
 	    $http.post('rest/questions/'+$scope.questionid +"/vote_up")
          .then(function(response){
         	 $log.debug(response.data);
-	    	        	 // $route.reload();
-         	 if(response.status == 200) {
+        	 if(response.status == 200 || response.status == 201) {
          		 $scope.currentquestion.totalVotes = response.data;
          	 } else if(response.status == 401) {
          		 $log.debug("ERROR..." );
@@ -459,8 +457,7 @@ $scope.openEditAnswer = function(answerTxt) {
 			.then(
 					function(response){
 						$log.debug(response.data);
-						//$route.reload();
-						if(response.status == 200) {
+						if(response.status == 200 || response.status == 201) {
 							$scope.currentquestion = response.data;
 							console.log("posting the question " );
 						} else if(response.status == 401) {
@@ -473,8 +470,6 @@ $scope.openEditAnswer = function(answerTxt) {
 						} else {
 							console.log("Comment posted respomse was " + response.status  );
 						}
-						//$location.path('/viewdetailblog/' + $scope.questionid);
-
 					}
 			);
 		};
@@ -506,10 +501,9 @@ $scope.openEditAnswer = function(answerTxt) {
 				.then(
 			function(response){
 				$log.debug(response.data);
-				//$route.reload();
-				if(response.status == 200) {
+				if(response.status == 200 || response.status == 201) {
 					$scope.currentquestion = response.data;
-					console.log("posting the question " );
+					console.log("Answer Comment posted successfully" );
 				} else if(response.status == 401) {
 					$log.debug("ERROR..." );
 					$cookies['token'] = "";
