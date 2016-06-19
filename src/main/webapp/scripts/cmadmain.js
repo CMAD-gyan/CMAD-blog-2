@@ -65,13 +65,16 @@
 	app.controller('UserController',function($http, $log, $scope, $window, $rootScope, $location, $cookies){
 		$rootScope.mypage = 0
 //		$rootScope.loginstatus = false;
+		$rootScope.username = "";
 		var controller = this;
 		$scope.users=[];
 		$scope.loading = true;
 		if($window.localStorage.getItem("loggedin") === "true"){
 			$rootScope.loginstatus = true;
+			$rootScope.username= $window.localStorage.getItem("currentUser");
 		} else {
 			$rootScope.loginstatus = false;
+			$rootScope.username= "";
 		}
 		$log.debug("loginstatus value after refresh and if cond'n: "+ $rootScope.loginstatus);
 		$scope.getUserOnLogin = function(user) {
@@ -176,7 +179,8 @@
 		$scope.oldText = "";
 		$scope.oldAnsText = "";
 		$scope.answerText = "";
-		$log.debug($routeParams.id  + "Getting New Detail Blogs..." + $scope.questionid);
+		$rootScope.username= $window.localStorage.getItem("currentUser");
+		$log.debug($rootScope.username  + "Getting New Detail Blogs..." + $scope.questionid);
 
 		$http.get('rest/questions/' + $scope.questionid).then(function(response) {
 			$log.debug("detail blog="+ response.data);
@@ -583,7 +587,8 @@ $scope.openEditAnswer = function(answerTxt) {
 		 $scope.addOper= false;
 
 //		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
-		console.log("Getting Blogs token========="  + $location.url() + " "  + $location.url().indexOf('addblog')  );
+		 $rootScope.username= $window.localStorage.getItem("currentUser");
+		console.log("Getting Blogs token========="  + $rootScope.username + " "  + $location.url().indexOf('addblog')  );
 		if($location.url().indexOf('addblog') > -1){    
 			$scope.addOper= true;
 	           
@@ -693,8 +698,9 @@ $scope.openEditAnswer = function(answerTxt) {
 		$scope.searchkey = "";
 		
 		$scope.prevpage = 1;
-
-		$log.debug("Getting  Search Results..." + $rootScope.loginstatus);
+		
+		$rootScope.username= $window.localStorage.getItem("currentUser");
+		$log.debug("Getting  Search Results..." + $rootScope.username);
 //		$rootScope.loginstatus = $window.localStorage.getItem("loggedin");
 		console.log("printing token=========" + $window.localStorage.getItem("loggedin"));
 
