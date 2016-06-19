@@ -186,7 +186,7 @@
 			$log.debug("detail blog="+ response.data);
 			$scope.currentquestion = response.data;
 			$scope.oldText = $scope.currentquestion.text;
-			
+			$log.debug("count = " + $scope.currentquestion.viewCount);
 			if($scope.currentquestion.answers != undefined && $scope.currentquestion.answers.length > 0) {
 				$scope.showanswers = true;
 			} else {
@@ -201,7 +201,7 @@
 			$scope.showansbtn = true;
 			$scope.dataloading = false;
 			
-			$http.post('rest/questions/' + $scope.questionid + '/view_incrementer');
+			//$http.post('rest/questions/' + $scope.questionid + '/view_incrementer');
 		}, function(response) {
 
 			$scope.error = response.status;
@@ -377,7 +377,7 @@ $scope.openEditAnswer = function(answerTxt) {
 		$scope.addYourAnswer = function (answer) {
 			$log.debug(answer);
 			$log.debug("=====" + $cookies['token']);
-			$log.debug("Add Answers...");
+			$log.debug("Add Answers ...");
 		
 			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
 			$http.put('rest/answers/'+$scope.questionid, answer)
@@ -386,8 +386,9 @@ $scope.openEditAnswer = function(answerTxt) {
 						$log.debug(response.data);
 						if(response.status == 200 || response.status == 201) {
 							$scope.currentquestion = response.data;
+							
 							$scope.showanswers = true;
-							console.log("posting the answer " );
+							console.log("check the answer " + $scope.currentquestion.answers);
 						} else if(response.status == 401) {
 							$log.debug("ERROR..." );
 							$cookies['token'] = "";
@@ -560,9 +561,13 @@ $scope.openEditAnswer = function(answerTxt) {
 						$http({ url: 'rest/answers/' +  $scope.currentquestion.id, 
 							method: 'DELETE'
 						}).then(function(response) {
-							console.log("del Successful" +response.data);
+							
 							if(response.status == 200 || response.status == 201) {
 								$scope.currentquestion = response.data;
+								console.log("del Successful" +$scope.currentquestion.answers.length );
+								if($scope.currentquestion.answers.length ===0) {
+									$scope.showanswers = false;
+								}
 							
 							}
 						}, function(error) {
@@ -639,6 +644,19 @@ $scope.openEditAnswer = function(answerTxt) {
 			});
 		}
 
+		$scope.incrViewCountOnClick =  function (id) {
+			$log.debug("Increment Count");
+			$http.post('rest/questions/' + id + '/view_incrementer').then(
+					function(response){
+						$log.debug("incremented count .."+ id);
+						$location.path('/viewdetailblog/' + id);
+					}, 
+					function(response){
+						$location.path('/viewdetailblog/' + id);
+					});
+		}
+		
+			
 		$scope.addBlog = function (data) {
 			$log.debug("Add Blogs..." + data + "=====" + $cookies['token']);
 			$http.defaults.headers.common.Authorization = 'Bearer ' + $cookies['token'];
@@ -646,8 +664,8 @@ $scope.openEditAnswer = function(answerTxt) {
 			.then(
 					function(response){
 						$log.debug("Question added .."+ response.data.id);
-
-						$location.path('/viewdetailblog/' + response.data.id);
+						$scope.incrViewCountOnClick(response.data.id);
+						//$location.path('/viewdetailblog/' + response.data.id);
 					}, 
 					function(response){
 						$log.debug("ERROR..." + response.status);  
@@ -781,6 +799,17 @@ $scope.openEditAnswer = function(answerTxt) {
 
 		}
 
+		$scope.incrViewCountOnClick =  function (id) {
+			$log.debug("Increment Count on search");
+			$http.post('rest/questions/' + id + '/view_incrementer').then(
+					function(response){
+						$log.debug("incremented the count .."+ id);
+						$location.path('/viewdetailblog/' + id);
+					}, 
+					function(response){
+						$location.path('/viewdetailblog/' + id);
+					});
+		}
 		
 		$scope.showsearchresult = function(searchkey) {
 			$location.path('/viewallblogs/tagged/'+ searchkey);

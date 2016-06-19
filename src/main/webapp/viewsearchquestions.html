@@ -1,6 +1,6 @@
  <div class="showblog" ng-repeat="question in questions"  >
   
-    <h2> <a href="index.html#/viewdetailblog/{{question.id}}">{{question.title}}</a>
+    <h2> <a ref ng-click="incrViewCountOnClick(question.id)">{{question.title}}</a>
   </h2>
          <p>{{ question.text | limitTo: 100 }}{{questiontext.length > 100 ? '.....' : ''}}</p>
          <p class="post-meta"> Posted by {{question.username}} on {{question.createTime | date:'M/d/yyyy HH:mm:ss'}} </p>
