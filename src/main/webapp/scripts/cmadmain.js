@@ -382,7 +382,8 @@ $scope.openEditAnswer = function(answerTxt) {
 						$log.debug(response.data);
 						if(response.status == 200 || response.status == 201) {
 							$scope.currentquestion = response.data;
-							console.log("posting the question " );
+							$scope.showanswers = true;
+							console.log("posting the answer " );
 						} else if(response.status == 401) {
 							$log.debug("ERROR..." );
 							$cookies['token'] = "";
